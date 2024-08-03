@@ -1,4 +1,4 @@
-package ge.luka.melodia
+package ge.luka.melodia.presentation
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,7 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import ge.luka.melodia.ui.theme.MelodiaTheme
+import ge.luka.melodia.presentation.ui.theme.MelodiaTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

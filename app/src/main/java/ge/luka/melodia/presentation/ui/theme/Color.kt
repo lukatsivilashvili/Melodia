@@ -1,4 +1,4 @@
-package ge.luka.melodia.ui.theme
+package ge.luka.melodia.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
