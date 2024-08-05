@@ -6,7 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import ge.luka.melodia.presentation.ui.MelodiaApp
 import ge.luka.melodia.presentation.ui.theme.MelodiaTheme
-import ge.luka.melodia.presentation.utils.SinglePermissionRequest
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -14,7 +13,6 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MelodiaTheme {
-                SinglePermissionRequest()
                 MelodiaApp()
             }
         }

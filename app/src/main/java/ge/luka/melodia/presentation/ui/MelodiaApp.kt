@@ -36,51 +36,50 @@ fun MelodiaApp() {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     var currentRoute by remember { mutableStateOf<String?>(null) }
 
+    // Callback function to update currentRoute
+    fun updateCurrentRoute(route: String?) {
+        currentRoute = route
+    }
+
     LaunchedEffect(navController) {
-        snapshotFlow { navController.currentBackStackEntry?.destination?.route }
-            .collect { route ->
-                currentRoute = route?.getScreenFromRoute()
-            }
+        snapshotFlow { navController.currentBackStackEntry?.destination?.route }.collect { route ->
+            currentRoute = route?.getScreenFromRoute()
+        }
     }
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            MediumTopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    scrolledContainerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.primaryContainer,
-                ),
-                title = {
-                    Text(
-                        currentRoute ?: stringResource(id = R.string.app_name),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        style = MaterialTheme.typography.headlineMedium
-                    )
-                },
-                navigationIcon = {
-                    if (currentRoute != "Library") {
-                        IconButton(onClick = { /* do something */ }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Localized description"
-                            )
-                        }
-                    }
-
-                },
-                actions = {
-                    IconButton(onClick = { println(currentRoute) }) {
+            MediumTopAppBar(colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                scrolledContainerColor = MaterialTheme.colorScheme.primary,
+                titleContentColor = MaterialTheme.colorScheme.primaryContainer,
+            ), title = {
+                Text(
+                    currentRoute ?: stringResource(id = R.string.app_name),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.headlineMedium
+                )
+            }, navigationIcon = {
+                if (currentRoute != "Library" && currentRoute != "Permission") {
+                    IconButton(onClick = { /* do something */ }) {
                         Icon(
-                            imageVector = Icons.Filled.Settings,
-                            contentDescription = "Localized description",
-                            tint = MaterialTheme.colorScheme.primaryContainer
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Localized description"
                         )
                     }
-                },
-                scrollBehavior = scrollBehavior
+                }
+
+            }, actions = {
+                IconButton(onClick = { println(currentRoute) }) {
+                    Icon(
+                        imageVector = Icons.Filled.Settings,
+                        contentDescription = "Localized description",
+                        tint = MaterialTheme.colorScheme.primaryContainer
+                    )
+                }
+            }, scrollBehavior = scrollBehavior
             )
         },
     ) { innerPadding ->
@@ -88,8 +87,8 @@ fun MelodiaApp() {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
-            navController = navController
+            navController = navController,
+            onUpdateRoute = ::updateCurrentRoute
         )
-        println(currentRoute)
     }
 }

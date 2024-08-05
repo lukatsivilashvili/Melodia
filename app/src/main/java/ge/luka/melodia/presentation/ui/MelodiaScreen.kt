@@ -8,14 +8,20 @@ sealed class MelodiaScreen {
     data object Library: MelodiaScreen()
 
     @Serializable
-    object Songs: MelodiaScreen()
+    data object Songs: MelodiaScreen()
 
     @Serializable
-    object Albums: MelodiaScreen()
+    data object Albums: MelodiaScreen()
 
     @Serializable
-    object Artists: MelodiaScreen()
+    data object Artists: MelodiaScreen()
 
     @Serializable
-    object Playlists: MelodiaScreen()
+    data object Playlists: MelodiaScreen()
+
+    @Serializable
+    data object Settings: MelodiaScreen()
+
+    @Serializable
+    data object Permission: MelodiaScreen()
 }
