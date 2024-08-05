@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Melodia</string>
+
+    <string name="screenNameLibrary">Library</string>
+    <string name="screenNameAlbums">Library</string>
+    <string name="screenNameArtists">Library</string>
+    <string name="screenNameSongs">Library</string>
+    <string name="screenNamePlaylists">Library</string>
 </resources>
