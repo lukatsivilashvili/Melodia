@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -109,7 +111,12 @@ fun SinglePermissionRequest(
                     Toast.makeText(context, "Permission Given Already", Toast.LENGTH_SHORT)
                         .show()
                 }
-            }) {
+            },
+                colors = ButtonColors(containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor =MaterialTheme.colorScheme.onPrimary,
+                    disabledContainerColor =MaterialTheme.colorScheme.tertiary,
+                    disabledContentColor =MaterialTheme.colorScheme.onTertiary,)
+            ) {
                 Text(text = "Ask for permission")
             }
             LaunchedEffect(key1 = permissionState.status.isGranted) {
