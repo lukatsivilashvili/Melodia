@@ -4,6 +4,8 @@ package ge.luka.melodia.presentation.ui
 
 import android.Manifest
 import android.os.Build
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -24,7 +26,7 @@ import ge.luka.melodia.presentation.utils.SinglePermissionRequest
 fun MelodiaNavController(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    onUpdateRoute: (String?) -> Unit
+    onUpdateRoute: (String?) -> Unit,
 ) {
     val permissionState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         rememberPermissionState(permission = Manifest.permission.READ_MEDIA_AUDIO)
@@ -36,22 +38,49 @@ fun MelodiaNavController(
 
     NavHost(
         navController = navController,
-        startDestination = startDestinationScreen
+        startDestination = startDestinationScreen,
+        enterTransition = {
+            slideIntoContainer(
+                AnimatedContentTransitionScope.SlideDirection.Start,
+                tween(300)
+            )
+        },
+        exitTransition = {
+            slideOutOfContainer(
+                AnimatedContentTransitionScope.SlideDirection.Start,
+                tween(300)
+            )
+        },
+        popEnterTransition = {
+            slideIntoContainer(
+                AnimatedContentTransitionScope.SlideDirection.End,
+                tween(300)
+            )
+        },
+        popExitTransition = {
+            slideOutOfContainer(
+                AnimatedContentTransitionScope.SlideDirection.End,
+                tween(300)
+            )
+        }
     ) {
         composable<MelodiaScreen.Library> {
-            LibraryScreen()
+            LibraryScreen(
+                navHostController = navController,
+                onUpdateRoute = onUpdateRoute
+            )
         }
         composable<MelodiaScreen.Songs> {
-            SongsScreen()
+            SongsScreen(navHostController = navController, onUpdateRoute = onUpdateRoute)
         }
         composable<MelodiaScreen.Albums> {
-            AlbumsScreen()
+            AlbumsScreen(navHostController = navController, onUpdateRoute = onUpdateRoute)
         }
         composable<MelodiaScreen.Artists> {
-            ArtistsScreen()
+            ArtistsScreen(navHostController = navController, onUpdateRoute = onUpdateRoute)
         }
         composable<MelodiaScreen.Playlists> {
-            PlaylistsScreen()
+            PlaylistsScreen(navHostController = navController, onUpdateRoute = onUpdateRoute)
         }
         composable<MelodiaScreen.Permission> {
             SinglePermissionRequest(

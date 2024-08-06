@@ -1,5 +1,6 @@
 package ge.luka.melodia.presentation.ui
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -35,6 +36,7 @@ fun MelodiaApp() {
     val navController = rememberNavController()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     var currentRoute by remember { mutableStateOf<String?>(null) }
+    navController.previousBackStackEntry?.destination?.route?.getScreenFromRoute()
 
     // Callback function to update currentRoute
     fun updateCurrentRoute(route: String?) {
@@ -51,22 +53,29 @@ fun MelodiaApp() {
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             MediumTopAppBar(colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                scrolledContainerColor = MaterialTheme.colorScheme.primary,
-                titleContentColor = MaterialTheme.colorScheme.primaryContainer,
+                containerColor = MaterialTheme.colorScheme.surface,
+                scrolledContainerColor = MaterialTheme.colorScheme.surface,
+                titleContentColor = MaterialTheme.colorScheme.onSurface,
             ), title = {
                 Text(
                     currentRoute ?: stringResource(id = R.string.app_name),
                     maxLines = 1,
+                    color = MaterialTheme.colorScheme.onSurface,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.headlineMedium
                 )
             }, navigationIcon = {
                 if (currentRoute != "Library" && currentRoute != "Permission") {
-                    IconButton(onClick = { /* do something */ }) {
+                    IconButton(onClick = {
+                        val previousRoute =
+                            navController.previousBackStackEntry?.destination?.route?.getScreenFromRoute()
+                        navController.popBackStack()
+                        updateCurrentRoute(previousRoute) // Update after popBackStack
+                    }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Localized description"
+                            contentDescription = "Localized description",
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }
@@ -76,19 +85,26 @@ fun MelodiaApp() {
                     Icon(
                         imageVector = Icons.Filled.Settings,
                         contentDescription = "Localized description",
-                        tint = MaterialTheme.colorScheme.primaryContainer
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }, scrollBehavior = scrollBehavior
             )
         },
-    ) { innerPadding ->
-        MelodiaNavController(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-            navController = navController,
-            onUpdateRoute = ::updateCurrentRoute
-        )
-    }
+        content = { innerPadding ->
+            Box(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+            ) {
+                MelodiaNavController(
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .fillMaxSize(),
+                    navController = navController,
+                    onUpdateRoute = ::updateCurrentRoute
+                )
+            }
+        }
+    )
 }
