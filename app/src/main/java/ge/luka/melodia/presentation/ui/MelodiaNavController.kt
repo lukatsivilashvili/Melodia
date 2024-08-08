@@ -14,11 +14,12 @@ import androidx.navigation.compose.composable
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-import ge.luka.melodia.presentation.ui.albums.AlbumsScreen
-import ge.luka.melodia.presentation.ui.artists.ArtistsScreen
-import ge.luka.melodia.presentation.ui.library.LibraryScreen
-import ge.luka.melodia.presentation.ui.playlists.PlaylistsScreen
-import ge.luka.melodia.presentation.ui.songs.SongsScreen
+import ge.luka.melodia.presentation.ui.screens.albums.AlbumsScreen
+import ge.luka.melodia.presentation.ui.screens.artists.ArtistsScreen
+import ge.luka.melodia.presentation.ui.screens.library.LibraryScreen
+import ge.luka.melodia.presentation.ui.screens.playlists.PlaylistsScreen
+import ge.luka.melodia.presentation.ui.screens.settings.SettingsScreen
+import ge.luka.melodia.presentation.ui.screens.songs.SongsScreen
 import ge.luka.melodia.presentation.utils.SinglePermissionRequest
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -81,6 +82,9 @@ fun MelodiaNavController(
         }
         composable<MelodiaScreen.Playlists> {
             PlaylistsScreen(navHostController = navController, onUpdateRoute = onUpdateRoute)
+        }
+        composable<MelodiaScreen.Settings> {
+            SettingsScreen(navHostController = navController, onUpdateRoute = onUpdateRoute)
         }
         composable<MelodiaScreen.Permission> {
             SinglePermissionRequest(

@@ -1,5 +1,8 @@
 package ge.luka.melodia.presentation.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -65,7 +68,13 @@ fun MelodiaApp() {
                     style = MaterialTheme.typography.headlineMedium
                 )
             }, navigationIcon = {
-                if (currentRoute != "Library" && currentRoute != "Permission") {
+                AnimatedVisibility(
+                    visible = currentRoute != MelodiaScreen.Library.toString()
+                        .getScreenFromRoute() &&
+                            currentRoute != MelodiaScreen.Permission.toString().getScreenFromRoute(),
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
                     IconButton(onClick = {
                         val previousRoute =
                             navController.previousBackStackEntry?.destination?.route?.getScreenFromRoute()
@@ -81,12 +90,23 @@ fun MelodiaApp() {
                 }
 
             }, actions = {
-                IconButton(onClick = { println(currentRoute) }) {
-                    Icon(
-                        imageVector = Icons.Filled.Settings,
-                        contentDescription = "Localized description",
-                        tint = MaterialTheme.colorScheme.onSurface
-                    )
+                AnimatedVisibility(
+                    visible = currentRoute == MelodiaScreen.Library.toString().getScreenFromRoute(),
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    IconButton(onClick = {
+                        navController.navigate(MelodiaScreen.Settings)
+                        updateCurrentRoute(
+                            MelodiaScreen.Settings.toString().getScreenFromRoute()
+                        )
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.Settings,
+                            contentDescription = "Localized description",
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
                 }
             }, scrollBehavior = scrollBehavior
             )
