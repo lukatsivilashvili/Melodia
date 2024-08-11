@@ -6,7 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import dagger.hilt.android.AndroidEntryPoint
 import ge.luka.melodia.presentation.ui.MelodiaApp
-import ge.luka.melodia.presentation.ui.theme.MelodiaTheme
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -14,9 +13,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MelodiaTheme {
-                MelodiaApp()
-            }
+            MelodiaApp()
         }
     }
 }
