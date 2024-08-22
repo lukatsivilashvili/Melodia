@@ -1,4 +1,4 @@
-package ge.luka.melodia.presentation.ui.theme
+package ge.luka.melodia.presentation.ui.theme.themecomponents
 
 import kotlinx.serialization.Serializable
 

@@ -13,6 +13,8 @@ import ge.luka.melodia.presentation.ui.theme.colors.ColorSchemes.darkBlueScheme
 import ge.luka.melodia.presentation.ui.theme.colors.ColorSchemes.darkGreenScheme
 import ge.luka.melodia.presentation.ui.theme.colors.ColorSchemes.lightBlueScheme
 import ge.luka.melodia.presentation.ui.theme.colors.ColorSchemes.lightGreenScheme
+import ge.luka.melodia.presentation.ui.theme.themecomponents.AppTheme
+import ge.luka.melodia.presentation.ui.theme.themecomponents.MelodiaTypography
 
 @Composable
 fun MelodiaTheme(

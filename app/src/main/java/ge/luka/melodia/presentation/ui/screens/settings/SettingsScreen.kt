@@ -16,7 +16,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import ge.luka.melodia.common.extensions.getScreenFromRoute
-import ge.luka.melodia.presentation.ui.theme.AppTheme
+import ge.luka.melodia.presentation.ui.theme.themecomponents.AppTheme
 
 @Composable
 fun SettingsScreen(

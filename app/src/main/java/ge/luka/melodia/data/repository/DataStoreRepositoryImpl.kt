@@ -7,9 +7,9 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import ge.luka.melodia.domain.repository.DataStoreRepository
-import ge.luka.melodia.presentation.ui.theme.AppTheme
-import ge.luka.melodia.presentation.ui.theme.CURRENT_THEME
-import ge.luka.melodia.presentation.ui.theme.IS_DARK_MODE
+import ge.luka.melodia.presentation.ui.theme.themecomponents.AppTheme
+import ge.luka.melodia.presentation.ui.theme.themecomponents.CURRENT_THEME
+import ge.luka.melodia.presentation.ui.theme.themecomponents.IS_DARK_MODE
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
