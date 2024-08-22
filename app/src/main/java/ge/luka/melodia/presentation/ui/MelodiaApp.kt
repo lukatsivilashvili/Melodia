@@ -32,7 +32,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.navigation.compose.rememberNavController
 import ge.luka.melodia.R
 import ge.luka.melodia.common.extensions.getScreenFromRoute
-import ge.luka.melodia.presentation.ui.theme.AppTheme
+import ge.luka.melodia.presentation.ui.components.MelodiaNavController
 import ge.luka.melodia.presentation.ui.theme.MelodiaTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,26 +43,12 @@ fun MelodiaApp() {
     var currentRoute by remember { mutableStateOf<String?>(null) }
     navController.previousBackStackEntry?.destination?.route?.getScreenFromRoute()
 
-    var currentTheme by remember {
-        mutableStateOf(
-            Pair<AppTheme, Boolean>(
-                AppTheme.Green,
-                false
-            )
-        )
-    }
-
     // Callback function to update currentRoute
     fun updateCurrentRoute(route: String?) {
         currentRoute = route
     }
 
-    fun updateCurrentTheme(colorScheme: (Pair<AppTheme, Boolean>)) {
-        currentTheme = colorScheme
-    }
     MelodiaTheme(
-        isDarkTheme = currentTheme.second,
-        userColorScheme = currentTheme.first
     ) {
 
         LaunchedEffect(navController) {
@@ -144,7 +130,6 @@ fun MelodiaApp() {
                             .fillMaxSize(),
                         navController = navController,
                         onUpdateRoute = ::updateCurrentRoute,
-                        onUpdateTheme = ::updateCurrentTheme
                     )
                 }
             }

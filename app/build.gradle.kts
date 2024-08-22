@@ -86,4 +86,10 @@ dependencies {
 
     // Accompanist
     implementation(libs.accompanist.permissions)
+
+    // Datastore
+    implementation(libs.preferences.datastore)
+
+    //LifeCycle
+    implementation(libs.lifecycle.viewmodel)
 }

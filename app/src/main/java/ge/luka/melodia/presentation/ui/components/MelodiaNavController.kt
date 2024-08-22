@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalPermissionsApi::class)
 
-package ge.luka.melodia.presentation.ui
+package ge.luka.melodia.presentation.ui.components
 
 import android.Manifest
 import android.os.Build
@@ -14,13 +14,13 @@ import androidx.navigation.compose.composable
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import ge.luka.melodia.presentation.ui.MelodiaScreen
 import ge.luka.melodia.presentation.ui.screens.albums.AlbumsScreen
 import ge.luka.melodia.presentation.ui.screens.artists.ArtistsScreen
 import ge.luka.melodia.presentation.ui.screens.library.LibraryScreen
 import ge.luka.melodia.presentation.ui.screens.playlists.PlaylistsScreen
 import ge.luka.melodia.presentation.ui.screens.settings.SettingsScreen
 import ge.luka.melodia.presentation.ui.screens.songs.SongsScreen
-import ge.luka.melodia.presentation.ui.theme.AppTheme
 import ge.luka.melodia.presentation.utils.SinglePermissionRequest
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -29,7 +29,6 @@ fun MelodiaNavController(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     onUpdateRoute: (String?) -> Unit,
-    onUpdateTheme: (Pair<AppTheme, Boolean>) -> Unit
 ) {
     val permissionState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         rememberPermissionState(permission = Manifest.permission.READ_MEDIA_AUDIO)
@@ -86,7 +85,7 @@ fun MelodiaNavController(
             PlaylistsScreen(navHostController = navController, onUpdateRoute = onUpdateRoute)
         }
         composable<MelodiaScreen.Settings> {
-            SettingsScreen(navHostController = navController, onUpdateRoute = onUpdateRoute, onUpdateTheme = onUpdateTheme)
+            SettingsScreen(navHostController = navController, onUpdateRoute = onUpdateRoute)
         }
         composable<MelodiaScreen.Permission> {
             SinglePermissionRequest(

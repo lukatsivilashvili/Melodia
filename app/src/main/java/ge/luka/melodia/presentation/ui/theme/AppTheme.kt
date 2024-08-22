@@ -1,6 +1,12 @@
 package ge.luka.melodia.presentation.ui.theme
 
-sealed class AppTheme {
-    data object Green: AppTheme()
-    data object Blue: AppTheme()
+import kotlinx.serialization.Serializable
+
+@Serializable
+enum class AppTheme {
+    GREEN,
+    BLUE
 }
+
+const val IS_DARK_MODE = "is_dark_mode"
+const val CURRENT_THEME = "current_theme"
