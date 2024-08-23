@@ -1,4 +1,4 @@
-package ge.luka.melodia.presentation.ui.songs
+package ge.luka.melodia.presentation.ui.screens.albums
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -11,22 +11,22 @@ import androidx.navigation.NavHostController
 import ge.luka.melodia.common.extensions.getScreenFromRoute
 
 @Composable
-fun SongsScreen(
-    modifier: Modifier = Modifier,
-    navHostController: NavHostController,
+fun AlbumsScreen(
+    modifier: Modifier = Modifier, navHostController: NavHostController,
     onUpdateRoute: (String?) -> Unit
 ) {
     val previousRoute =
         navHostController.previousBackStackEntry?.destination?.route?.getScreenFromRoute()
+
     BackHandler {
         onUpdateRoute.invoke(previousRoute)
         navHostController.popBackStack()
     }
-
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.Cyan)
+            .background(Color.Red)
     ) {
+
     }
 }

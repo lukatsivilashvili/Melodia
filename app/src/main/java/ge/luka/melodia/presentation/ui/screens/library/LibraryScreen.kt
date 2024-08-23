@@ -1,4 +1,4 @@
-package ge.luka.melodia.presentation.ui.library
+package ge.luka.melodia.presentation.ui.screens.library
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column

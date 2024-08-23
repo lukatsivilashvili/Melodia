@@ -13,6 +13,8 @@ hiltVersion = "2.51.1"
 composeNavigation = "2.8.0-beta06"
 serialization = "1.6.3"
 accompanist = "0.24.13-rc"
+datastore = "1.1.1"
+lifecycleViewModel = "2.8.4"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -35,6 +37,8 @@ hilt-compose-navigation = { module = "androidx.hilt:hilt-navigation-compose", ve
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "composeNavigation" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization"}
 accompanist-permissions = {module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist"}
+preferences-datastore = {module = "androidx.datastore:datastore-preferences", version.ref = "datastore"}
+lifecycle-viewmodel = {module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewModel"}
 
 
 [plugins]

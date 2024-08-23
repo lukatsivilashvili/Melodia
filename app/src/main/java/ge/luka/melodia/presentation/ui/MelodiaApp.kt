@@ -1,5 +1,8 @@
 package ge.luka.melodia.presentation.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -29,6 +32,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.navigation.compose.rememberNavController
 import ge.luka.melodia.R
 import ge.luka.melodia.common.extensions.getScreenFromRoute
+import ge.luka.melodia.presentation.ui.components.MelodiaNavController
+import ge.luka.melodia.presentation.ui.theme.MelodiaTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,68 +48,91 @@ fun MelodiaApp() {
         currentRoute = route
     }
 
-    LaunchedEffect(navController) {
-        snapshotFlow { navController.currentBackStackEntry?.destination?.route }.collect { route ->
-            currentRoute = route?.getScreenFromRoute()
-        }
-    }
+    MelodiaTheme(
+    ) {
 
-    Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {
-            MediumTopAppBar(colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.surface,
-                scrolledContainerColor = MaterialTheme.colorScheme.surface,
-                titleContentColor = MaterialTheme.colorScheme.onSurface,
-            ), title = {
-                Text(
-                    currentRoute ?: stringResource(id = R.string.app_name),
-                    maxLines = 1,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.headlineMedium
-                )
-            }, navigationIcon = {
-                if (currentRoute != "Library" && currentRoute != "Permission") {
-                    IconButton(onClick = {
-                        val previousRoute =
-                            navController.previousBackStackEntry?.destination?.route?.getScreenFromRoute()
-                        navController.popBackStack()
-                        updateCurrentRoute(previousRoute) // Update after popBackStack
-                    }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Localized description",
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                }
-
-            }, actions = {
-                IconButton(onClick = { println(currentRoute) }) {
-                    Icon(
-                        imageVector = Icons.Filled.Settings,
-                        contentDescription = "Localized description",
-                        tint = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-            }, scrollBehavior = scrollBehavior
-            )
-        },
-        content = { innerPadding ->
-            Box(
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize()
-            ) {
-                MelodiaNavController(
-                    modifier = Modifier
-                        .padding(innerPadding)
-                        .fillMaxSize(),
-                    navController = navController,
-                    onUpdateRoute = ::updateCurrentRoute
-                )
+        LaunchedEffect(navController) {
+            snapshotFlow { navController.currentBackStackEntry?.destination?.route }.collect { route ->
+                currentRoute = route?.getScreenFromRoute()
             }
         }
-    )
+
+        Scaffold(
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            topBar = {
+                MediumTopAppBar(colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    scrolledContainerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                ), title = {
+                    Text(
+                        currentRoute ?: stringResource(id = R.string.app_name),
+                        maxLines = 1,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.headlineMedium
+                    )
+                }, navigationIcon = {
+                    AnimatedVisibility(
+                        visible = currentRoute != MelodiaScreen.Library.toString()
+                            .getScreenFromRoute() &&
+                                currentRoute != MelodiaScreen.Permission.toString()
+                            .getScreenFromRoute(),
+                        enter = fadeIn(),
+                        exit = fadeOut()
+                    ) {
+                        IconButton(onClick = {
+                            val previousRoute =
+                                navController.previousBackStackEntry?.destination?.route?.getScreenFromRoute()
+                            navController.popBackStack()
+                            updateCurrentRoute(previousRoute) // Update after popBackStack
+                        }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Localized description",
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
+
+                }, actions = {
+                    AnimatedVisibility(
+                        visible = currentRoute == MelodiaScreen.Library.toString()
+                            .getScreenFromRoute(),
+                        enter = fadeIn(),
+                        exit = fadeOut()
+                    ) {
+                        IconButton(onClick = {
+                            navController.navigate(MelodiaScreen.Settings)
+                            updateCurrentRoute(
+                                MelodiaScreen.Settings.toString().getScreenFromRoute()
+                            )
+                        }) {
+                            Icon(
+                                imageVector = Icons.Filled.Settings,
+                                contentDescription = "Localized description",
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
+                }, scrollBehavior = scrollBehavior
+                )
+            },
+            content = { innerPadding ->
+                Box(
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .fillMaxSize()
+                ) {
+                    MelodiaNavController(
+                        modifier = Modifier
+                            .padding(innerPadding)
+                            .fillMaxSize(),
+                        navController = navController,
+                        onUpdateRoute = ::updateCurrentRoute,
+                    )
+                }
+            }
+        )
+    }
 }

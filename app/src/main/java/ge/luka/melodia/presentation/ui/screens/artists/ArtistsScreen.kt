@@ -1,4 +1,4 @@
-package ge.luka.melodia.presentation.ui.albums
+package ge.luka.melodia.presentation.ui.screens.artists
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -11,7 +11,7 @@ import androidx.navigation.NavHostController
 import ge.luka.melodia.common.extensions.getScreenFromRoute
 
 @Composable
-fun AlbumsScreen(
+fun ArtistsScreen(
     modifier: Modifier = Modifier, navHostController: NavHostController,
     onUpdateRoute: (String?) -> Unit
 ) {
@@ -25,7 +25,7 @@ fun AlbumsScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.Red)
+            .background(Color.Green)
     ) {
 
     }
