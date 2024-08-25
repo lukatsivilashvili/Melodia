@@ -18,20 +18,22 @@ class SettingsScreenViewModel @Inject constructor(
 ) : ViewModel() {
 
     // Observe the DataStore flow for dynamic theme preference
-    val isDarkMode: StateFlow<Boolean> =
-        dataStoreRepository.getDarkMode().map { it }.stateIn(
+    var isDarkMode: StateFlow<Boolean> =
+        dataStoreRepository.getDarkMode().map { isDarkMode -> isDarkMode }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = false
         )
+        private set
 
     // Observe the DataStore flow for theme type preference
-    val currentTheme: StateFlow<AppTheme> =
-        dataStoreRepository.getCurrentTheme().map { it }.stateIn(
+    var currentTheme: StateFlow<AppTheme> =
+        dataStoreRepository.getCurrentTheme().map { currentTheme -> currentTheme }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = AppTheme.GREEN
         )
+        private set
 
     fun setIsDarkMode(isDarkMode: Boolean) = viewModelScope.launch {
         dataStoreRepository.setDarkMode(isDarkMode)

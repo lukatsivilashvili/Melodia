@@ -1,6 +1,7 @@
 package ge.luka.melodia.domain.model
 
-enum class MediaType{
-    SONG,
-    ALBUM
+
+sealed class MediaType {
+    data object Song : MediaType()
+    data object Album : MediaType()
 }
