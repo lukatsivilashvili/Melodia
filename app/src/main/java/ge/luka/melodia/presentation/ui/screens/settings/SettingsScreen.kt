@@ -10,13 +10,18 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import ge.luka.melodia.common.extensions.getScreenFromRoute
 import ge.luka.melodia.presentation.ui.theme.themecomponents.AppTheme
+import kotlinx.coroutines.launch
 
 @Composable
 fun SettingsScreen(
@@ -28,10 +33,17 @@ fun SettingsScreen(
 
     val previousRoute =
         navHostController.previousBackStackEntry?.destination?.route?.getScreenFromRoute()
-    val isDarkMode = viewModel.isDarkMode.collectAsStateWithLifecycle()
-    val currentTheme = viewModel.currentTheme.collectAsStateWithLifecycle()
+    var isDarkMode by remember { mutableStateOf(false) }
+    var currentTheme by remember { mutableStateOf(AppTheme.GREEN) }
 
-
+    LaunchedEffect(Unit) {
+        launch {
+            viewModel.isDarkMode.collect { isDarkMode = it }
+        }
+        launch {
+            viewModel.currentTheme.collect { currentTheme = it }
+        }
+    }
 
     BackHandler {
         onUpdateRoute.invoke(previousRoute)
@@ -42,15 +54,15 @@ fun SettingsScreen(
         Row {
             Text("Dark mode")
             Switch(
-                checked = isDarkMode.value,
+                checked = isDarkMode,
                 onCheckedChange = {
-                    viewModel.setIsDarkMode(isDarkMode = !isDarkMode.value)
+                    viewModel.setIsDarkMode(isDarkMode = !isDarkMode)
                 }
             )
         }
         Spacer(Modifier.height(16.dp))
 
-        ColorSchemeRadioButtons(selectedScheme = currentTheme.value) { newTheme ->
+        ColorSchemeRadioButtons(selectedScheme = currentTheme) { newTheme ->
             viewModel.setCurrentTheme(theme = newTheme)
         }
     }

@@ -48,9 +48,7 @@ fun MelodiaApp() {
         currentRoute = route
     }
 
-    MelodiaTheme(
-    ) {
-
+    MelodiaTheme{
         LaunchedEffect(navController) {
             snapshotFlow { navController.currentBackStackEntry?.destination?.route }.collect { route ->
                 currentRoute = route?.getScreenFromRoute()

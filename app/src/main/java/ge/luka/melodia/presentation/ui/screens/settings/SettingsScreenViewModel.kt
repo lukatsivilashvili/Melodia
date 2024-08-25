@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Singleton
 
 @HiltViewModel
 class SettingsScreenViewModel @Inject constructor(
@@ -21,7 +22,7 @@ class SettingsScreenViewModel @Inject constructor(
     val isDarkMode: StateFlow<Boolean> =
         dataStoreRepository.getDarkMode().map { it }.stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
+            started = SharingStarted.Eagerly,
             initialValue = false
         )
 
@@ -29,7 +30,7 @@ class SettingsScreenViewModel @Inject constructor(
     val currentTheme: StateFlow<AppTheme> =
         dataStoreRepository.getCurrentTheme().map { it }.stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
+            started = SharingStarted.Eagerly,
             initialValue = AppTheme.GREEN
         )
 
