@@ -1,4 +1,4 @@
-package ge.luka.melodia.presentation.utils
+package ge.luka.melodia.presentation.ui.components
 
 import android.Manifest
 import android.content.Intent
