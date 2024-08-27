@@ -1,6 +1,5 @@
 package ge.luka.melodia.presentation.ui.screens.songs
 
-import android.util.Log.d
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,7 +24,6 @@ class SongsViewModel @Inject constructor(
         viewModelScope.launch {
             mediaStoreRepository.getAllSongs().map { allSongs ->
                 _songsList.value = allSongs
-                d("songsList", songsList.value.toString())
             }.stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.Eagerly,
