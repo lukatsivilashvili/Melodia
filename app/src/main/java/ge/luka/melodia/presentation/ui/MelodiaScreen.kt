@@ -8,7 +8,7 @@ sealed class MelodiaScreen {
     data object Library: MelodiaScreen()
 
     @Serializable
-    data object Songs: MelodiaScreen()
+    data class Songs(val albumId: Long): MelodiaScreen()
 
     @Serializable
     data object Albums: MelodiaScreen()

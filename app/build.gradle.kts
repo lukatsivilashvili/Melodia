@@ -8,6 +8,14 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        create("release") {
+            storeFile = file("/Users/lukawivilashvili/keystores/upload-keystore.jks")
+            storePassword = "Nekomamushi1."
+            keyAlias = "upload"
+            keyPassword = "Nekomamushi1."
+        }
+    }
     namespace = "ge.luka.melodia"
     compileSdk = 34
 
@@ -26,7 +34,19 @@ android {
 
     buildTypes {
         release {
+            isMinifyEnabled = true
+            isDebuggable = true
+            isShrinkResources = true
+            signingConfig = signingConfigs.findByName("release")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+        debug {
             isMinifyEnabled = false
+            isDebuggable = true
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -42,6 +62,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"

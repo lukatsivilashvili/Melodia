@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Build
 import android.provider.MediaStore
 import android.provider.MediaStore.Audio.Media
-import androidx.annotation.RequiresApi
 import ge.luka.melodia.domain.model.AlbumModel
 import ge.luka.melodia.domain.model.SongModel
 import kotlinx.coroutines.Dispatchers
@@ -12,11 +11,14 @@ import kotlinx.coroutines.withContext
 
 object MediaStoreLoader {
 
-    @RequiresApi(Build.VERSION_CODES.Q)
     suspend fun getSongsList(context: Context): List<SongModel> {
         val songs = mutableListOf<SongModel>()
         withContext(Dispatchers.IO) {
-            val collection = Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
+            val collection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
+            } else {
+                Media.EXTERNAL_CONTENT_URI
+            }
             val selection = Media.IS_MUSIC + " !=0"
             val sortOrder = "${Media.TITLE} ASC"
             val projection = arrayOf(
@@ -65,11 +67,14 @@ object MediaStoreLoader {
         return songs
     }
 
-    @RequiresApi(Build.VERSION_CODES.Q)
     suspend fun getAlbumList(context: Context): List<AlbumModel> {
         val albumSet = mutableSetOf<AlbumModel>()
         withContext(Dispatchers.IO) {
-            val collection = MediaStore.Audio.Albums.getContentUri(MediaStore.VOLUME_EXTERNAL)
+            val collection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                MediaStore.Audio.Albums.getContentUri(MediaStore.VOLUME_EXTERNAL)
+            } else {
+                MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI
+            }
             val sortOrder = "${MediaStore.Audio.Albums.ALBUM} ASC"
             val projection = arrayOf(
                 Media.ALBUM_ID,
@@ -78,12 +83,12 @@ object MediaStoreLoader {
                 MediaStore.Audio.Albums.NUMBER_OF_SONGS
             )
             val query = context.contentResolver.query(
-                /* uri = */ collection,
-                /* projection = */ projection,
-                /* selection = */ null,
-                /* selectionArgs = */ null,
-                /* sortOrder = */ sortOrder,
-                /* cancellationSignal = */ null
+                collection,
+                projection,
+                null,
+                null,
+                sortOrder,
+                null
             )
             query?.use { cursor ->
 
@@ -110,5 +115,4 @@ object MediaStoreLoader {
         }
         return albumSet.toList()
     }
-
 }

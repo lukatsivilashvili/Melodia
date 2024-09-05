@@ -28,14 +28,23 @@ fun SongsScreen(
     modifier: Modifier = Modifier,
     viewModel: SongsScreenVM = hiltViewModel(),
     navHostController: NavHostController,
-    onUpdateRoute: (String?) -> Unit
+    onUpdateRoute: (String?) -> Unit,
+    albumId: Long? = null
 ) {
     var songsList by remember { mutableStateOf(listOf<SongModel>()) }
     val previousRoute =
         navHostController.previousBackStackEntry?.destination?.route?.getScreenFromRoute()
 
     LaunchedEffect(Unit) {
-        launch { viewModel.songsList.collect { songsList = it } }
+        launch {
+            viewModel.songsList.collect {
+                songsList = if (albumId != 0L) {
+                    it.filter { song -> song.albumId == albumId }
+                } else {
+                    it
+                }
+            }
+        }
     }
 
     BackHandler {
@@ -66,7 +75,7 @@ fun SongsScreenContent(
                 modifier = modifier.alpha(0.5F),
                 text = "No Songs Found",
                 style = MelodiaTypography.titleLarge,
-                )
+            )
         }
     }
 }

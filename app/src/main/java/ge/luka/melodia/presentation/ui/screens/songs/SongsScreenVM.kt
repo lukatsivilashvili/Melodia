@@ -31,5 +31,4 @@ class SongsScreenVM @Inject constructor(
             )
         }
     }
-
 }

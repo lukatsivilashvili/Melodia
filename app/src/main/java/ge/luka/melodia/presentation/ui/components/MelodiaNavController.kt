@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -72,7 +73,8 @@ fun MelodiaNavController(
             )
         }
         composable<MelodiaScreen.Songs> {
-            SongsScreen(navHostController = navController, onUpdateRoute = onUpdateRoute)
+            val args = it.toRoute<MelodiaScreen.Songs>()
+            SongsScreen(navHostController = navController, onUpdateRoute = onUpdateRoute, albumId = args.albumId)
         }
         composable<MelodiaScreen.Albums> {
             AlbumsScreen(navHostController = navController, onUpdateRoute = onUpdateRoute)
