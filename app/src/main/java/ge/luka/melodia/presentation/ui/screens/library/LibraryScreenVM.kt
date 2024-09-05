@@ -6,7 +6,7 @@ import ge.luka.melodia.presentation.ui.MelodiaScreen
 import javax.inject.Inject
 
 @HiltViewModel
-class LibraryScreenViewModel @Inject constructor() : ViewModel() {
+class LibraryScreenVM @Inject constructor() : ViewModel() {
 
     fun setDestinationScreen(screen: String): MelodiaScreen {
         return when (screen) {

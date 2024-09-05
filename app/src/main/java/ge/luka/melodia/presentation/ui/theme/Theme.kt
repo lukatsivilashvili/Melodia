@@ -13,7 +13,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import ge.luka.melodia.presentation.ui.screens.settings.SettingsScreenViewModel
+import ge.luka.melodia.presentation.ui.screens.settings.SettingsScreenVM
 import ge.luka.melodia.presentation.ui.theme.colors.ColorSchemes.darkBlueScheme
 import ge.luka.melodia.presentation.ui.theme.colors.ColorSchemes.darkGreenScheme
 import ge.luka.melodia.presentation.ui.theme.colors.ColorSchemes.lightBlueScheme
@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun MelodiaTheme(
-    viewModel: SettingsScreenViewModel = hiltViewModel(),
+    viewModel: SettingsScreenVM = hiltViewModel(),
     content: @Composable () -> Unit,
 ) {
 

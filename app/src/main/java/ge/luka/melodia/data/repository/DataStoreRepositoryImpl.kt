@@ -1,7 +1,6 @@
 package ge.luka.melodia.data.repository
 
 import android.content.Context
-import android.util.Log.d
 import androidx.datastore.preferences.SharedPreferencesMigration
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
@@ -47,12 +46,10 @@ class DataStoreRepositoryImpl @Inject constructor(
     }
 
     override fun getDarkMode(): Flow<Boolean> = context.dataStore.data.map { preferences ->
-        d("datastore", "getDarkMode Invoked")
         preferences[isDarkModeKey] ?: false
     }
 
     override fun getCurrentTheme(): Flow<AppTheme> = context.dataStore.data.map { preferences ->
-        d("datastore", "getTheme Invoked")
         AppTheme.entries[preferences[currentThemeKey] ?: 0]
     }
 
