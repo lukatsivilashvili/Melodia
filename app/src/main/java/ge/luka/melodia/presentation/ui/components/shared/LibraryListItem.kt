@@ -23,7 +23,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ge.luka.melodia.R
-import ge.luka.melodia.presentation.ui.theme.MelodiaTheme
 
 @Composable
 fun LibraryListItem(
@@ -77,11 +76,8 @@ fun LibraryListItem(
 @Preview
 @Composable
 fun LibraryListItemPreview(modifier: Modifier = Modifier) {
-    MelodiaTheme {
         LibraryListItem(
             title = "Playlist", icon = R.drawable.ic_playlists
         )
-
-    }
 
 }

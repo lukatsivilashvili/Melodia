@@ -46,6 +46,9 @@ fun MelodiaApp() {
     // Callback function to update currentRoute
     fun updateCurrentRoute(route: String?) {
         currentRoute = route
+
+        scrollBehavior.state.heightOffset = 0f
+        scrollBehavior.state.contentOffset = 0f
     }
 
     MelodiaTheme{

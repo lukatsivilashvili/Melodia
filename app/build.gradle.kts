@@ -92,4 +92,7 @@ dependencies {
 
     //LifeCycle
     implementation(libs.lifecycle.viewmodel)
+
+    // Coil
+    implementation(libs.coil)
 }

@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SongsViewModel @Inject constructor(
+class SongsScreenVM @Inject constructor(
     private val mediaStoreRepository: MediaStoreRepository
 ) : ViewModel() {
     private val _songsList: MutableStateFlow<List<SongModel>> = MutableStateFlow(listOf())

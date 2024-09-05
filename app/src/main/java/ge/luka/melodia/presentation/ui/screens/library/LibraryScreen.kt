@@ -18,7 +18,7 @@ import ge.luka.melodia.presentation.ui.theme.MelodiaTheme
 @Composable
 fun LibraryScreen(
     modifier: Modifier = Modifier,
-    viewModel: LibraryScreenViewModel? = hiltViewModel(),
+    viewModel: LibraryScreenVM? = hiltViewModel(),
     navHostController: NavHostController?,
     onUpdateRoute: ((String?) -> Unit)?
 ) {
@@ -33,7 +33,7 @@ fun LibraryScreen(
 @Composable
 fun LibraryScreenContent(
     modifier: Modifier,
-    viewModel: LibraryScreenViewModel? = null,
+    viewModel: LibraryScreenVM? = null,
     navHostController: NavHostController? = null,
     onUpdateRoute: ((String?) -> Unit)? = null
 ) {

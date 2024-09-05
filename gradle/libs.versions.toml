@@ -15,6 +15,7 @@ serialization = "1.6.3"
 accompanist = "0.24.13-rc"
 datastore = "1.1.1"
 lifecycleViewModel = "2.8.4"
+coil = "2.7.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -35,10 +36,12 @@ hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltV
 hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltVersion" }
 hilt-compose-navigation = { module = "androidx.hilt:hilt-navigation-compose", version = "1.2.0" }
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "composeNavigation" }
-kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization"}
-accompanist-permissions = {module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist"}
-preferences-datastore = {module = "androidx.datastore:datastore-preferences", version.ref = "datastore"}
-lifecycle-viewmodel = {module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewModel"}
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
+accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
+preferences-datastore = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
+lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewModel" }
+coil = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
+
 
 
 [plugins]

@@ -11,10 +11,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Singleton
 
 @HiltViewModel
-class SettingsScreenViewModel @Inject constructor(
+class SettingsScreenVM @Inject constructor(
     private val dataStoreRepository: DataStoreRepository
 ) : ViewModel() {
 

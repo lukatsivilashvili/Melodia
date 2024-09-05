@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun SettingsScreen(
     modifier: Modifier = Modifier,
-    viewModel: SettingsScreenViewModel = hiltViewModel(),
+    viewModel: SettingsScreenVM = hiltViewModel(),
     navHostController: NavHostController,
     onUpdateRoute: (String?) -> Unit,
 ) {
