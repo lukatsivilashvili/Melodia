@@ -28,23 +28,15 @@ fun SongsScreen(
     modifier: Modifier = Modifier,
     viewModel: SongsScreenVM = hiltViewModel(),
     navHostController: NavHostController,
-    onUpdateRoute: (String?) -> Unit,
-    albumId: Long? = null
+    onUpdateRoute: (String?) -> Unit
 ) {
     var songsList by remember { mutableStateOf(listOf<SongModel>()) }
     val previousRoute =
         navHostController.previousBackStackEntry?.destination?.route?.getScreenFromRoute()
 
     LaunchedEffect(Unit) {
-        launch {
-            viewModel.songsList.collect {
-                songsList = if (albumId != 0L) {
-                    it.filter { song -> song.albumId == albumId }
-                } else {
-                    it
-                }
-            }
-        }
+        launch { viewModel.songsList.collect { songsList = it } }
+
     }
 
     BackHandler {
@@ -62,7 +54,7 @@ fun SongsScreenContent(
 ) {
     if (songsList.isNotEmpty()) {
         LazyColumn(modifier = modifier.fillMaxSize()) {
-            items(songsList) { songItem ->
+            items(items = songsList, key = {it.songId ?: 0}) { songItem ->
                 GeneralMusicListItem(songItem = songItem)
             }
         }

@@ -6,12 +6,14 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import ge.luka.melodia.domain.model.AlbumModel
 import ge.luka.melodia.domain.model.SongModel
 import ge.luka.melodia.domain.repository.MediaStoreRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,13 +25,15 @@ class AlbumsScreenVM @Inject constructor(
 
     init {
         viewModelScope.launch {
-            mediaStoreRepository.getAllAlbums().map { allalbums ->
-                _albumsList.value = allalbums
-            }.stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.Eagerly,
-                initialValue = listOf<SongModel>()
-            )
+            withContext(Dispatchers.IO) {
+                mediaStoreRepository.getAllAlbums().map { allalbums ->
+                    _albumsList.value = allalbums
+                }.stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.Eagerly,
+                    initialValue = listOf<SongModel>()
+                )
+            }
         }
     }
 

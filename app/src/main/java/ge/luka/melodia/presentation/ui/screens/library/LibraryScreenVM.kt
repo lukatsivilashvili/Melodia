@@ -11,7 +11,7 @@ class LibraryScreenVM @Inject constructor() : ViewModel() {
     fun setDestinationScreen(screen: String): MelodiaScreen {
         return when (screen) {
             "Library" -> MelodiaScreen.Library
-            "Songs" -> MelodiaScreen.Songs(0)
+            "Songs" -> MelodiaScreen.Songs
             "Albums" -> MelodiaScreen.Albums
             "Artists" -> MelodiaScreen.Artists
             "Playlists" -> MelodiaScreen.Playlists

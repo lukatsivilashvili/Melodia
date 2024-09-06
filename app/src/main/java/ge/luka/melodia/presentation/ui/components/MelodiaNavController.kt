@@ -15,13 +15,17 @@ import androidx.navigation.toRoute
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import ge.luka.melodia.common.navtype.AlbumNavType
+import ge.luka.melodia.domain.model.AlbumModel
 import ge.luka.melodia.presentation.ui.MelodiaScreen
 import ge.luka.melodia.presentation.ui.screens.albums.AlbumsScreen
+import ge.luka.melodia.presentation.ui.screens.albumsongs.AlbumSongsScreen
 import ge.luka.melodia.presentation.ui.screens.artists.ArtistsScreen
 import ge.luka.melodia.presentation.ui.screens.library.LibraryScreen
 import ge.luka.melodia.presentation.ui.screens.playlists.PlaylistsScreen
 import ge.luka.melodia.presentation.ui.screens.settings.SettingsScreen
 import ge.luka.melodia.presentation.ui.screens.songs.SongsScreen
+import kotlin.reflect.typeOf
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -73,8 +77,16 @@ fun MelodiaNavController(
             )
         }
         composable<MelodiaScreen.Songs> {
-            val args = it.toRoute<MelodiaScreen.Songs>()
-            SongsScreen(navHostController = navController, onUpdateRoute = onUpdateRoute, albumId = args.albumId)
+            SongsScreen(navHostController = navController, onUpdateRoute = onUpdateRoute)
+        }
+        composable<MelodiaScreen.AlbumSongs>(typeMap = mapOf(typeOf<AlbumModel>() to AlbumNavType.AlbumType)) {
+            val args = it.toRoute<MelodiaScreen.AlbumSongs>()
+            AlbumSongsScreen(
+                navHostController = navController,
+                onUpdateRoute = onUpdateRoute,
+                albumId = args.albumId,
+                albumModel = args.albumModel
+            )
         }
         composable<MelodiaScreen.Albums> {
             AlbumsScreen(navHostController = navController, onUpdateRoute = onUpdateRoute)

@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Build
 import android.provider.MediaStore
 import android.provider.MediaStore.Audio.Media
+import ge.luka.melodia.common.extensions.formatAlbumDuration
 import ge.luka.melodia.domain.model.AlbumModel
 import ge.luka.melodia.domain.model.SongModel
 import kotlinx.coroutines.Dispatchers
@@ -101,6 +102,8 @@ object MediaStoreLoader {
                     cursor.getColumnIndexOrThrow(MediaStore.Audio.AlbumColumns.NUMBER_OF_SONGS)
 
                 while (cursor.moveToNext()) {
+                    val albumId = cursor.getLong(albumIdColumn)
+                    val albumDuration = getAlbumDuration(context, albumId)
                     albumSet.add(
                         AlbumModel.fromCursor(
                             cursor = cursor,
@@ -108,11 +111,31 @@ object MediaStoreLoader {
                             titleColumn = titleColumn,
                             artistColumn = artistColumn,
                             songCountColumn = songCountColumn,
+                            duration = albumDuration.formatAlbumDuration()
                         )
                     )
                 }
             }
         }
         return albumSet.toList()
+    }
+
+    fun getAlbumDuration(context: Context, albumId: Long): Long {
+        val uri = Media.EXTERNAL_CONTENT_URI
+        val projection = arrayOf(Media.DURATION)
+        val selection = "${Media.ALBUM_ID} = ?"
+        val selectionArgs = arrayOf(albumId.toString())
+
+        val cursor = context.contentResolver.query(uri, projection, selection, selectionArgs, null)
+
+        var totalDuration = 0L
+        cursor?.use {
+            while (it.moveToNext()) {
+                val duration = it.getLong(it.getColumnIndexOrThrow(Media.DURATION))
+                totalDuration += duration
+            }
+        }
+
+        return totalDuration
     }
 }

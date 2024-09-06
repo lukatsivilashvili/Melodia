@@ -1,27 +1,31 @@
 package ge.luka.melodia.presentation.ui
 
+import ge.luka.melodia.domain.model.AlbumModel
 import kotlinx.serialization.Serializable
 
 sealed class MelodiaScreen {
 
     @Serializable
-    data object Library: MelodiaScreen()
+    data object Library : MelodiaScreen()
 
     @Serializable
-    data class Songs(val albumId: Long): MelodiaScreen()
+    data object Songs : MelodiaScreen()
 
     @Serializable
-    data object Albums: MelodiaScreen()
+    data class AlbumSongs(val albumId: Long, val albumModel: AlbumModel) : MelodiaScreen()
 
     @Serializable
-    data object Artists: MelodiaScreen()
+    data object Albums : MelodiaScreen()
 
     @Serializable
-    data object Playlists: MelodiaScreen()
+    data object Artists : MelodiaScreen()
 
     @Serializable
-    data object Settings: MelodiaScreen()
+    data object Playlists : MelodiaScreen()
 
     @Serializable
-    data object Permission: MelodiaScreen()
+    data object Settings : MelodiaScreen()
+
+    @Serializable
+    data object Permission : MelodiaScreen()
 }

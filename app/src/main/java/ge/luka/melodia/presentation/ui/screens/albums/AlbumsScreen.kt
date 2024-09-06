@@ -46,7 +46,7 @@ fun AlbumsScreen(
     }
 
     AlbumsScreenContent(albumsList = albumsList) {
-        navHostController.navigate(MelodiaScreen.Songs(it.second))
+        navHostController.navigate(MelodiaScreen.AlbumSongs(it.second, it.third))
         onUpdateRoute.invoke(it.first)
 
     }
@@ -56,13 +56,19 @@ fun AlbumsScreen(
 fun AlbumsScreenContent(
     modifier: Modifier = Modifier,
     albumsList: List<AlbumModel>,
-    onClick: (Pair<String, Long>) -> Unit
+    onClick: (Triple<String, Long, AlbumModel>) -> Unit
 ) {
     if (albumsList.isNotEmpty()) {
         LazyColumn(modifier = modifier.fillMaxSize()) {
             items(albumsList) { albumItem ->
                 GeneralAlbumListItem(albumItem = albumItem, modifier = modifier.clickable {
-                    onClick.invoke(Pair(albumItem.title ?: "", albumItem.albumId ?: 0))
+                    onClick.invoke(
+                        Triple(
+                            first = albumItem.title ?: "",
+                            second = albumItem.albumId ?: 0,
+                            third = albumItem
+                        )
+                    )
                 })
             }
         }
