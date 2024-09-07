@@ -9,9 +9,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,22 +36,38 @@ import ge.luka.melodia.common.extensions.getScreenFromRoute
 import ge.luka.melodia.domain.model.AlbumModel
 import ge.luka.melodia.domain.model.SongModel
 import ge.luka.melodia.presentation.ui.components.shared.GeneralMusicListItem
+import ge.luka.melodia.presentation.ui.components.shared.HelperControlButtons
 import ge.luka.melodia.presentation.ui.theme.themecomponents.MelodiaTypography
 import kotlinx.coroutines.launch
 
 @Composable
 fun AlbumSongsScreen(
     modifier: Modifier = Modifier,
-    viewModel: AlbumSongsScreenVM = hiltViewModel(),
     navHostController: NavHostController,
     onUpdateRoute: (String?) -> Unit,
     albumId: Long? = null,
     albumModel: AlbumModel
 ) {
-    var songsList by remember { mutableStateOf(listOf<SongModel>()) }
     val previousRoute =
         navHostController.previousBackStackEntry?.destination?.route?.getScreenFromRoute()
 
+
+    BackHandler {
+        onUpdateRoute.invoke(previousRoute)
+        navHostController.popBackStack()
+    }
+
+    AlbumSongsScreenContent(albumModel = albumModel, albumId = albumId)
+}
+
+@Composable
+fun AlbumSongsScreenContent(
+    modifier: Modifier = Modifier,
+    viewModel: AlbumSongsScreenVM = hiltViewModel(),
+    albumModel: AlbumModel,
+    albumId: Long?
+) {
+    var songsList by remember { mutableStateOf(listOf<SongModel>()) }
     LaunchedEffect(Unit) {
         launch {
             viewModel.songsList.collect {
@@ -57,29 +75,17 @@ fun AlbumSongsScreen(
             }
         }
     }
-
-    BackHandler {
-        onUpdateRoute.invoke(previousRoute)
-        navHostController.popBackStack()
+    val derivedSongsList by remember {
+        derivedStateOf { songsList }
     }
 
-    AlbumSongsScreenContent(songsList = songsList, albumModel = albumModel)
-}
-
-@Composable
-fun AlbumSongsScreenContent(
-    modifier: Modifier = Modifier,
-    songsList: List<SongModel>,
-    albumModel: AlbumModel
-) {
-    if (songsList.isNotEmpty()) {
-        LazyColumn(modifier = modifier.fillMaxSize()) {
+    if (derivedSongsList.isNotEmpty()) {
+        LazyColumn(modifier = modifier.fillMaxSize(), state = rememberLazyListState()) {
             item {
-                InfoBoxView(
-                    albumModel = albumModel
-                )
+                InfoBoxView(albumModel = albumModel)
+                HelperControlButtons()
             }
-            items(songsList, key = {it.songId ?: 0}) { songItem ->
+            items(derivedSongsList, key = { it.songId ?: 0 }) { songItem ->
                 GeneralMusicListItem(songItem = songItem)
             }
         }
@@ -145,20 +151,15 @@ fun InfoBoxView(modifier: Modifier = Modifier, albumModel: AlbumModel) {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun AlbumSongsScreenPreview() {
-    val mockSongsList = listOf(
-        SongModel(1, 1, "Artist 1", "1", "", 1, "120"),
-        SongModel(2, 1, "Artist 2", "2", "", 2, "180")
-    )
-
     AlbumSongsScreenContent(
-        songsList = mockSongsList, albumModel = AlbumModel(
+        albumModel = AlbumModel(
             albumId = 1,
             title = "Madvillainy",
             artist = "Madvillain",
             songCount = 99,
             artUri = "",
             duration = "4min"
-        )
+        ), albumId = 1
     )
 }
 

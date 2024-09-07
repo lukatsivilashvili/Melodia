@@ -32,14 +32,13 @@ import ge.luka.melodia.presentation.ui.theme.themecomponents.MelodiaTypography
 fun GeneralMusicListItem(
     modifier: Modifier = Modifier,
     songItem: SongModel,
-    shouldShowDuration: Boolean = true
 ) {
 
     Row(
         modifier = modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surface)
-            .padding(11.dp),
+            .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
@@ -83,14 +82,12 @@ fun GeneralMusicListItem(
                 fontWeight = FontWeight.Medium
             )
         }
-        if (shouldShowDuration) {
-            Text(
-                text = songItem.duration?.formatDuration() ?: "00:00",
-                fontSize = 10.sp,
-                modifier = modifier
-                    .padding(start = 22.dp),
-                style = MelodiaTypography.labelLarge
-            )
-        }
+        Text(
+            text = songItem.duration?.formatDuration() ?: "00:00",
+            fontSize = 10.sp,
+            modifier = modifier
+                .padding(start = 22.dp),
+            style = MelodiaTypography.labelLarge
+        )
     }
 }

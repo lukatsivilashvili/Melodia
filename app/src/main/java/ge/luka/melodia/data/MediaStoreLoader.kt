@@ -120,7 +120,7 @@ object MediaStoreLoader {
         return albumSet.toList()
     }
 
-    fun getAlbumDuration(context: Context, albumId: Long): Long {
+    private fun getAlbumDuration(context: Context, albumId: Long): Long {
         val uri = Media.EXTERNAL_CONTENT_URI
         val projection = arrayOf(Media.DURATION)
         val selection = "${Media.ALBUM_ID} = ?"

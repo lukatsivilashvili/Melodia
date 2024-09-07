@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,24 +29,20 @@ import kotlinx.coroutines.launch
 @Composable
 fun AlbumsScreen(
     modifier: Modifier = Modifier,
-    viewModel: AlbumsScreenVM = hiltViewModel(),
     navHostController: NavHostController,
     onUpdateRoute: (String?) -> Unit
 ) {
-    var albumsList by remember { mutableStateOf(listOf<AlbumModel>()) }
     val previousRoute =
         navHostController.previousBackStackEntry?.destination?.route?.getScreenFromRoute()
 
-    LaunchedEffect(Unit) {
-        launch { viewModel.albumsList.collect { albumsList = it } }
-    }
+
 
     BackHandler {
         onUpdateRoute.invoke(previousRoute)
         navHostController.popBackStack()
     }
 
-    AlbumsScreenContent(albumsList = albumsList) {
+    AlbumsScreenContent {
         navHostController.navigate(MelodiaScreen.AlbumSongs(it.second, it.third))
         onUpdateRoute.invoke(it.first)
 
@@ -55,12 +52,22 @@ fun AlbumsScreen(
 @Composable
 fun AlbumsScreenContent(
     modifier: Modifier = Modifier,
-    albumsList: List<AlbumModel>,
+    viewModel: AlbumsScreenVM = hiltViewModel(),
     onClick: (Triple<String, Long, AlbumModel>) -> Unit
 ) {
-    if (albumsList.isNotEmpty()) {
+    var albumsList by remember { mutableStateOf(listOf<AlbumModel>()) }
+
+    LaunchedEffect(Unit) {
+        launch { viewModel.albumsList.collect { albumsList = it } }
+    }
+
+    val derivedSongsList by remember {
+        derivedStateOf { albumsList }
+    }
+
+    if (derivedSongsList.isNotEmpty()) {
         LazyColumn(modifier = modifier.fillMaxSize()) {
-            items(albumsList) { albumItem ->
+            items(derivedSongsList) { albumItem ->
                 GeneralAlbumListItem(albumItem = albumItem, modifier = modifier.clickable {
                     onClick.invoke(
                         Triple(

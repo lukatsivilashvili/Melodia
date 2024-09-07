@@ -24,21 +24,21 @@ fun LibraryScreen(
 ) {
     LibraryScreenContent(
         modifier = modifier,
-        viewModel = viewModel,
         navHostController = navHostController,
-        onUpdateRoute = onUpdateRoute
+        onUpdateRoute = onUpdateRoute,
+        getDestinationScreen = { viewModel?.setDestinationScreen(screen = it) }
     )
 }
 
 @Composable
 fun LibraryScreenContent(
     modifier: Modifier,
-    viewModel: LibraryScreenVM? = null,
     navHostController: NavHostController? = null,
-    onUpdateRoute: ((String?) -> Unit)? = null
+    onUpdateRoute: ((String?) -> Unit)? = null,
+    getDestinationScreen: (String) -> MelodiaScreen?
 ) {
     val navigateToScreen: (String) -> Unit = { screen ->
-        val destination = viewModel?.setDestinationScreen(screen = screen)
+        val destination = getDestinationScreen.invoke(screen)
         navHostController?.navigate(destination ?: MelodiaScreen.Library)
         onUpdateRoute?.invoke(destination.toString().getScreenFromRoute())
 
@@ -60,7 +60,7 @@ fun LibraryScreenContent(
         )
         LibraryListItem(
             title = "Artists",
-            icon = R.drawable.ic_artists,
+            icon = R.drawable.ic_artist,
             navigateToScreen = navigateToScreen
         )
         LibraryListItem(
@@ -75,6 +75,6 @@ fun LibraryScreenContent(
 @Composable
 fun LibraryScreenPreview(modifier: Modifier = Modifier) {
     MelodiaTheme {
-        LibraryScreenContent(modifier = modifier)
+        LibraryScreenContent(modifier = modifier, getDestinationScreen = { MelodiaScreen.Library })
     }
 }
