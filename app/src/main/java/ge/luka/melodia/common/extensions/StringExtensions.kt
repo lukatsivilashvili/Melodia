@@ -1,5 +1,6 @@
 package ge.luka.melodia.common.extensions
 
 fun String.getScreenFromRoute(): String {
-    return this.split(".").last()
+    val parts = this.split("(")
+    return parts[0].split(".").last()
 }

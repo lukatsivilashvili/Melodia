@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Build
 import android.provider.MediaStore
 import android.provider.MediaStore.Audio.Media
-import androidx.annotation.RequiresApi
+import ge.luka.melodia.common.extensions.formatAlbumDuration
 import ge.luka.melodia.domain.model.AlbumModel
 import ge.luka.melodia.domain.model.SongModel
 import kotlinx.coroutines.Dispatchers
@@ -12,11 +12,14 @@ import kotlinx.coroutines.withContext
 
 object MediaStoreLoader {
 
-    @RequiresApi(Build.VERSION_CODES.Q)
     suspend fun getSongsList(context: Context): List<SongModel> {
         val songs = mutableListOf<SongModel>()
         withContext(Dispatchers.IO) {
-            val collection = Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
+            val collection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
+            } else {
+                Media.EXTERNAL_CONTENT_URI
+            }
             val selection = Media.IS_MUSIC + " !=0"
             val sortOrder = "${Media.TITLE} ASC"
             val projection = arrayOf(
@@ -65,11 +68,14 @@ object MediaStoreLoader {
         return songs
     }
 
-    @RequiresApi(Build.VERSION_CODES.Q)
     suspend fun getAlbumList(context: Context): List<AlbumModel> {
         val albumSet = mutableSetOf<AlbumModel>()
         withContext(Dispatchers.IO) {
-            val collection = MediaStore.Audio.Albums.getContentUri(MediaStore.VOLUME_EXTERNAL)
+            val collection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                MediaStore.Audio.Albums.getContentUri(MediaStore.VOLUME_EXTERNAL)
+            } else {
+                MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI
+            }
             val sortOrder = "${MediaStore.Audio.Albums.ALBUM} ASC"
             val projection = arrayOf(
                 Media.ALBUM_ID,
@@ -78,12 +84,12 @@ object MediaStoreLoader {
                 MediaStore.Audio.Albums.NUMBER_OF_SONGS
             )
             val query = context.contentResolver.query(
-                /* uri = */ collection,
-                /* projection = */ projection,
-                /* selection = */ null,
-                /* selectionArgs = */ null,
-                /* sortOrder = */ sortOrder,
-                /* cancellationSignal = */ null
+                collection,
+                projection,
+                null,
+                null,
+                sortOrder,
+                null
             )
             query?.use { cursor ->
 
@@ -96,6 +102,8 @@ object MediaStoreLoader {
                     cursor.getColumnIndexOrThrow(MediaStore.Audio.AlbumColumns.NUMBER_OF_SONGS)
 
                 while (cursor.moveToNext()) {
+                    val albumId = cursor.getLong(albumIdColumn)
+                    val albumDuration = getAlbumDuration(context, albumId)
                     albumSet.add(
                         AlbumModel.fromCursor(
                             cursor = cursor,
@@ -103,6 +111,7 @@ object MediaStoreLoader {
                             titleColumn = titleColumn,
                             artistColumn = artistColumn,
                             songCountColumn = songCountColumn,
+                            duration = albumDuration.formatAlbumDuration()
                         )
                     )
                 }
@@ -111,4 +120,22 @@ object MediaStoreLoader {
         return albumSet.toList()
     }
 
+    private fun getAlbumDuration(context: Context, albumId: Long): Long {
+        val uri = Media.EXTERNAL_CONTENT_URI
+        val projection = arrayOf(Media.DURATION)
+        val selection = "${Media.ALBUM_ID} = ?"
+        val selectionArgs = arrayOf(albumId.toString())
+
+        val cursor = context.contentResolver.query(uri, projection, selection, selectionArgs, null)
+
+        var totalDuration = 0L
+        cursor?.use {
+            while (it.moveToNext()) {
+                val duration = it.getLong(it.getColumnIndexOrThrow(Media.DURATION))
+                totalDuration += duration
+            }
+        }
+
+        return totalDuration
+    }
 }

@@ -23,22 +23,20 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import ge.luka.melodia.R
-import ge.luka.melodia.common.extensions.formatDuration
-import ge.luka.melodia.domain.model.SongModel
+import ge.luka.melodia.domain.model.AlbumModel
 import ge.luka.melodia.presentation.ui.theme.themecomponents.MelodiaTypography
 
-
 @Composable
-fun GeneralMusicListItem(
+fun GeneralAlbumListItem(
     modifier: Modifier = Modifier,
-    songItem: SongModel,
+    albumItem: AlbumModel,
 ) {
 
     Row(
         modifier = modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surface)
-            .padding(10.dp),
+            .padding(11.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
@@ -54,7 +52,7 @@ fun GeneralMusicListItem(
                 error = painterResource(id = R.drawable.ic_songs),
                 fallback = painterResource(id = R.drawable.ic_songs),
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(songItem.artUri)
+                    .data(albumItem.artUri)
                     .crossfade(true)
                     .build(),
                 contentDescription = null,
@@ -65,7 +63,7 @@ fun GeneralMusicListItem(
                 .weight(1f)
         ) {
             Text(
-                text = songItem.title ?: "",
+                text = albumItem.title ?: "",
                 fontSize = 14.sp,
                 style = MelodiaTypography.labelLarge,
                 fontWeight = FontWeight.SemiBold,
@@ -74,7 +72,7 @@ fun GeneralMusicListItem(
                     .padding(start = 11.dp, end = 11.dp)
             )
             Text(
-                text = songItem.artist ?: "",
+                text = albumItem.artist ?: "",
                 fontSize = 12.sp,
                 modifier = modifier
                     .padding(start = 11.dp, end = 11.dp),
@@ -82,12 +80,5 @@ fun GeneralMusicListItem(
                 fontWeight = FontWeight.Medium
             )
         }
-        Text(
-            text = songItem.duration?.formatDuration() ?: "00:00",
-            fontSize = 10.sp,
-            modifier = modifier
-                .padding(start = 22.dp),
-            style = MelodiaTypography.labelLarge
-        )
     }
 }

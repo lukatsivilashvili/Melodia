@@ -11,3 +11,8 @@ fun Long.formatDuration(): String {
     ) - minutes * TimeUnit.SECONDS.convert(1, TimeUnit.MINUTES)
     return String.format(Locale.getDefault(),"%02d:%02d", minutes, seconds)
 }
+
+fun Long.formatAlbumDuration(): String {
+    val minutes = TimeUnit.MILLISECONDS.toMinutes(this)
+    return "${minutes}min"
+}

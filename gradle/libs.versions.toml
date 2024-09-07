@@ -1,20 +1,20 @@
 [versions]
-agp = "8.5.1"
+agp = "8.5.2"
 kotlin = "2.0.0"
 coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-lifecycleRuntimeKtx = "2.8.4"
-activityCompose = "1.9.1"
-composeBom = "2024.06.00"
+lifecycleRuntimeKtx = "2.8.5"
+activityCompose = "1.9.2"
+composeBom = "2024.09.00"
 kspVersion = "2.0.0-1.0.23"
 hiltVersion = "2.51.1"
-composeNavigation = "2.8.0-beta06"
+composeNavigation = "2.8.0"
 serialization = "1.6.3"
 accompanist = "0.24.13-rc"
 datastore = "1.1.1"
-lifecycleViewModel = "2.8.4"
+lifecycleViewModel = "2.8.5"
 coil = "2.7.0"
 
 [libraries]
@@ -41,6 +41,7 @@ accompanist-permissions = { module = "com.google.accompanist:accompanist-permiss
 preferences-datastore = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewModel" }
 coil = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
+material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 
 
 
