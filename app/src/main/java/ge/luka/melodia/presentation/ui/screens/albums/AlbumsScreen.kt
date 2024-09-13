@@ -5,6 +5,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -66,8 +69,11 @@ fun AlbumsScreenContent(
     }
 
     if (derivedSongsList.isNotEmpty()) {
-        LazyColumn(modifier = modifier.fillMaxSize()) {
-            items(derivedSongsList) { albumItem ->
+        LazyVerticalGrid(
+            modifier = modifier.fillMaxSize(),
+            columns = GridCells.Fixed(2)
+        ) {
+            items(derivedSongsList, key = {it.albumId ?: 0}) { albumItem ->
                 GeneralAlbumListItem(albumItem = albumItem, modifier = modifier.clickable {
                     onClick.invoke(
                         Triple(

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -21,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -112,7 +114,8 @@ fun InfoBoxView(modifier: Modifier = Modifier, albumModel: AlbumModel) {
     ) {
         AsyncImage(
             modifier = modifier
-                .size(256.dp),
+                .size(256.dp)
+                .clip(RoundedCornerShape(10.dp)),
             placeholder = painterResource(id = R.drawable.ic_albums),
             error = painterResource(id = R.drawable.ic_albums),
             fallback = painterResource(id = R.drawable.ic_albums),
