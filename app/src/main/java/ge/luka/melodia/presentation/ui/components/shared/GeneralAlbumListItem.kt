@@ -3,18 +3,13 @@
 package ge.luka.melodia.presentation.ui.components.shared
 
 import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -27,7 +22,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -58,9 +52,9 @@ fun GeneralAlbumListItem(
                     .fillMaxSize()
                     .clip(RoundedCornerShape(10.dp)),
                 contentScale = ContentScale.Crop,
-                placeholder = painterResource(id = R.drawable.ic_songs),
-                error = painterResource(id = R.drawable.ic_songs),
-                fallback = painterResource(id = R.drawable.ic_songs),
+                placeholder = painterResource(id = R.drawable.ic_albums),
+                error = painterResource(id = R.drawable.ic_albums),
+                fallback = painterResource(id = R.drawable.ic_albums),
                 model = ImageRequest
                     .Builder(LocalContext.current)
                     .data(albumItem.artUri)
