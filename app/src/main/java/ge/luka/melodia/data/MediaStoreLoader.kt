@@ -6,6 +6,7 @@ import android.provider.MediaStore
 import android.provider.MediaStore.Audio.Media
 import ge.luka.melodia.common.extensions.formatAlbumDuration
 import ge.luka.melodia.domain.model.AlbumModel
+import ge.luka.melodia.domain.model.ArtistModel
 import ge.luka.melodia.domain.model.SongModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -118,6 +119,104 @@ object MediaStoreLoader {
             }
         }
         return albumSet.toList()
+    }
+
+    suspend fun getArtistsList(context: Context): List<ArtistModel> {
+        val artistSet = mutableSetOf<ArtistModel>()
+        withContext(Dispatchers.IO) {
+            val collection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                MediaStore.Audio.Artists.getContentUri(MediaStore.VOLUME_EXTERNAL)
+            } else {
+                MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI
+            }
+            val sortOrder = "${MediaStore.Audio.Artists.ARTIST} ASC"
+            val projection = arrayOf(
+                MediaStore.Audio.Artists.ARTIST,
+                MediaStore.Audio.Artists._ID,
+                MediaStore.Audio.Artists.NUMBER_OF_ALBUMS,
+                MediaStore.Audio.Artists.NUMBER_OF_TRACKS
+            )
+            val query = context.contentResolver.query(
+                collection,
+                projection,
+                null,
+                null,
+                sortOrder,
+                null
+            )
+            query?.use { cursor ->
+                val artistIdColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Artists._ID)
+                val artistColumn =
+                    cursor.getColumnIndexOrThrow(MediaStore.Audio.ArtistColumns.ARTIST)
+                val artistAlbumCountColumn =
+                    cursor.getColumnIndexOrThrow(MediaStore.Audio.ArtistColumns.NUMBER_OF_ALBUMS)
+                val artistSongCountColumn =
+                    cursor.getColumnIndexOrThrow(MediaStore.Audio.ArtistColumns.NUMBER_OF_TRACKS)
+
+                while (cursor.moveToNext()) {
+                    val artistId = cursor.getLong(artistIdColumn)
+                    artistSet.add(
+                        ArtistModel.fromCursor(
+                            cursor = cursor,
+                            artistColumn = artistColumn,
+                            artistAlbumCountColumn = artistAlbumCountColumn,
+                            artistSongCountColumn = artistSongCountColumn,
+                            albums = getArtistAlbumList(context = context, artistId = artistId)
+                        )
+                    )
+                }
+            }
+        }
+        return artistSet.toList()
+    }
+
+    private suspend fun getArtistAlbumList(context: Context, artistId: Long): Set<AlbumModel> {
+        val albumSet = mutableSetOf<AlbumModel>()
+        withContext(Dispatchers.IO) {
+            val collection = MediaStore.Audio.Artists.Albums.getContentUri("external", artistId)
+
+            val sortOrder = "${MediaStore.Audio.Albums.ALBUM} ASC"
+            val projection = arrayOf(
+                Media.ALBUM_ID,
+                MediaStore.Audio.Albums.ALBUM,
+                MediaStore.Audio.Albums.ARTIST,
+                MediaStore.Audio.Albums.NUMBER_OF_SONGS
+            )
+            val query = context.contentResolver.query(
+                collection,
+                projection,
+                null,
+                null,
+                sortOrder,
+                null
+            )
+            query?.use { cursor ->
+
+                val albumIdColumn =
+                    cursor.getColumnIndexOrThrow(MediaStore.Audio.AlbumColumns.ALBUM_ID)
+                val titleColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.AlbumColumns.ALBUM)
+                val artistColumn =
+                    cursor.getColumnIndexOrThrow(MediaStore.Audio.AlbumColumns.ARTIST)
+                val songCountColumn =
+                    cursor.getColumnIndexOrThrow(MediaStore.Audio.AlbumColumns.NUMBER_OF_SONGS)
+
+                while (cursor.moveToNext()) {
+                    val albumId = cursor.getLong(albumIdColumn)
+                    val albumDuration = getAlbumDuration(context, albumId)
+                    albumSet.add(
+                        AlbumModel.fromCursor(
+                            cursor = cursor,
+                            albumIdColumn = albumIdColumn,
+                            titleColumn = titleColumn,
+                            artistColumn = artistColumn,
+                            songCountColumn = songCountColumn,
+                            duration = albumDuration.formatAlbumDuration()
+                        )
+                    )
+                }
+            }
+        }
+        return albumSet
     }
 
     private fun getAlbumDuration(context: Context, albumId: Long): Long {

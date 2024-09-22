@@ -3,6 +3,7 @@ package ge.luka.melodia.data.repository
 import android.content.Context
 import ge.luka.melodia.data.MediaStoreLoader
 import ge.luka.melodia.domain.model.AlbumModel
+import ge.luka.melodia.domain.model.ArtistModel
 import ge.luka.melodia.domain.model.SongModel
 import ge.luka.melodia.domain.repository.MediaStoreRepository
 import kotlinx.coroutines.flow.Flow
@@ -16,6 +17,7 @@ class MediaStoreRepositoryImpl @Inject constructor(
 
     private val songsCache = mutableMapOf<String, List<SongModel>>()
     private val albumsCache = mutableMapOf<String, List<AlbumModel>>()
+    private val artistsCache = mutableMapOf<String, List<ArtistModel>>()
 
     override suspend fun getAllSongs(): Flow<List<SongModel>> = flow {
         val cachedSongs = songsCache["allSongs"]
@@ -38,6 +40,18 @@ class MediaStoreRepositoryImpl @Inject constructor(
             val allAlbums = mediaStoreLoader.getAlbumList(context = context)
             albumsCache["allAlbums"] = allAlbums
             emit(allAlbums)
+        }
+    }
+
+    override suspend fun getAllArtists(): Flow<List<ArtistModel>> = flow {
+        val cachedArtists = artistsCache["allArtists"]
+        if (cachedArtists != null) {
+            emit(cachedArtists)
+            return@flow
+        } else {
+            val allArtists = mediaStoreLoader.getArtistsList(context = context)
+            artistsCache["allAlbums"] = allArtists
+            emit(allArtists)
         }
     }
 }
