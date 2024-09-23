@@ -34,7 +34,6 @@ fun SongsScreen(
     val previousRoute =
         navHostController.previousBackStackEntry?.destination?.route?.getScreenFromRoute()
 
-
     BackHandler {
         onUpdateRoute.invoke(previousRoute)
         navHostController.popBackStack()

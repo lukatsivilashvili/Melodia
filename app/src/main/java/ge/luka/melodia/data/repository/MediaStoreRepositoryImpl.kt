@@ -50,7 +50,7 @@ class MediaStoreRepositoryImpl @Inject constructor(
             return@flow
         } else {
             val allArtists = mediaStoreLoader.getArtistsList(context = context)
-            artistsCache["allAlbums"] = allArtists
+            artistsCache["allArtists"] = allArtists
             emit(allArtists)
         }
     }
