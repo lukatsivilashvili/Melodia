@@ -17,6 +17,7 @@ class MediaStoreRepositoryImpl @Inject constructor(
 
     private val songsCache = mutableMapOf<String, List<SongModel>>()
     private val albumsCache = mutableMapOf<String, List<AlbumModel>>()
+    private val artistAlbumsCache = mutableMapOf<String, List<AlbumModel>>()
     private val artistsCache = mutableMapOf<String, List<ArtistModel>>()
 
     override suspend fun getAllSongs(): Flow<List<SongModel>> = flow {
@@ -40,6 +41,18 @@ class MediaStoreRepositoryImpl @Inject constructor(
             val allAlbums = mediaStoreLoader.getAlbumList(context = context)
             albumsCache["allAlbums"] = allAlbums
             emit(allAlbums)
+        }
+    }
+
+    override suspend fun getArtistAlbums(artistId: Long): Flow<List<AlbumModel>> = flow {
+        val cachedArtistAlbums = artistAlbumsCache["$artistId"]
+        if (cachedArtistAlbums != null) {
+            emit(cachedArtistAlbums)
+            return@flow
+        } else {
+            val artistAlbums = mediaStoreLoader.getArtistAlbumList(context = context, artistId = artistId)
+            artistAlbumsCache["$artistId"] = artistAlbums
+            emit(artistAlbums)
         }
     }
 
