@@ -1,6 +1,7 @@
 package ge.luka.melodia.presentation.ui.screens.artists
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,6 +22,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import ge.luka.melodia.common.extensions.getScreenFromRoute
 import ge.luka.melodia.domain.model.ArtistModel
+import ge.luka.melodia.presentation.ui.MelodiaScreen
 import ge.luka.melodia.presentation.ui.components.shared.GeneralArtistListItem
 import ge.luka.melodia.presentation.ui.theme.themecomponents.MelodiaTypography
 import kotlinx.coroutines.launch
@@ -38,13 +40,17 @@ fun ArtistsScreen(
         navHostController.popBackStack()
     }
 
-    ArtistsScreenContent()
+    ArtistsScreenContent {
+        navHostController.navigate(MelodiaScreen.ArtistAlbums(it.first, it.second))
+        onUpdateRoute.invoke(it.first)
+    }
 }
 
 @Composable
 fun ArtistsScreenContent(
     modifier: Modifier = Modifier,
-    viewModel: ArtistsScreenVM = hiltViewModel()
+    viewModel: ArtistsScreenVM = hiltViewModel(),
+    onClick: (Pair<String, Long>) -> Unit
 ) {
     var artistsList by remember { mutableStateOf(listOf<ArtistModel>()) }
 
@@ -59,7 +65,14 @@ fun ArtistsScreenContent(
     if (derivedArtistsList.isNotEmpty()) {
         LazyColumn(modifier = modifier.fillMaxSize(), state = rememberLazyListState()) {
             items(items = derivedArtistsList, key = { it.title ?: 0 }) { artistItem ->
-                GeneralArtistListItem(modifier = modifier, artistItem = artistItem)
+                GeneralArtistListItem(modifier = modifier.clickable {
+                    onClick.invoke(
+                        Pair(
+                            first = artistItem.title ?: "",
+                            second = artistItem.id ?: 0
+                        )
+                    )
+                }, artistItem = artistItem)
             }
         }
     } else {

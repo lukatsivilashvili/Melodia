@@ -70,7 +70,7 @@ object MediaStoreLoader {
     }
 
     suspend fun getAlbumList(context: Context): List<AlbumModel> {
-        val albumSet = mutableSetOf<AlbumModel>()
+        val albumList = mutableListOf<AlbumModel>()
         withContext(Dispatchers.IO) {
             val collection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 MediaStore.Audio.Albums.getContentUri(MediaStore.VOLUME_EXTERNAL)
@@ -105,7 +105,7 @@ object MediaStoreLoader {
                 while (cursor.moveToNext()) {
                     val albumId = cursor.getLong(albumIdColumn)
                     val albumDuration = getAlbumDuration(context, albumId)
-                    albumSet.add(
+                    albumList.add(
                         AlbumModel.fromCursor(
                             cursor = cursor,
                             albumIdColumn = albumIdColumn,
@@ -118,11 +118,11 @@ object MediaStoreLoader {
                 }
             }
         }
-        return albumSet.toList()
+        return albumList
     }
 
     suspend fun getArtistsList(context: Context): List<ArtistModel> {
-        val artistSet = mutableSetOf<ArtistModel>()
+        val artistList = mutableListOf<ArtistModel>()
         withContext(Dispatchers.IO) {
             val collection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 MediaStore.Audio.Artists.getContentUri(MediaStore.VOLUME_EXTERNAL)
@@ -155,9 +155,10 @@ object MediaStoreLoader {
 
                 while (cursor.moveToNext()) {
                     val artistId = cursor.getLong(artistIdColumn)
-                    artistSet.add(
+                    artistList.add(
                         ArtistModel.fromCursor(
                             cursor = cursor,
+                            id = artistId,
                             artistColumn = artistColumn,
                             artistAlbumCountColumn = artistAlbumCountColumn,
                             artistSongCountColumn = artistSongCountColumn,
@@ -167,11 +168,11 @@ object MediaStoreLoader {
                 }
             }
         }
-        return artistSet.toList()
+        return artistList
     }
 
-    private suspend fun getArtistAlbumList(context: Context, artistId: Long): Set<AlbumModel> {
-        val albumSet = mutableSetOf<AlbumModel>()
+    suspend fun getArtistAlbumList(context: Context, artistId: Long): List<AlbumModel> {
+        val albumList = mutableListOf<AlbumModel>()
         withContext(Dispatchers.IO) {
             val collection = MediaStore.Audio.Artists.Albums.getContentUri("external", artistId)
 
@@ -203,7 +204,7 @@ object MediaStoreLoader {
                 while (cursor.moveToNext()) {
                     val albumId = cursor.getLong(albumIdColumn)
                     val albumDuration = getAlbumDuration(context, albumId)
-                    albumSet.add(
+                    albumList.add(
                         AlbumModel.fromCursor(
                             cursor = cursor,
                             albumIdColumn = albumIdColumn,
@@ -216,7 +217,7 @@ object MediaStoreLoader {
                 }
             }
         }
-        return albumSet
+        return albumList
     }
 
     private fun getAlbumDuration(context: Context, albumId: Long): Long {

@@ -1,5 +1,6 @@
-package ge.luka.melodia.presentation.ui.screens.albums
+package ge.luka.melodia.presentation.ui.screens.artistalbumsscreen
 
+import android.util.Log.d
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -28,10 +29,12 @@ import ge.luka.melodia.presentation.ui.theme.themecomponents.MelodiaTypography
 import kotlinx.coroutines.launch
 
 @Composable
-fun AlbumsScreen(
+fun ArtistAlbumsScreen(
     modifier: Modifier = Modifier,
     navHostController: NavHostController,
-    onUpdateRoute: (String?) -> Unit
+    onUpdateRoute: (String?) -> Unit,
+    artistId: Long,
+    artistName: String,
 ) {
     val previousRoute =
         navHostController.previousBackStackEntry?.destination?.route?.getScreenFromRoute()
@@ -41,23 +44,27 @@ fun AlbumsScreen(
         navHostController.popBackStack()
     }
 
-    AlbumsScreenContent {
+    ArtistAlbumsScreenContent(artistId = artistId) {
         navHostController.navigate(MelodiaScreen.AlbumSongs(it.second, it.third))
         onUpdateRoute.invoke(it.first)
-
     }
 }
 
 @Composable
-fun AlbumsScreenContent(
+fun ArtistAlbumsScreenContent(
     modifier: Modifier = Modifier,
-    viewModel: AlbumsScreenVM = hiltViewModel(),
+    viewModel: ArtistAlbumsScreenVM = hiltViewModel(),
+    artistId: Long,
     onClick: (Triple<String, Long, AlbumModel>) -> Unit
 ) {
     var albumsList by remember { mutableStateOf(listOf<AlbumModel>()) }
 
     LaunchedEffect(Unit) {
-        launch { viewModel.albumsList.collect { albumsList = it } }
+        launch { viewModel.getArtistAlbums(artistId = artistId) }
+        launch { viewModel.artistAlbumsList.collect {
+            d("testLog", it.toString())
+            albumsList = it
+        } }
     }
 
     val derivedSongsList by remember {
