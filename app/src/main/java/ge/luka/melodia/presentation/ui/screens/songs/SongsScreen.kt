@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import ge.luka.melodia.common.extensions.getScreenFromRoute
 import ge.luka.melodia.domain.model.SongModel
 import ge.luka.melodia.presentation.ui.components.shared.GeneralMusicListItem
 import ge.luka.melodia.presentation.ui.components.shared.HelperControlButtons
@@ -31,11 +30,11 @@ fun SongsScreen(
     navHostController: NavHostController,
     onUpdateRoute: (String?) -> Unit
 ) {
-    val previousRoute =
-        navHostController.previousBackStackEntry?.destination?.route?.getScreenFromRoute()
+    LaunchedEffect(Unit) {
+        onUpdateRoute.invoke("Songs")
+    }
 
     BackHandler {
-        onUpdateRoute.invoke(previousRoute)
         navHostController.popBackStack()
     }
 

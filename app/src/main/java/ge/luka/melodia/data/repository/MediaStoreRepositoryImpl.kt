@@ -21,25 +21,25 @@ class MediaStoreRepositoryImpl @Inject constructor(
     private val artistsCache = mutableMapOf<String, List<ArtistModel>>()
 
     override suspend fun getAllSongs(): Flow<List<SongModel>> = flow {
-        val cachedSongs = songsCache["allSongs"]
+        val cachedSongs = songsCache[ALL_SONGS]
         if (cachedSongs != null) {
             emit(cachedSongs)
             return@flow
         } else {
             val allSongs = mediaStoreLoader.getSongsList(context = context)
-            songsCache["allSongs"] = allSongs
+            songsCache[ALL_SONGS] = allSongs
             emit(allSongs)
         }
     }
 
     override suspend fun getAllAlbums(): Flow<List<AlbumModel>> = flow {
-        val cachedAlbums = albumsCache["allAlbums"]
+        val cachedAlbums = albumsCache[ALL_ALBUMS]
         if (cachedAlbums != null) {
             emit(cachedAlbums)
             return@flow
         } else {
             val allAlbums = mediaStoreLoader.getAlbumList(context = context)
-            albumsCache["allAlbums"] = allAlbums
+            albumsCache[ALL_ALBUMS] = allAlbums
             emit(allAlbums)
         }
     }
@@ -57,14 +57,20 @@ class MediaStoreRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getAllArtists(): Flow<List<ArtistModel>> = flow {
-        val cachedArtists = artistsCache["allArtists"]
+        val cachedArtists = artistsCache[ALL_ARTISTS]
         if (cachedArtists != null) {
             emit(cachedArtists)
             return@flow
         } else {
             val allArtists = mediaStoreLoader.getArtistsList(context = context)
-            artistsCache["allArtists"] = allArtists
+            artistsCache[ALL_ARTISTS] = allArtists
             emit(allArtists)
         }
+    }
+
+    companion object {
+        const val ALL_SONGS = "allSongs"
+        const val ALL_ALBUMS = "allAlbums"
+        const val ALL_ARTISTS = "allArtists"
     }
 }

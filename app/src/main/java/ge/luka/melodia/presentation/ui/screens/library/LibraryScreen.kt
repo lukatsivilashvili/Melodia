@@ -3,14 +3,16 @@ package ge.luka.melodia.presentation.ui.screens.library
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import ge.luka.melodia.R
-import ge.luka.melodia.common.extensions.getScreenFromRoute
 import ge.luka.melodia.presentation.ui.MelodiaScreen
 import ge.luka.melodia.presentation.ui.components.shared.LibraryListItem
 import ge.luka.melodia.presentation.ui.theme.MelodiaTheme
@@ -37,15 +39,19 @@ fun LibraryScreenContent(
     onUpdateRoute: ((String?) -> Unit)? = null,
     getDestinationScreen: (String) -> MelodiaScreen?
 ) {
+    LaunchedEffect(Unit) {
+        onUpdateRoute?.invoke("Library")
+    }
+
     val navigateToScreen: (String) -> Unit = { screen ->
         val destination = getDestinationScreen.invoke(screen)
         navHostController?.navigate(destination ?: MelodiaScreen.Library)
-        onUpdateRoute?.invoke(destination.toString().getScreenFromRoute())
-
     }
+
     Column(
         modifier = modifier
             .fillMaxSize()
+            .padding(horizontal = 8.dp)
             .background(MaterialTheme.colorScheme.surface)
     ) {
         LibraryListItem(
