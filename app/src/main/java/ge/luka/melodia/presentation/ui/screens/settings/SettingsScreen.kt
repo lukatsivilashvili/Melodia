@@ -12,14 +12,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import ge.luka.melodia.common.extensions.getScreenFromRoute
+import ge.luka.melodia.common.mvi.CollectSideEffects
 import ge.luka.melodia.presentation.ui.theme.themecomponents.AppTheme
 import kotlinx.coroutines.launch
 
@@ -31,22 +29,39 @@ fun SettingsScreen(
     onUpdateRoute: (String?) -> Unit,
 ) {
 
-    val previousRoute =
-        navHostController.previousBackStackEntry?.destination?.route?.getScreenFromRoute()
-    var isDarkMode by remember { mutableStateOf(false) }
-    var currentTheme by remember { mutableStateOf(AppTheme.GREEN) }
+    onUpdateRoute.invoke("Settings")
+
+    val viewState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    CollectSideEffects(flow = viewModel.sideEffect) { effect ->
+        when (effect) {
+            is SettingsSideEffect.DarkModeSwitched -> viewModel.setIsDarkMode(isDarkMode = effect.isDarkMode)
+            is SettingsSideEffect.ThemeChanged -> viewModel.setCurrentTheme(theme = effect.newTheme)
+        }
+    }
 
     LaunchedEffect(Unit) {
         launch {
-            viewModel.isDarkMode.collect { isDarkMode = it }
+            viewModel.isDarkMode.collect {
+                viewModel.onAction(
+                    uiAction = SettingsAction.DarkModeReceived(
+                        receivedDarkMode = it
+                    )
+                )
+            }
         }
         launch {
-            viewModel.currentTheme.collect { currentTheme = it }
+            viewModel.currentTheme.collect {
+                viewModel.onAction(
+                    uiAction = SettingsAction.ThemeReceived(
+                        receivedTheme = it
+                    )
+                )
+            }
         }
     }
 
     BackHandler {
-        onUpdateRoute.invoke(previousRoute)
         navHostController.popBackStack()
     }
 
@@ -54,16 +69,16 @@ fun SettingsScreen(
         Row {
             Text("Dark mode")
             Switch(
-                checked = isDarkMode,
+                checked = viewState.isDarkMode,
                 onCheckedChange = {
-                    viewModel.setIsDarkMode(isDarkMode = !isDarkMode)
+                    viewModel.onAction(SettingsAction.DarkModeSwitched(isDarkMode = viewState.isDarkMode.not()))
                 }
             )
         }
         Spacer(Modifier.height(16.dp))
 
-        ColorSchemeRadioButtons(selectedScheme = currentTheme) { newTheme ->
-            viewModel.setCurrentTheme(theme = newTheme)
+        ColorSchemeRadioButtons(selectedScheme = viewState.currentTheme) { newTheme ->
+            viewModel.onAction(SettingsAction.ThemeChanged(newTheme = newTheme))
         }
     }
 }

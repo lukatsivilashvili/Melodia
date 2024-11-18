@@ -1,6 +1,6 @@
 package ge.luka.melodia.presentation.ui.screens.settings
 
-import androidx.lifecycle.ViewModel
+import BaseMviViewmodel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ge.luka.melodia.domain.repository.DataStoreRepository
@@ -15,25 +15,48 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsScreenVM @Inject constructor(
     private val dataStoreRepository: DataStoreRepository
-) : ViewModel() {
+) : BaseMviViewmodel<SettingsViewState, SettingsAction, SettingsSideEffect>(
+    initialUiState = SettingsViewState()
+) {
+    override fun onAction(uiAction: SettingsAction) {
+        when (uiAction) {
+            is SettingsAction.DarkModeReceived -> updateUiState {
+                copy(isDarkMode = uiAction.receivedDarkMode)
+            }
+
+            is SettingsAction.ThemeReceived -> updateUiState {
+                copy(currentTheme = uiAction.receivedTheme)
+            }
+
+            is SettingsAction.DarkModeSwitched -> {
+                if (uiState.value.isDarkMode) {
+                    emitSideEffect(SettingsSideEffect.DarkModeSwitched(isDarkMode = false))
+                } else {
+                    emitSideEffect(SettingsSideEffect.DarkModeSwitched(isDarkMode = true))
+                }
+            }
+
+            is SettingsAction.ThemeChanged -> {
+                emitSideEffect(SettingsSideEffect.ThemeChanged(newTheme = uiAction.newTheme))
+            }
+        }
+    }
 
     // Observe the DataStore flow for dynamic theme preference
-    var isDarkMode: StateFlow<Boolean> =
+    val isDarkMode: StateFlow<Boolean> =
         dataStoreRepository.getDarkMode().map { isDarkMode -> isDarkMode }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
             initialValue = false
         )
-        private set
 
     // Observe the DataStore flow for theme type preference
-    var currentTheme: StateFlow<AppTheme> =
+    val currentTheme: StateFlow<AppTheme> =
         dataStoreRepository.getCurrentTheme().map { currentTheme -> currentTheme }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
             initialValue = AppTheme.GREEN
         )
-        private set
 
     fun setIsDarkMode(isDarkMode: Boolean) = viewModelScope.launch {
         dataStoreRepository.setDarkMode(isDarkMode)
