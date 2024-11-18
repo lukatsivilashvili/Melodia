@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import ge.luka.melodia.common.extensions.getScreenFromRoute
 import ge.luka.melodia.domain.model.AlbumModel
 import ge.luka.melodia.presentation.ui.MelodiaScreen
 import ge.luka.melodia.presentation.ui.components.shared.GeneralAlbumListItem
@@ -33,18 +32,17 @@ fun AlbumsScreen(
     navHostController: NavHostController,
     onUpdateRoute: (String?) -> Unit
 ) {
-    val previousRoute =
-        navHostController.previousBackStackEntry?.destination?.route?.getScreenFromRoute()
+
+    LaunchedEffect(Unit) {
+        onUpdateRoute.invoke("Albums")
+    }
 
     BackHandler {
-        onUpdateRoute.invoke(previousRoute)
         navHostController.popBackStack()
     }
 
     AlbumsScreenContent {
         navHostController.navigate(MelodiaScreen.AlbumSongs(it.second, it.third))
-        onUpdateRoute.invoke(it.first)
-
     }
 }
 
@@ -69,7 +67,7 @@ fun AlbumsScreenContent(
             modifier = modifier.fillMaxSize(),
             columns = GridCells.Fixed(2)
         ) {
-            items(derivedSongsList, key = {it.albumId ?: 0}) { albumItem ->
+            items(derivedSongsList, key = { it.albumId ?: 0 }) { albumItem ->
                 GeneralAlbumListItem(albumItem = albumItem, modifier = modifier.clickable {
                     onClick.invoke(
                         Triple(

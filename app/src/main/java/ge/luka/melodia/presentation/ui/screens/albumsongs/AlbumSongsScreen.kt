@@ -34,7 +34,6 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import ge.luka.melodia.R
-import ge.luka.melodia.common.extensions.getScreenFromRoute
 import ge.luka.melodia.domain.model.AlbumModel
 import ge.luka.melodia.domain.model.SongModel
 import ge.luka.melodia.presentation.ui.components.shared.GeneralMusicListItem
@@ -50,12 +49,12 @@ fun AlbumSongsScreen(
     albumId: Long? = null,
     albumModel: AlbumModel
 ) {
-    val previousRoute =
-        navHostController.previousBackStackEntry?.destination?.route?.getScreenFromRoute()
 
+    LaunchedEffect(Unit) {
+        onUpdateRoute.invoke(albumModel.title)
+    }
 
     BackHandler {
-        onUpdateRoute.invoke(previousRoute)
         navHostController.popBackStack()
     }
 

@@ -32,11 +32,13 @@ fun ArtistsScreen(
     modifier: Modifier = Modifier, navHostController: NavHostController,
     onUpdateRoute: (String?) -> Unit
 ) {
-    val previousRoute =
-        navHostController.previousBackStackEntry?.destination?.route?.getScreenFromRoute()
+    navHostController.previousBackStackEntry?.destination?.route?.getScreenFromRoute()
+
+    LaunchedEffect(Unit) {
+        onUpdateRoute.invoke("Artists")
+    }
 
     BackHandler {
-        onUpdateRoute.invoke(previousRoute)
         navHostController.popBackStack()
     }
 

@@ -41,7 +41,6 @@ fun MelodiaApp() {
     val navController = rememberNavController()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     var currentRoute by remember { mutableStateOf<String?>(null) }
-    navController.previousBackStackEntry?.destination?.route?.getScreenFromRoute()
 
     // Callback function to update currentRoute
     fun updateCurrentRoute(route: String?) {
@@ -51,7 +50,7 @@ fun MelodiaApp() {
         scrollBehavior.state.contentOffset = 0f
     }
 
-    MelodiaTheme{
+    MelodiaTheme {
         LaunchedEffect(navController) {
             snapshotFlow { navController.currentBackStackEntry?.destination?.route }.collect { route ->
                 currentRoute = route?.getScreenFromRoute()
@@ -61,7 +60,8 @@ fun MelodiaApp() {
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
-                MediumTopAppBar(colors = TopAppBarDefaults.topAppBarColors(
+                MediumTopAppBar(
+                    colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface,
                     scrolledContainerColor = MaterialTheme.colorScheme.surface,
                     titleContentColor = MaterialTheme.colorScheme.onSurface,
@@ -83,10 +83,7 @@ fun MelodiaApp() {
                         exit = fadeOut()
                     ) {
                         IconButton(onClick = {
-                            val previousRoute =
-                                navController.previousBackStackEntry?.destination?.route?.getScreenFromRoute()
                             navController.popBackStack()
-                            updateCurrentRoute(previousRoute) // Update after popBackStack
                         }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
