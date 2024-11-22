@@ -125,50 +125,62 @@ object MediaStoreLoader {
         val artistList = mutableListOf<ArtistModel>()
         withContext(Dispatchers.IO) {
             val collection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                MediaStore.Audio.Artists.getContentUri(MediaStore.VOLUME_EXTERNAL)
+                MediaStore.Audio.Albums.getContentUri(MediaStore.VOLUME_EXTERNAL)
             } else {
-                MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI
+                MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI
             }
-            val sortOrder = "${MediaStore.Audio.Artists.ARTIST} ASC"
+
+            // Query through albums to get distinct album artists
             val projection = arrayOf(
-                MediaStore.Audio.Artists.ARTIST,
-                MediaStore.Audio.Artists._ID,
-                MediaStore.Audio.Artists.NUMBER_OF_ALBUMS,
-                MediaStore.Audio.Artists.NUMBER_OF_TRACKS
+                MediaStore.Audio.Albums.ARTIST,
+                MediaStore.Audio.Albums.ARTIST_ID
             )
+
+            val sortOrder = "${MediaStore.Audio.Albums.ARTIST} ASC"
+
+            // Filter out empty or unknown artists
+            val selection = "${MediaStore.Audio.Albums.ARTIST} IS NOT NULL AND " +
+                    "${MediaStore.Audio.Albums.ARTIST} != '' AND " +
+                    "${MediaStore.Audio.Albums.ARTIST} != '<unknown>'"
+
             val query = context.contentResolver.query(
                 collection,
                 projection,
-                null,
+                selection,
                 null,
                 sortOrder,
                 null
             )
+
+            val artistsMap = mutableMapOf<String, Long>() // Artist name to ID mapping
+
             query?.use { cursor ->
-                val artistIdColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Artists._ID)
-                val artistColumn =
-                    cursor.getColumnIndexOrThrow(MediaStore.Audio.ArtistColumns.ARTIST)
-                val artistAlbumCountColumn =
-                    cursor.getColumnIndexOrThrow(MediaStore.Audio.ArtistColumns.NUMBER_OF_ALBUMS)
-                val artistSongCountColumn =
-                    cursor.getColumnIndexOrThrow(MediaStore.Audio.ArtistColumns.NUMBER_OF_TRACKS)
+                val artistColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums.ARTIST)
+                val artistIdColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums.ARTIST_ID)
 
                 while (cursor.moveToNext()) {
+                    val artistName = cursor.getString(artistColumn)
                     val artistId = cursor.getLong(artistIdColumn)
-                    artistList.add(
-                        ArtistModel.fromCursor(
-                            cursor = cursor,
-                            id = artistId,
-                            artistColumn = artistColumn,
-                            artistAlbumCountColumn = artistAlbumCountColumn,
-                            artistSongCountColumn = artistSongCountColumn,
-                            albums = getArtistAlbumList(context = context, artistId = artistId)
-                        )
-                    )
+                    artistsMap[artistName] = artistId
                 }
             }
+
+            // For each unique artist, get their details
+            artistsMap.forEach { (artistName, artistId) ->
+
+                val albums = getArtistAlbumList(context, artistId)
+
+                artistList.add(
+                    ArtistModel(
+                        id = artistId,
+                        title = artistName,
+                        albums = albums
+                    )
+
+                )
+            }
         }
-        return artistList
+        return artistList.sortedBy { it.title }
     }
 
     suspend fun getArtistAlbumList(context: Context, artistId: Long): List<AlbumModel> {
