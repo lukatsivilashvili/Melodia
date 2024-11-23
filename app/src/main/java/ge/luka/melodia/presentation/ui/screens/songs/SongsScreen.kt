@@ -39,12 +39,12 @@ fun SongsScreen(
         navHostController.popBackStack()
     }
 
-    SongsScreenContent()
+    SongsScreenContent(modifier = modifier)
 }
 
 @Composable
 fun SongsScreenContent(
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
     viewModel: SongsScreenVM = hiltViewModel(),
 ) {
 

@@ -42,7 +42,7 @@ fun ArtistsScreen(
         navHostController.popBackStack()
     }
 
-    ArtistsScreenContent {
+    ArtistsScreenContent(modifier = modifier) {
         navHostController.navigate(MelodiaScreen.Albums(it.first, it.second))
         onUpdateRoute.invoke(it.first)
     }
@@ -50,7 +50,7 @@ fun ArtistsScreen(
 
 @Composable
 fun ArtistsScreenContent(
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
     viewModel: ArtistsScreenVM = hiltViewModel(),
     onClick: (Pair<String, Long>) -> Unit
 ) {

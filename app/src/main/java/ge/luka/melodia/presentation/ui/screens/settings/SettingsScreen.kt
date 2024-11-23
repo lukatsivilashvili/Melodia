@@ -34,7 +34,7 @@ fun SettingsScreen(
         navHostController.popBackStack()
     }
 
-    Column(modifier = Modifier) {
+    Column(modifier = modifier) {
         Row {
             Text("Dark mode")
             Switch(
@@ -44,9 +44,9 @@ fun SettingsScreen(
                 }
             )
         }
-        Spacer(Modifier.height(16.dp))
+        Spacer(modifier.height(16.dp))
 
-        ColorSchemeRadioButtons(selectedScheme = viewState.currentTheme) { newTheme ->
+        ColorSchemeRadioButtons(modifier = modifier, selectedScheme = viewState.currentTheme) { newTheme ->
             viewModel.onAction(SettingsAction.ThemeChanged(newTheme = newTheme))
         }
     }
@@ -55,6 +55,7 @@ fun SettingsScreen(
 
 @Composable
 fun ColorSchemeRadioButtons(
+    modifier: Modifier,
     selectedScheme: AppTheme,
     onSchemeSelected: (AppTheme) -> Unit
 ) {
@@ -66,7 +67,7 @@ fun ColorSchemeRadioButtons(
         )
         Text("Green")
 
-        Spacer(Modifier.width(16.dp))
+        Spacer(modifier.width(16.dp))
 
         RadioButton(
             selected = selectedScheme == AppTheme.BLUE,

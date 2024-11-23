@@ -88,13 +88,7 @@ fun MelodiaNavController(
                 albumModel = args.albumModel
             )
         }
-//        composable<MelodiaScreen.ArtistAlbums> {
-//            val args = it.toRoute<MelodiaScreen.ArtistAlbums>()
-//            ArtistAlbumsScreen(
-//                navHostController = navController, onUpdateRoute = onUpdateRoute,
-//                artistId = args.artistId, artistName = args.artistName
-//            )
-//        }
+
         composable<MelodiaScreen.Albums> {
             val args = it.toRoute<MelodiaScreen.Albums>()
             AlbumsScreen(
