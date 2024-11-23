@@ -6,7 +6,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import ge.luka.melodia.domain.repository.DataStoreRepository
 import ge.luka.melodia.presentation.ui.theme.themecomponents.AppTheme
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -18,10 +17,24 @@ class SettingsScreenVM @Inject constructor(
 ) : BaseMviViewmodel<SettingsViewState, SettingsAction, SettingsSideEffect>(
     initialUiState = SettingsViewState()
 ) {
+    init {
+        dataStoreRepository.getDarkMode().map { isDarkMode -> updateUiState { copy(darkMode = isDarkMode) } }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = false
+        )
+
+        dataStoreRepository.getCurrentTheme().map { currentTheme -> updateUiState { copy(currentTheme = currentTheme) } }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = AppTheme.GREEN
+        )
+    }
+
     override fun onAction(uiAction: SettingsAction) {
         when (uiAction) {
             is SettingsAction.DarkModeReceived -> updateUiState {
-                copy(isDarkMode = uiAction.receivedDarkMode)
+                copy(darkMode = uiAction.receivedDarkMode)
             }
 
             is SettingsAction.ThemeReceived -> updateUiState {
@@ -29,42 +42,27 @@ class SettingsScreenVM @Inject constructor(
             }
 
             is SettingsAction.DarkModeSwitched -> {
-                if (uiState.value.isDarkMode) {
-                    emitSideEffect(SettingsSideEffect.DarkModeSwitched(isDarkMode = false))
+                if (uiAction.darkMode) {
+                    updateUiState { copy(darkMode = true) }
+                    setIsDarkMode(isDarkMode = true)
                 } else {
-                    emitSideEffect(SettingsSideEffect.DarkModeSwitched(isDarkMode = true))
+                    updateUiState { copy(darkMode = false) }
+                    setIsDarkMode(isDarkMode = false)
+
                 }
             }
 
             is SettingsAction.ThemeChanged -> {
-                emitSideEffect(SettingsSideEffect.ThemeChanged(newTheme = uiAction.newTheme))
-            }
+                updateUiState { copy(currentTheme = uiAction.newTheme) }
+                setCurrentTheme(theme = uiAction.newTheme)            }
         }
     }
 
-    // Observe the DataStore flow for dynamic theme preference
-    val isDarkMode: StateFlow<Boolean> =
-        dataStoreRepository.getDarkMode().map { isDarkMode -> isDarkMode }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.Eagerly,
-            initialValue = false
-        )
-
-    // Observe the DataStore flow for theme type preference
-    val currentTheme: StateFlow<AppTheme> =
-        dataStoreRepository.getCurrentTheme().map { currentTheme -> currentTheme }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.Eagerly,
-            initialValue = AppTheme.GREEN
-        )
-
-    fun setIsDarkMode(isDarkMode: Boolean) = viewModelScope.launch {
+    private fun setIsDarkMode(isDarkMode: Boolean) = viewModelScope.launch {
         dataStoreRepository.setDarkMode(isDarkMode)
     }
 
-    fun setCurrentTheme(theme: AppTheme) = viewModelScope.launch {
+    private fun setCurrentTheme(theme: AppTheme) = viewModelScope.launch {
         dataStoreRepository.setCurrentTheme(theme)
     }
-
-
 }

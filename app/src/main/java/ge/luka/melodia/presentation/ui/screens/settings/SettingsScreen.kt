@@ -10,16 +10,13 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import ge.luka.melodia.common.mvi.CollectSideEffects
 import ge.luka.melodia.presentation.ui.theme.themecomponents.AppTheme
-import kotlinx.coroutines.launch
 
 @Composable
 fun SettingsScreen(
@@ -33,34 +30,6 @@ fun SettingsScreen(
 
     val viewState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    CollectSideEffects(flow = viewModel.sideEffect) { effect ->
-        when (effect) {
-            is SettingsSideEffect.DarkModeSwitched -> viewModel.setIsDarkMode(isDarkMode = effect.isDarkMode)
-            is SettingsSideEffect.ThemeChanged -> viewModel.setCurrentTheme(theme = effect.newTheme)
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        launch {
-            viewModel.isDarkMode.collect {
-                viewModel.onAction(
-                    uiAction = SettingsAction.DarkModeReceived(
-                        receivedDarkMode = it
-                    )
-                )
-            }
-        }
-        launch {
-            viewModel.currentTheme.collect {
-                viewModel.onAction(
-                    uiAction = SettingsAction.ThemeReceived(
-                        receivedTheme = it
-                    )
-                )
-            }
-        }
-    }
-
     BackHandler {
         navHostController.popBackStack()
     }
@@ -69,9 +38,9 @@ fun SettingsScreen(
         Row {
             Text("Dark mode")
             Switch(
-                checked = viewState.isDarkMode,
+                checked = viewState.darkMode,
                 onCheckedChange = {
-                    viewModel.onAction(SettingsAction.DarkModeSwitched(isDarkMode = viewState.isDarkMode.not()))
+                    viewModel.onAction(SettingsAction.DarkModeSwitched(darkMode = viewState.darkMode.not()))
                 }
             )
         }
