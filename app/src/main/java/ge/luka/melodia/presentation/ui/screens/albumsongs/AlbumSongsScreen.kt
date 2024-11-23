@@ -1,5 +1,6 @@
 package ge.luka.melodia.presentation.ui.screens.albumsongs
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,9 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -30,16 +29,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import ge.luka.melodia.R
+import ge.luka.melodia.common.mvi.CollectSideEffects
 import ge.luka.melodia.domain.model.AlbumModel
-import ge.luka.melodia.domain.model.SongModel
 import ge.luka.melodia.presentation.ui.components.shared.GeneralMusicListItem
 import ge.luka.melodia.presentation.ui.components.shared.HelperControlButtons
 import ge.luka.melodia.presentation.ui.theme.themecomponents.MelodiaTypography
-import kotlinx.coroutines.launch
 
 @Composable
 fun AlbumSongsScreen(
@@ -58,36 +57,45 @@ fun AlbumSongsScreen(
         navHostController.popBackStack()
     }
 
-    AlbumSongsScreenContent(albumModel = albumModel, albumId = albumId)
+    AlbumSongsScreenContent(modifier = modifier, albumModel = albumModel, albumId = albumId)
 }
 
 @Composable
 fun AlbumSongsScreenContent(
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
     viewModel: AlbumSongsScreenVM = hiltViewModel(),
     albumModel: AlbumModel,
     albumId: Long?
 ) {
-    var songsList by remember { mutableStateOf(listOf<SongModel>()) }
-    LaunchedEffect(Unit) {
-        launch {
-            viewModel.songsList.collect {
-                songsList = it.filter { song -> song.albumId == albumId }
+    val viewState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    CollectSideEffects(flow = viewModel.sideEffect) { effect ->
+        when (effect) {
+            is AlbumSongsSideEffect.ThrowToast -> {
+                Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
             }
         }
     }
+
     val derivedSongsList by remember {
-        derivedStateOf { songsList }
+        derivedStateOf { viewState.songsList.filter { song -> song.albumId == albumId } }
     }
 
     if (derivedSongsList.isNotEmpty()) {
         LazyColumn(modifier = modifier.fillMaxSize(), state = rememberLazyListState()) {
             item {
-                InfoBoxView(albumModel = albumModel)
+                InfoBoxView(modifier = modifier, albumModel = albumModel)
                 HelperControlButtons()
             }
             items(derivedSongsList, key = { it.songId ?: 0 }) { songItem ->
-                GeneralMusicListItem(songItem = songItem)
+                GeneralMusicListItem(songItem = songItem, onClick = {
+                    viewModel.onAction(
+                        AlbumSongsAction.SongPressed(
+                            song = songItem
+                        )
+                    )
+                })
             }
         }
     } else {
@@ -105,7 +113,7 @@ fun AlbumSongsScreenContent(
 }
 
 @Composable
-fun InfoBoxView(modifier: Modifier = Modifier, albumModel: AlbumModel) {
+fun InfoBoxView(modifier: Modifier, albumModel: AlbumModel) {
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -154,6 +162,7 @@ fun InfoBoxView(modifier: Modifier = Modifier, albumModel: AlbumModel) {
 @Composable
 fun AlbumSongsScreenPreview() {
     AlbumSongsScreenContent(
+        modifier = Modifier,
         albumModel = AlbumModel(
             albumId = 1,
             title = "Madvillainy",
