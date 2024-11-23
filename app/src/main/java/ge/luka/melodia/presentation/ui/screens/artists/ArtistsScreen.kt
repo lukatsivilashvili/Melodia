@@ -12,27 +12,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import ge.luka.melodia.common.extensions.getScreenFromRoute
-import ge.luka.melodia.domain.model.ArtistModel
+import ge.luka.melodia.common.mvi.CollectSideEffects
 import ge.luka.melodia.presentation.ui.MelodiaScreen
 import ge.luka.melodia.presentation.ui.components.shared.GeneralArtistListItem
 import ge.luka.melodia.presentation.ui.theme.themecomponents.MelodiaTypography
-import kotlinx.coroutines.launch
 
 @Composable
 fun ArtistsScreen(
-    modifier: Modifier = Modifier, navHostController: NavHostController,
+    modifier: Modifier = Modifier,
+    navHostController: NavHostController,
     onUpdateRoute: (String?) -> Unit
 ) {
-    navHostController.previousBackStackEntry?.destination?.route?.getScreenFromRoute()
 
     LaunchedEffect(Unit) {
         onUpdateRoute.invoke("Artists")
@@ -42,36 +39,48 @@ fun ArtistsScreen(
         navHostController.popBackStack()
     }
 
-    ArtistsScreenContent(modifier = modifier) {
-        navHostController.navigate(MelodiaScreen.Albums(it.first, it.second))
-        onUpdateRoute.invoke(it.first)
-    }
+    ArtistsScreenContent(
+        modifier = modifier,
+        navHostController = navHostController,
+        onUpdateRoute = onUpdateRoute
+    )
 }
 
 @Composable
 fun ArtistsScreenContent(
     modifier: Modifier,
-    viewModel: ArtistsScreenVM = hiltViewModel(),
-    onClick: (Pair<String, Long>) -> Unit
+    navHostController: NavHostController,
+    onUpdateRoute: (String?) -> Unit,
+    viewModel: ArtistsScreenVM = hiltViewModel()
 ) {
-    var artistsList by remember { mutableStateOf(listOf<ArtistModel>()) }
+    val viewState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        launch { viewModel.artistsList.collect { artistsList = it } }
+    CollectSideEffects(flow = viewModel.sideEffect) { effect ->
+        when (effect) {
+            is ArtistsSideEffect.NavigateToAlbums -> {
+                navHostController.navigate(
+                    MelodiaScreen.Albums(
+                        artistName = effect.artistName,
+                        artistId = effect.artistId
+                    )
+                )
+                onUpdateRoute.invoke(effect.artistName)
+            }
+        }
     }
 
     val derivedArtistsList by remember {
-        derivedStateOf { artistsList }
+        derivedStateOf { viewState.artistsList }
     }
 
     if (derivedArtistsList.isNotEmpty()) {
         LazyColumn(modifier = modifier.fillMaxSize(), state = rememberLazyListState()) {
             items(items = derivedArtistsList, key = { it.title ?: 0 }) { artistItem ->
                 GeneralArtistListItem(modifier = modifier.clickable {
-                    onClick.invoke(
-                        Pair(
-                            first = artistItem.title ?: "",
-                            second = artistItem.id ?: 0
+                    viewModel.onAction(
+                        ArtistsAction.OnArtistClicked(
+                            artistId = artistItem.id ?: 0,
+                            artistName = artistItem.title ?: ""
                         )
                     )
                 }, artistItem = artistItem)
