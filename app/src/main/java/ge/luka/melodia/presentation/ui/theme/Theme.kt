@@ -6,13 +6,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ge.luka.melodia.presentation.ui.theme.colors.ColorSchemes.darkBlueScheme
 import ge.luka.melodia.presentation.ui.theme.colors.ColorSchemes.darkGreenScheme
 import ge.luka.melodia.presentation.ui.theme.colors.ColorSchemes.lightBlueScheme
@@ -27,28 +25,39 @@ fun MelodiaTheme(
     content: @Composable () -> Unit,
 ) {
 
-    var isDarkMode by remember { mutableStateOf(false) }
-    var currentTheme by remember { mutableStateOf(AppTheme.GREEN) }
+    val viewState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         launch {
-            viewModel.isDarkMode.collect { isDarkMode = it }
+            viewModel.isDarkMode.collect {
+                viewModel.onAction(
+                    ThemeAction.DarkModeReceived(
+                        isDarkMode = it
+                    )
+                )
+            }
         }
         launch {
-            viewModel.currentTheme.collect { currentTheme = it }
+            viewModel.currentTheme.collect {
+                viewModel.onAction(
+                    ThemeAction.ThemeColorReceived(
+                        newTheme = it
+                    )
+                )
+            }
         }
     }
 
-    val colorScheme = when (currentTheme) {
-        AppTheme.BLUE -> if (isDarkMode) darkBlueScheme else lightBlueScheme
-        AppTheme.GREEN -> if (isDarkMode) darkGreenScheme else lightGreenScheme
+    val colorScheme = when (viewState.currentTheme) {
+        AppTheme.BLUE -> if (viewState.isDarkMode) darkBlueScheme else lightBlueScheme
+        AppTheme.GREEN -> if (viewState.isDarkMode) darkGreenScheme else lightGreenScheme
     }
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = isDarkMode
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = viewState.isDarkMode
         }
     }
 

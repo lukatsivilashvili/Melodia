@@ -1,21 +1,28 @@
 package ge.luka.melodia.presentation.ui.screens.library
 
-import androidx.lifecycle.ViewModel
+import BaseMviViewmodel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import ge.luka.melodia.presentation.ui.MelodiaScreen
 import javax.inject.Inject
 
 @HiltViewModel
-class LibraryScreenVM @Inject constructor() : ViewModel() {
+class LibraryScreenVM @Inject constructor() :
+    BaseMviViewmodel<LibraryViewState, LibraryAction, LibrarySideEffect>(initialUiState = LibraryViewState()) {
 
-    fun setDestinationScreen(screen: String): MelodiaScreen {
-        return when (screen) {
-            "Library" -> MelodiaScreen.Library
-            "Songs" -> MelodiaScreen.Songs
-            "Albums" -> MelodiaScreen.Albums
-            "Artists" -> MelodiaScreen.Artists
-            "Playlists" -> MelodiaScreen.Playlists
-            else -> MelodiaScreen.Library
+    override fun onAction(uiAction: LibraryAction) {
+        when (uiAction) {
+            is LibraryAction.LibraryItemClicked -> {
+                emitDestinationScreen(screen = uiAction)
+            }
+        }
+    }
+
+    private fun emitDestinationScreen(screen: LibraryAction.LibraryItemClicked) {
+        when (screen.libraryItem) {
+            "Songs" -> emitSideEffect(LibrarySideEffect.NavigateToSongs())
+            "Albums" -> emitSideEffect(LibrarySideEffect.NavigateToAlbums())
+            "Artists" -> emitSideEffect(LibrarySideEffect.NavigateToArtists())
+            "Playlists" -> emitSideEffect(LibrarySideEffect.NavigateToPlaylists())
+            else -> emitSideEffect(LibrarySideEffect.NavigateToLibrary())
         }
     }
 

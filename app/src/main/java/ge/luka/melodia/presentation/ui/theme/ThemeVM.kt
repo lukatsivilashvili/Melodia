@@ -1,6 +1,6 @@
 package ge.luka.melodia.presentation.ui.theme
 
-import androidx.lifecycle.ViewModel
+import BaseMviViewmodel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ge.luka.melodia.domain.repository.DataStoreRepository
@@ -17,7 +17,21 @@ import javax.inject.Inject
 class ThemeVM @Inject constructor(
     dataStoreRepository: DataStoreRepository,
     mediaStoreRepository: MediaStoreRepository
-) : ViewModel() {
+) : BaseMviViewmodel<ThemeViewState, ThemeAction, ThemeSideEffect>(
+    initialUiState = ThemeViewState()
+) {
+
+    override fun onAction(uiAction: ThemeAction) {
+        when(uiAction) {
+            is ThemeAction.DarkModeReceived -> updateUiState {
+                copy(isDarkMode = uiAction.isDarkMode)
+            }
+            is ThemeAction.ThemeColorReceived -> updateUiState {
+                copy(currentTheme = uiAction.newTheme)
+            }
+        }
+    }
+
     init {
         viewModelScope.launch {
             mediaStoreRepository.getAllSongs().collect { println(it) }
@@ -27,20 +41,18 @@ class ThemeVM @Inject constructor(
     }
 
     // Observe the DataStore flow for dynamic theme preference
-    var isDarkMode: StateFlow<Boolean> =
+    val isDarkMode: StateFlow<Boolean> =
         dataStoreRepository.getDarkMode().map { isDarkMode -> isDarkMode }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
             initialValue = false
         )
-        private set
 
     // Observe the DataStore flow for theme type preference
-    var currentTheme: StateFlow<AppTheme> =
+    val currentTheme: StateFlow<AppTheme> =
         dataStoreRepository.getCurrentTheme().map { currentTheme -> currentTheme }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
             initialValue = AppTheme.GREEN
         )
-        private set
 }

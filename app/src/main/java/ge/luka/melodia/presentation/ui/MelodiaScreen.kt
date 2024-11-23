@@ -15,10 +15,7 @@ sealed class MelodiaScreen {
     data class AlbumSongs(val albumId: Long, val albumModel: AlbumModel) : MelodiaScreen()
 
     @Serializable
-    data class ArtistAlbums(val artistName: String, val artistId: Long) : MelodiaScreen()
-
-    @Serializable
-    data object Albums : MelodiaScreen()
+    data class Albums(val artistName: String? = null, val artistId: Long? = null) : MelodiaScreen()
 
     @Serializable
     data object Artists : MelodiaScreen()

@@ -13,39 +13,46 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import ge.luka.melodia.R
-import ge.luka.melodia.presentation.ui.MelodiaScreen
+import ge.luka.melodia.common.mvi.CollectSideEffects
 import ge.luka.melodia.presentation.ui.components.shared.LibraryListItem
 import ge.luka.melodia.presentation.ui.theme.MelodiaTheme
 
 @Composable
 fun LibraryScreen(
     modifier: Modifier = Modifier,
-    viewModel: LibraryScreenVM? = hiltViewModel(),
     navHostController: NavHostController?,
     onUpdateRoute: ((String?) -> Unit)?
 ) {
     LibraryScreenContent(
         modifier = modifier,
         navHostController = navHostController,
-        onUpdateRoute = onUpdateRoute,
-        getDestinationScreen = { viewModel?.setDestinationScreen(screen = it) }
+        onUpdateRoute = onUpdateRoute
     )
 }
 
 @Composable
 fun LibraryScreenContent(
     modifier: Modifier,
+    viewModel: LibraryScreenVM = hiltViewModel(),
     navHostController: NavHostController? = null,
-    onUpdateRoute: ((String?) -> Unit)? = null,
-    getDestinationScreen: (String) -> MelodiaScreen?
+    onUpdateRoute: ((String?) -> Unit)? = null
 ) {
+    CollectSideEffects(flow = viewModel.sideEffect) { effect ->
+        when (effect) {
+            is LibrarySideEffect.NavigateToAlbums -> navHostController?.navigate(effect.screen)
+            is LibrarySideEffect.NavigateToArtists -> navHostController?.navigate(effect.screen)
+            is LibrarySideEffect.NavigateToLibrary -> navHostController?.navigate(effect.screen)
+            is LibrarySideEffect.NavigateToPlaylists -> navHostController?.navigate(effect.screen)
+            is LibrarySideEffect.NavigateToSongs -> navHostController?.navigate(effect.screen)
+        }
+    }
+
     LaunchedEffect(Unit) {
         onUpdateRoute?.invoke("Library")
     }
 
     val navigateToScreen: (String) -> Unit = { screen ->
-        val destination = getDestinationScreen.invoke(screen)
-        navHostController?.navigate(destination ?: MelodiaScreen.Library)
+        viewModel.onAction(LibraryAction.LibraryItemClicked(libraryItem = screen))
     }
 
     Column(
@@ -81,6 +88,6 @@ fun LibraryScreenContent(
 @Composable
 fun LibraryScreenPreview(modifier: Modifier = Modifier) {
     MelodiaTheme {
-        LibraryScreenContent(modifier = modifier, getDestinationScreen = { MelodiaScreen.Library })
+        LibraryScreenContent(modifier = modifier)
     }
 }

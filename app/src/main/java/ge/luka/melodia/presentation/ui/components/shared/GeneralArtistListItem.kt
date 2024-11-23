@@ -81,8 +81,6 @@ fun GeneralArtistListItem(
 fun ArtistItemPreview(modifier: Modifier = Modifier) {
     GeneralArtistListItem(modifier, ArtistModel(
         title = "A$/AP ROCKY",
-        albumCount = 2,
-        songCount = 3,
         albums = listOf(AlbumModel(
             albumId = 2,
             title = "asdsad",

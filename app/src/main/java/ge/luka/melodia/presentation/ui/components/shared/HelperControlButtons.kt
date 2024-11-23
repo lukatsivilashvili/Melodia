@@ -17,14 +17,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun HelperControlButtons(modifier: Modifier = Modifier) {
+fun HelperControlButtons(modifier: Modifier = Modifier, onPlayClick: () -> Unit = {}, onShuffleClick: () -> Unit = {}) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .padding(bottom = 16.dp)
     ) {
         Button(
-            onClick = { /*TODO*/ },
+            onClick = { onPlayClick.invoke() },
             colors = ButtonColors(
                 containerColor = MaterialTheme.colorScheme.secondaryContainer,
                 contentColor = MaterialTheme.colorScheme.secondaryContainer,
@@ -44,7 +44,7 @@ fun HelperControlButtons(modifier: Modifier = Modifier) {
             Text(text = "Play", color = MaterialTheme.colorScheme.onSecondaryContainer)
         }
         Button(
-            onClick = { /*TODO*/ },
+            onClick = { onShuffleClick.invoke() },
             colors = ButtonColors(
                 containerColor = MaterialTheme.colorScheme.secondaryContainer,
                 contentColor = MaterialTheme.colorScheme.secondaryContainer,

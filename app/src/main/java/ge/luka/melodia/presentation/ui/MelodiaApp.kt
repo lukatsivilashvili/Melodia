@@ -3,6 +3,7 @@ package ge.luka.melodia.presentation.ui
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -19,12 +20,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
@@ -51,12 +50,6 @@ fun MelodiaApp() {
     }
 
     MelodiaTheme {
-        LaunchedEffect(navController) {
-            snapshotFlow { navController.currentBackStackEntry?.destination?.route }.collect { route ->
-                currentRoute = route?.getScreenFromRoute()
-            }
-        }
-
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
@@ -67,7 +60,8 @@ fun MelodiaApp() {
                     titleContentColor = MaterialTheme.colorScheme.onSurface,
                 ), title = {
                     Text(
-                        currentRoute ?: stringResource(id = R.string.app_name),
+                        modifier = Modifier.basicMarquee(),
+                        text = currentRoute ?: stringResource(id = R.string.app_name),
                         maxLines = 1,
                         color = MaterialTheme.colorScheme.onSurface,
                         overflow = TextOverflow.Ellipsis,

@@ -10,18 +10,13 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import ge.luka.melodia.common.extensions.getScreenFromRoute
 import ge.luka.melodia.presentation.ui.theme.themecomponents.AppTheme
-import kotlinx.coroutines.launch
 
 @Composable
 fun SettingsScreen(
@@ -31,39 +26,28 @@ fun SettingsScreen(
     onUpdateRoute: (String?) -> Unit,
 ) {
 
-    val previousRoute =
-        navHostController.previousBackStackEntry?.destination?.route?.getScreenFromRoute()
-    var isDarkMode by remember { mutableStateOf(false) }
-    var currentTheme by remember { mutableStateOf(AppTheme.GREEN) }
+    onUpdateRoute.invoke("Settings")
 
-    LaunchedEffect(Unit) {
-        launch {
-            viewModel.isDarkMode.collect { isDarkMode = it }
-        }
-        launch {
-            viewModel.currentTheme.collect { currentTheme = it }
-        }
-    }
+    val viewState by viewModel.uiState.collectAsStateWithLifecycle()
 
     BackHandler {
-        onUpdateRoute.invoke(previousRoute)
         navHostController.popBackStack()
     }
 
-    Column(modifier = Modifier) {
+    Column(modifier = modifier) {
         Row {
             Text("Dark mode")
             Switch(
-                checked = isDarkMode,
+                checked = viewState.darkMode,
                 onCheckedChange = {
-                    viewModel.setIsDarkMode(isDarkMode = !isDarkMode)
+                    viewModel.onAction(SettingsAction.DarkModeSwitched(darkMode = viewState.darkMode.not()))
                 }
             )
         }
-        Spacer(Modifier.height(16.dp))
+        Spacer(modifier.height(16.dp))
 
-        ColorSchemeRadioButtons(selectedScheme = currentTheme) { newTheme ->
-            viewModel.setCurrentTheme(theme = newTheme)
+        ColorSchemeRadioButtons(modifier = modifier, selectedScheme = viewState.currentTheme) { newTheme ->
+            viewModel.onAction(SettingsAction.ThemeChanged(newTheme = newTheme))
         }
     }
 }
@@ -71,6 +55,7 @@ fun SettingsScreen(
 
 @Composable
 fun ColorSchemeRadioButtons(
+    modifier: Modifier,
     selectedScheme: AppTheme,
     onSchemeSelected: (AppTheme) -> Unit
 ) {
@@ -82,7 +67,7 @@ fun ColorSchemeRadioButtons(
         )
         Text("Green")
 
-        Spacer(Modifier.width(16.dp))
+        Spacer(modifier.width(16.dp))
 
         RadioButton(
             selected = selectedScheme == AppTheme.BLUE,
