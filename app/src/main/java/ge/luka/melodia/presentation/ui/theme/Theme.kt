@@ -3,7 +3,6 @@ package ge.luka.melodia.presentation.ui.theme
 import android.app.Activity
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.toArgb
@@ -17,7 +16,6 @@ import ge.luka.melodia.presentation.ui.theme.colors.ColorSchemes.lightBlueScheme
 import ge.luka.melodia.presentation.ui.theme.colors.ColorSchemes.lightGreenScheme
 import ge.luka.melodia.presentation.ui.theme.themecomponents.AppTheme
 import ge.luka.melodia.presentation.ui.theme.themecomponents.MelodiaTypography
-import kotlinx.coroutines.launch
 
 @Composable
 fun MelodiaTheme(
@@ -26,27 +24,6 @@ fun MelodiaTheme(
 ) {
 
     val viewState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    LaunchedEffect(Unit) {
-        launch {
-            viewModel.isDarkMode.collect {
-                viewModel.onAction(
-                    ThemeAction.DarkModeReceived(
-                        isDarkMode = it
-                    )
-                )
-            }
-        }
-        launch {
-            viewModel.currentTheme.collect {
-                viewModel.onAction(
-                    ThemeAction.ThemeColorReceived(
-                        newTheme = it
-                    )
-                )
-            }
-        }
-    }
 
     val colorScheme = when (viewState.currentTheme) {
         AppTheme.BLUE -> if (viewState.isDarkMode) darkBlueScheme else lightBlueScheme

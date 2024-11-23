@@ -50,9 +50,28 @@ class MediaStoreRepositoryImpl @Inject constructor(
             emit(cachedArtistAlbums)
             return@flow
         } else {
-            val artistAlbums = mediaStoreLoader.getArtistAlbumList(context = context, artistId = artistId)
+            val artistAlbums =
+                mediaStoreLoader.getArtistAlbumList(context = context, artistId = artistId)
             artistAlbumsCache["$artistId"] = artistAlbums
             emit(artistAlbums)
+        }
+    }
+
+    override suspend fun cacheAllSongs() {
+        if (songsCache[ALL_SONGS] == null) {
+            songsCache[ALL_SONGS] = mediaStoreLoader.getSongsList(context)
+        }
+    }
+
+    override suspend fun cacheAllAlbums() {
+        if (albumsCache[ALL_ALBUMS] == null) {
+            albumsCache[ALL_ALBUMS] = mediaStoreLoader.getAlbumList(context)
+        }
+    }
+
+    override suspend fun cacheAllArtists() {
+        if (artistsCache[ALL_ARTISTS] == null) {
+            artistsCache[ALL_ARTISTS] = mediaStoreLoader.getArtistsList(context)
         }
     }
 

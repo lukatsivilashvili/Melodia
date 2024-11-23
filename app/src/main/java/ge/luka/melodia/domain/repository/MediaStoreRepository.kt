@@ -8,6 +8,9 @@ import kotlinx.coroutines.flow.Flow
 interface MediaStoreRepository {
     suspend fun getAllSongs(): Flow<List<SongModel>>
     suspend fun getAllAlbums(): Flow<List<AlbumModel>>
-    suspend fun getArtistAlbums(artistId: Long): Flow<List<AlbumModel>>
     suspend fun getAllArtists(): Flow<List<ArtistModel>>
+    suspend fun getArtistAlbums(artistId: Long): Flow<List<AlbumModel>>
+    suspend fun cacheAllSongs()
+    suspend fun cacheAllAlbums()
+    suspend fun cacheAllArtists()
 }
