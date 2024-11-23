@@ -20,7 +20,6 @@ import ge.luka.melodia.domain.model.AlbumModel
 import ge.luka.melodia.presentation.ui.MelodiaScreen
 import ge.luka.melodia.presentation.ui.screens.albums.AlbumsScreen
 import ge.luka.melodia.presentation.ui.screens.albumsongs.AlbumSongsScreen
-import ge.luka.melodia.presentation.ui.screens.artistalbumsscreen.ArtistAlbumsScreen
 import ge.luka.melodia.presentation.ui.screens.artists.ArtistsScreen
 import ge.luka.melodia.presentation.ui.screens.library.LibraryScreen
 import ge.luka.melodia.presentation.ui.screens.playlists.PlaylistsScreen
@@ -89,15 +88,21 @@ fun MelodiaNavController(
                 albumModel = args.albumModel
             )
         }
-        composable<MelodiaScreen.ArtistAlbums> {
-            val args = it.toRoute<MelodiaScreen.ArtistAlbums>()
-            ArtistAlbumsScreen(
-                navHostController = navController, onUpdateRoute = onUpdateRoute,
-                artistId = args.artistId,artistName = args.artistName
-            )
-        }
+//        composable<MelodiaScreen.ArtistAlbums> {
+//            val args = it.toRoute<MelodiaScreen.ArtistAlbums>()
+//            ArtistAlbumsScreen(
+//                navHostController = navController, onUpdateRoute = onUpdateRoute,
+//                artistId = args.artistId, artistName = args.artistName
+//            )
+//        }
         composable<MelodiaScreen.Albums> {
-            AlbumsScreen(navHostController = navController, onUpdateRoute = onUpdateRoute)
+            val args = it.toRoute<MelodiaScreen.Albums>()
+            AlbumsScreen(
+                navHostController = navController,
+                onUpdateRoute = onUpdateRoute,
+                artistId = args.artistId,
+                artistName = args.artistName,
+            )
         }
         composable<MelodiaScreen.Artists> {
             ArtistsScreen(navHostController = navController, onUpdateRoute = onUpdateRoute)

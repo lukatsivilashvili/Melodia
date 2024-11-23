@@ -43,7 +43,7 @@ fun ArtistsScreen(
     }
 
     ArtistsScreenContent {
-        navHostController.navigate(MelodiaScreen.ArtistAlbums(it.first, it.second))
+        navHostController.navigate(MelodiaScreen.Albums(it.first, it.second))
         onUpdateRoute.invoke(it.first)
     }
 }

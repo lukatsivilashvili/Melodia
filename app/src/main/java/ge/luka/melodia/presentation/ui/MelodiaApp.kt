@@ -3,6 +3,7 @@ package ge.luka.melodia.presentation.ui
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -59,7 +60,8 @@ fun MelodiaApp() {
                     titleContentColor = MaterialTheme.colorScheme.onSurface,
                 ), title = {
                     Text(
-                        currentRoute ?: stringResource(id = R.string.app_name),
+                        modifier = Modifier.basicMarquee(),
+                        text = currentRoute ?: stringResource(id = R.string.app_name),
                         maxLines = 1,
                         color = MaterialTheme.colorScheme.onSurface,
                         overflow = TextOverflow.Ellipsis,
