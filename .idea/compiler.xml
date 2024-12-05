@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <bytecodeTargetLevel target="17" />
+    <bytecodeTargetLevel target="21">
+      <module name="Melodia.core" target="21" />
+      <module name="Melodia.core.data" target="21" />
+      <module name="Melodia.core.presentation" target="21" />
+      <module name="Melodia.features.albums.data" target="21" />
+      <module name="Melodia.features.albums.presentation" target="21" />
+      <module name="Melodia.features.albumsongs.data" target="21" />
+      <module name="Melodia.features.albumsongs.presentation" target="21" />
+      <module name="Melodia.features.artists.data" target="21" />
+      <module name="Melodia.features.artists.presentation" target="21" />
+      <module name="Melodia.features.library.data" target="21" />
+      <module name="Melodia.features.library.presentation" target="21" />
+      <module name="Melodia.features.settings.data" target="21" />
+      <module name="Melodia.features.settings.presentation" target="21" />
+      <module name="Melodia.features.songs.data" target="21" />
+      <module name="Melodia.features.songs.presentation" target="21" />
+    </bytecodeTargetLevel>
   </component>
 </project>

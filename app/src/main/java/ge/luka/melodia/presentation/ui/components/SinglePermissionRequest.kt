@@ -16,9 +16,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,28 +27,92 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.startActivity
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import ge.luka.melodia.common.extensions.getScreenFromRoute
+import ge.luka.melodia.common.mvi.CollectSideEffects
 import ge.luka.melodia.presentation.ui.MelodiaScreen
+import ge.luka.melodia.presentation.ui.components.singlepermission.PermissionAction
+import ge.luka.melodia.presentation.ui.components.singlepermission.PermissionSideEffect
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun SinglePermissionRequest(
     navHostController: NavHostController,
-    onUpdateRoute: (String?) -> Unit
+    onUpdateRoute: (String?) -> Unit,
+    viewModel: SinglePermissionViewModel = hiltViewModel()
 ) {
-    val permissionState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        rememberPermissionState(permission = Manifest.permission.READ_MEDIA_AUDIO)
-    } else {
-        rememberPermissionState(permission = Manifest.permission.READ_EXTERNAL_STORAGE)
-    }
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    CollectSideEffects(flow = viewModel.sideEffect) { effect ->
+        when (effect) {
+            is PermissionSideEffect.PermissionGranted -> {
+                viewModel.cacheData()
+            }
+        }
+    }
+
+    // Create a permission state with a callback
+    val permissionState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        rememberPermissionState(
+            permission = Manifest.permission.READ_MEDIA_AUDIO,
+            onPermissionResult = { isGranted ->
+                if (isGranted) {
+                    scope.launch {
+                        try {
+                            // Call repository immediately when permission is granted
+                            viewModel.onAction(PermissionAction.PermissionGranted)
+
+                            // Navigate after repository call succeeds
+                            navHostController.navigate(MelodiaScreen.Library)
+                            onUpdateRoute(MelodiaScreen.Library.toString().getScreenFromRoute())
+                        } catch (e: Exception) {
+                            // Handle any repository errors
+                            Toast.makeText(
+                                context,
+                                "Error initializing: ${e.message}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
+            }
+        )
+    } else {
+        rememberPermissionState(
+            permission = Manifest.permission.READ_EXTERNAL_STORAGE,
+            onPermissionResult = { isGranted ->
+                if (isGranted) {
+                    scope.launch {
+                        try {
+                            // Call repository immediately when permission is granted
+                            viewModel.onAction(PermissionAction.PermissionGranted)
+
+                            // Navigate after repository call succeeds
+                            navHostController.navigate(MelodiaScreen.Library)
+                            onUpdateRoute(MelodiaScreen.Library.toString().getScreenFromRoute())
+                        } catch (e: Exception) {
+                            // Handle any repository errors
+                            Toast.makeText(
+                                context,
+                                "Error initializing: ${e.message}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
+            }
+        )
+    }
 
     val showRationalDialog = remember { mutableStateOf(false) }
+
     if (showRationalDialog.value) {
         AlertDialog(
             onDismissRequest = {
@@ -77,7 +141,6 @@ fun SinglePermissionRequest(
                         )
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         startActivity(context, intent, null)
-
                     }) {
                     Text("OK", style = TextStyle(color = Color.Black))
                 }
@@ -92,50 +155,41 @@ fun SinglePermissionRequest(
             },
         )
     }
+
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Button(onClick = {
-                if (!permissionState.status.isGranted) {
-                    if (permissionState.status.shouldShowRationale) {
-                        // Show a rationale if needed (optional)
-                        showRationalDialog.value = true
+            Button(
+                onClick = {
+                    if (!permissionState.status.isGranted) {
+                        if (permissionState.status.shouldShowRationale) {
+                            showRationalDialog.value = true
+                        } else {
+                            // Launch permission request - callback will be triggered on result
+                            permissionState.launchPermissionRequest()
+                        }
                     } else {
-                        // Request the permission
-                        permissionState.launchPermissionRequest()
-
+                        Toast.makeText(context, "Permission Given Already", Toast.LENGTH_SHORT)
+                            .show()
                     }
-                } else {
-                    Toast.makeText(context, "Permission Given Already", Toast.LENGTH_SHORT)
-                        .show()
-                }
-            },
-                colors = ButtonColors(containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor =MaterialTheme.colorScheme.onPrimary,
-                    disabledContainerColor =MaterialTheme.colorScheme.tertiary,
-                    disabledContentColor =MaterialTheme.colorScheme.onTertiary,)
+                },
+                colors = ButtonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    disabledContainerColor = MaterialTheme.colorScheme.tertiary,
+                    disabledContentColor = MaterialTheme.colorScheme.onTertiary,
+                )
             ) {
                 Text(text = "Ask for permission")
             }
-            LaunchedEffect(key1 = permissionState.status.isGranted) {
-                if (permissionState.status.isGranted) {
-                    navHostController.navigate(MelodiaScreen.Library)
-                    onUpdateRoute(MelodiaScreen.Library.toString().getScreenFromRoute())
-                }
-            }
+
             if (permissionState.status.shouldShowRationale) {
-                // If the user has denied the permission but the rationale can be shown,
-                // then gently explain why the app requires this permission
                 Text("The notification is important for this app. Please grant the permission.")
             } else {
-                // If it's the first time the user lands on this feature, or the user
-                // doesn't want to be asked again for this permission, explain that the
-                // permission is required
                 Text("The notification permission is required for some functionality.")
             }
-
         }
     }
 }

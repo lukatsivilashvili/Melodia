@@ -58,19 +58,19 @@ class MediaStoreRepositoryImpl @Inject constructor(
     }
 
     override suspend fun cacheAllSongs() {
-        if (songsCache[ALL_SONGS] == null) {
+        if (songsCache[ALL_SONGS].isNullOrEmpty()) {
             songsCache[ALL_SONGS] = mediaStoreLoader.getSongsList(context)
         }
     }
 
     override suspend fun cacheAllAlbums() {
-        if (albumsCache[ALL_ALBUMS] == null) {
+        if (albumsCache[ALL_ALBUMS].isNullOrEmpty()) {
             albumsCache[ALL_ALBUMS] = mediaStoreLoader.getAlbumList(context)
         }
     }
 
     override suspend fun cacheAllArtists() {
-        if (artistsCache[ALL_ARTISTS] == null) {
+        if (artistsCache[ALL_ARTISTS].isNullOrEmpty()) {
             artistsCache[ALL_ARTISTS] = mediaStoreLoader.getArtistsList(context)
         }
     }
