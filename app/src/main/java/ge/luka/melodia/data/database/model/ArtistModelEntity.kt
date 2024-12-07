@@ -1,9 +1,13 @@
 package ge.luka.melodia.data.database.model
 
-import ge.luka.melodia.domain.model.AlbumModel
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
+@Entity(tableName = "allArtists")
 data class ArtistModelEntity(
-    val id: Long? = null,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
+    val artistId: Long?,
     val title: String?,
-    val albums: List<AlbumModel>
+    val artUri: String?
 )

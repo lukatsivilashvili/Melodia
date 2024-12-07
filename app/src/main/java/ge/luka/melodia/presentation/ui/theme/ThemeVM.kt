@@ -3,7 +3,6 @@ package ge.luka.melodia.presentation.ui.theme
 import BaseMviViewmodel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import ge.luka.melodia.domain.repository.MediaStoreRepository
 import ge.luka.melodia.domain.repository.ThemeRepository
 import ge.luka.melodia.presentation.ui.theme.themecomponents.AppTheme
 import kotlinx.coroutines.flow.SharingStarted
@@ -14,8 +13,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ThemeVM @Inject constructor(
-    themeRepository: ThemeRepository,
-    mediaStoreRepository: MediaStoreRepository
+    themeRepository: ThemeRepository
 ) : BaseMviViewmodel<ThemeViewState, ThemeAction, ThemeSideEffect>(
     initialUiState = ThemeViewState()
 ) {
@@ -33,7 +31,6 @@ class ThemeVM @Inject constructor(
 
     init {
         viewModelScope.launch {
-            mediaStoreRepository.cacheAllSongs()
 
             themeRepository.getDarkMode().map { isDarkMode ->
                 updateUiState { copy(isDarkMode = isDarkMode) }

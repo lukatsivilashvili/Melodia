@@ -10,9 +10,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -59,19 +57,14 @@ fun SongsScreenContent(
         }
     }
 
-    val derivedSongsList by remember {
-        derivedStateOf { viewState.songsList }
-    }
-
-    // Use derivedSongsList in your LazyColumn
-    if (derivedSongsList.isNotEmpty()) {
+    if (viewState.songsList.isNotEmpty()) {
         LazyColumn(modifier = modifier.fillMaxSize(), state = rememberLazyListState()) {
             item {
                 HelperControlButtons(
                     onPlayClick = { viewModel.onAction(SongsAction.PlayPressed) },
                     onShuffleClick = { viewModel.onAction(SongsAction.ShufflePressed) })
             }
-            items(items = derivedSongsList) { songItem ->
+            items(items = viewState.songsList, key = {it.songId ?: 0}) { songItem ->
                 GeneralMusicListItem(songItem = songItem, onClick = {
                     viewModel.onAction(
                         SongsAction.SongPressed(

@@ -11,9 +11,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -75,16 +73,12 @@ fun AlbumsScreenContent(
         }
     }
 
-    val derivedSongsList by remember {
-        derivedStateOf { viewState.albumsList }
-    }
-
-    if (derivedSongsList.isNotEmpty()) {
+    if (viewState.albumsList.isNotEmpty()) {
         LazyVerticalGrid(
             modifier = modifier.fillMaxSize(),
             columns = GridCells.Fixed(2)
         ) {
-            items(derivedSongsList, key = { it.albumId ?: 0 }) { albumItem ->
+            items(viewState.albumsList, key = { it.albumId ?: 0 }) { albumItem ->
                 GeneralAlbumListItem(albumItem = albumItem, modifier = modifier.clickable {
                     viewModel.onAction(AlbumsAction.AlbumPressed(albumItem))
                     onClick.invoke(

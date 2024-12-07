@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class AlbumModel(
     val albumId: Long? = null,
+    val artistId: Long? = null,
     val title: String? = null,
     val artist: String? = null,
     val songCount: Int? = null,
@@ -17,6 +18,7 @@ data class AlbumModel(
         fun fromCursor(
             cursor: Cursor,
             albumIdColumn: Int,
+            artistIdColumn: Int,
             titleColumn: Int,
             artistColumn: Int,
             songCountColumn: Int,
@@ -25,10 +27,11 @@ data class AlbumModel(
 
             return AlbumModel(
                 albumId = cursor.getLong(albumIdColumn),
+                artistId = cursor.getLong(artistIdColumn),
                 title = cursor.getString(titleColumn),
                 artist = cursor.getString(artistColumn),
                 songCount = cursor.getInt(songCountColumn),
-                artUri = Uri.withAppendedPath(/* baseUri = */ Uri.parse("content://media/external/audio/albumart"),
+                artUri = Uri.withAppendedPath(Uri.parse("content://media/external/audio/albumart"),
                     cursor.getLong(albumIdColumn).toString()
                 ).toString(),
                 duration = duration

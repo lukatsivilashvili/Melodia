@@ -15,9 +15,6 @@ interface SongsDao {
     @Query("SELECT * FROM allSongs ORDER BY title ASC")
     fun getAllSongsOrderedByTitle(): Flow<List<SongModelEntity>>
 
-    @Query("SELECT * FROM allSongs ORDER BY artist ASC")
-    fun getAllSongsOrderedByArtist(): Flow<List<SongModelEntity>>
-
-    @Query("SELECT * FROM allSongs ORDER BY album ASC")
-    fun getAllSongsOrderedByAlbum(): Flow<List<SongModelEntity>>
+    @Query("SELECT * FROM allSongs WHERE albumId = :albumId ORDER BY title ASC")
+    fun getAlbumSongsOrderedByTitle(albumId: Long): Flow<List<SongModelEntity>>
 }

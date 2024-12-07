@@ -7,6 +7,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import ge.luka.melodia.data.MediaStoreLoader
+import ge.luka.melodia.data.database.dao.AlbumsDao
+import ge.luka.melodia.data.database.dao.ArtistsDao
 import ge.luka.melodia.data.database.dao.SongsDao
 import ge.luka.melodia.data.repository.MediaStoreRepositoryImpl
 import ge.luka.melodia.data.repository.ThemeRepositoryImpl
@@ -30,9 +32,17 @@ abstract class RepositoryModule {
         fun provideMediaStoreRepository(
             mediaStoreLoader: MediaStoreLoader,
             songsDao: SongsDao,
+            albumsDao: AlbumsDao,
+            artistsDao: ArtistsDao,
             context: Context
         ): MediaStoreRepository {
-            return MediaStoreRepositoryImpl(mediaStoreLoader = mediaStoreLoader, context = context, songsDao = songsDao)
+            return MediaStoreRepositoryImpl(
+                mediaStoreLoader = mediaStoreLoader,
+                context = context,
+                songsDao = songsDao,
+                albumsDao = albumsDao,
+                artistsDao = artistsDao
+            )
         }
     }
 }

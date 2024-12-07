@@ -28,11 +28,11 @@ class AlbumSongsScreenVM@Inject constructor(
         }
     }
 
-    init {
+    fun getAlbumSongs(albumId: Long) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                mediaStoreRepository.getAllSongs().map { allSongs ->
-                    updateUiState { copy(songsList = allSongs) }
+                mediaStoreRepository.getAlbumSongs(albumId = albumId).map { albumSongs ->
+                    updateUiState { copy(songsList = albumSongs) }
                 }.stateIn(
                     scope = viewModelScope,
                     started = SharingStarted.Eagerly,

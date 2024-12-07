@@ -1,7 +1,7 @@
 package ge.luka.melodia.domain.model
 
 data class ArtistModel(
-    val id: Long? = null,
+    val artistId: Long?,
     val title: String?,
-    val albums: List<AlbumModel>
+    val artUri: String? = null
 )
