@@ -3,14 +3,11 @@ package ge.luka.melodia.presentation.ui.screens.songs
 import BaseMviViewmodel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import ge.luka.melodia.domain.model.SongModel
 import ge.luka.melodia.domain.repository.MediaStoreRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,15 +27,12 @@ class SongsScreenVM @Inject constructor(
 
     init {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                mediaStoreRepository.getAllSongs().map { allSongs ->
+            mediaStoreRepository.getAllSongs()
+                .distinctUntilChanged()
+                .flowOn(Dispatchers.IO)
+                .collect { allSongs ->
                     updateUiState { copy(songsList = allSongs) }
-                }.stateIn(
-                    scope = viewModelScope,
-                    started = SharingStarted.Eagerly,
-                    initialValue = listOf<SongModel>()
-                )
-            }
+                }
         }
     }
 }

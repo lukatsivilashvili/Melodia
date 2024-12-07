@@ -34,8 +34,6 @@ class ThemeVM @Inject constructor(
     init {
         viewModelScope.launch {
             mediaStoreRepository.cacheAllSongs()
-            mediaStoreRepository.cacheAllAlbums()
-            mediaStoreRepository.cacheAllArtists()
 
             themeRepository.getDarkMode().map { isDarkMode ->
                 updateUiState { copy(isDarkMode = isDarkMode) }

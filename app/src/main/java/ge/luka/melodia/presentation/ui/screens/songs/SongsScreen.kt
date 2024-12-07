@@ -71,7 +71,7 @@ fun SongsScreenContent(
                     onPlayClick = { viewModel.onAction(SongsAction.PlayPressed) },
                     onShuffleClick = { viewModel.onAction(SongsAction.ShufflePressed) })
             }
-            items(items = derivedSongsList, key = { it.songId ?: 0 }) { songItem ->
+            items(items = derivedSongsList) { songItem ->
                 GeneralMusicListItem(songItem = songItem, onClick = {
                     viewModel.onAction(
                         SongsAction.SongPressed(

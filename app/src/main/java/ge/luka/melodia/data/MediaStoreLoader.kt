@@ -16,11 +16,8 @@ object MediaStoreLoader {
     suspend fun getSongsList(context: Context): List<SongModel> {
         val songs = mutableListOf<SongModel>()
         withContext(Dispatchers.IO) {
-            val collection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val collection =
                 Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
-            } else {
-                Media.EXTERNAL_CONTENT_URI
-            }
             val selection = Media.IS_MUSIC + " !=0"
             val sortOrder = "${Media.TITLE} ASC"
             val projection = arrayOf(

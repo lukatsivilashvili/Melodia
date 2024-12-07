@@ -1,35 +1,46 @@
 package ge.luka.melodia.data.repository
 
 import android.content.Context
+import android.util.Log
+import android.util.Log.d
+import ge.luka.melodia.common.util.toDomain
+import ge.luka.melodia.common.util.toEntity
 import ge.luka.melodia.data.MediaStoreLoader
+import ge.luka.melodia.data.database.dao.SongsDao
 import ge.luka.melodia.domain.model.AlbumModel
 import ge.luka.melodia.domain.model.ArtistModel
 import ge.luka.melodia.domain.model.SongModel
 import ge.luka.melodia.domain.repository.MediaStoreRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 class MediaStoreRepositoryImpl @Inject constructor(
     private val mediaStoreLoader: MediaStoreLoader,
+    private val songsDao: SongsDao,
     private val context: Context
 ) : MediaStoreRepository {
 
-    private val songsCache = mutableMapOf<String, List<SongModel>>()
     private val albumsCache = mutableMapOf<String, List<AlbumModel>>()
     private val artistAlbumsCache = mutableMapOf<String, List<AlbumModel>>()
     private val artistsCache = mutableMapOf<String, List<ArtistModel>>()
 
-    override suspend fun getAllSongs(): Flow<List<SongModel>> = flow {
-        val cachedSongs = songsCache[ALL_SONGS]
-        if (cachedSongs != null) {
-            emit(cachedSongs)
-            return@flow
-        } else {
-            val allSongs = mediaStoreLoader.getSongsList(context = context)
-            songsCache[ALL_SONGS] = allSongs
-            emit(allSongs)
-        }
+    override suspend fun getAllSongs(): Flow<List<SongModel>> {
+        return songsDao.getAllSongsOrderedByTitle()
+            .onEach { entities ->
+                Log.d("MediaStoreRepo", "Raw entities from DB: ${entities.size}")
+            }
+            .map { it.toDomain() }
+            .onEach { models ->
+                Log.d("MediaStoreRepo", "Transformed models: ${models.size}")
+            }
+            .distinctUntilChanged()
+            .flowOn(Dispatchers.IO)
     }
 
     override suspend fun getAllAlbums(): Flow<List<AlbumModel>> = flow {
@@ -58,9 +69,10 @@ class MediaStoreRepositoryImpl @Inject constructor(
     }
 
     override suspend fun cacheAllSongs() {
-        if (songsCache[ALL_SONGS].isNullOrEmpty()) {
-            songsCache[ALL_SONGS] = mediaStoreLoader.getSongsList(context)
-        }
+        // Only insert new songs, don't clear existing ones
+        val songs = mediaStoreLoader.getSongsList(context).map { it.toEntity() }
+        d("allSongs", songs.toString())
+        songsDao.insertAllSongs(songs) // Using @Upsert will handle duplicates
     }
 
     override suspend fun cacheAllAlbums() {

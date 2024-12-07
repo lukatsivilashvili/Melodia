@@ -23,7 +23,7 @@ class SinglePermissionViewModel @Inject constructor(
 
     suspend fun cacheData() {
         mediaStoreRepository.cacheAllSongs()
-        mediaStoreRepository.cacheAllArtists()
-        mediaStoreRepository.cacheAllAlbums()
+//        mediaStoreRepository.cacheAllArtists()
+//        mediaStoreRepository.cacheAllAlbums()
     }
 }
