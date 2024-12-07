@@ -18,7 +18,8 @@ object MediaStoreLoader {
         withContext(Dispatchers.IO) {
             val collection =
                 Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
-            val selection = Media.IS_MUSIC + " !=0"
+            val selection = "${Media.RELATIVE_PATH} LIKE ? AND " + "${Media.IS_MUSIC} != 0"
+            val selectionArgs = arrayOf("%MelodiaMusic%")
             val sortOrder = "${Media.TITLE} ASC"
             val projection = arrayOf(
                 MediaStore.Audio.AudioColumns._ID,
@@ -27,13 +28,14 @@ object MediaStoreLoader {
                 Media.ARTIST,
                 Media.DURATION,
                 Media.ALBUM_ID,
+                Media.RELATIVE_PATH,
                 MediaStore.Audio.AudioColumns.BITRATE,
-            )
+                )
             val query = context.contentResolver.query(
                 collection,
                 projection,
                 selection,
-                null,
+                selectionArgs,
                 sortOrder,
                 null
             )
@@ -194,31 +196,32 @@ object MediaStoreLoader {
         return totalDuration
     }
 
-    private suspend fun getArtistFirstAlbumArt(context: Context, artistId: Long): String? {
-        return withContext(Dispatchers.IO) {
-            val collection = MediaStore.Audio.Artists.Albums.getContentUri("external", artistId)
+    private fun getArtistFirstAlbumArt(context: Context, artistId: Long): String? {
+        val collection = MediaStore.Audio.Artists.Albums.getContentUri("external", artistId)
 
-            val projection = arrayOf(Media.ALBUM_ID)
-            val sortOrder = "${MediaStore.Audio.Albums.ALBUM} ASC"
+        val projection = arrayOf(Media.ALBUM_ID)
+        val sortOrder = "${MediaStore.Audio.Albums.ALBUM} ASC"
 
-            val query = context.contentResolver.query(
-                collection,
-                projection,
-                null,
-                null,
-                sortOrder,
-                null
-            )
+        val query = context.contentResolver.query(
+            collection,
+            projection,
+            null,
+            null,
+            sortOrder,
+            null
+        )
+        var artistArtUri: String? = null
 
-            query?.use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val albumId = cursor.getLong(cursor.getColumnIndexOrThrow(Media.ALBUM_ID))
-                    Uri.withAppendedPath(
-                        Uri.parse("content://media/external/audio/albumart"),
-                        albumId.toString()
-                    ).toString()
-                } else null
-            }
+        query?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                val albumId = cursor.getLong(cursor.getColumnIndexOrThrow(Media.ALBUM_ID))
+                artistArtUri = Uri.withAppendedPath(
+                    Uri.parse("content://media/external/audio/albumart"),
+                    albumId.toString()
+                ).toString()
+            } else null
         }
+
+        return artistArtUri
     }
 }

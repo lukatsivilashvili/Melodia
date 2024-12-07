@@ -52,21 +52,19 @@ fun SinglePermissionRequest(
     onUpdateRoute: (String?) -> Unit,
     viewModel: SinglePermissionViewModel = hiltViewModel()
 ) {
-    // Set up our basic requirements
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val showRationalDialog = remember { mutableStateOf(false) }
 
-    // Handle side effects from the ViewModel
     CollectSideEffects(flow = viewModel.sideEffect) { effect ->
         when (effect) {
             is PermissionSideEffect.PermissionGranted -> {
                 viewModel.cacheData()
+                viewModel.createMediaDirectory(context = context)
             }
         }
     }
 
-    // Create and manage permission state
     val permissionState = createPermissionState(
         scope = scope,
         context = context,
@@ -75,7 +73,6 @@ fun SinglePermissionRequest(
         onUpdateRoute = onUpdateRoute
     )
 
-    // Display the permission request UI
     PermissionRequestContent(
         permissionState = permissionState,
         showRationalDialog = showRationalDialog,
@@ -92,15 +89,12 @@ private fun createPermissionState(
     navHostController: NavHostController,
     onUpdateRoute: (String?) -> Unit
 ): PermissionState {
-    // Create a permission callback handler
     val permissionCallback: (Boolean) -> Unit = { isGranted ->
         if (isGranted) {
             scope.launch {
                 try {
                     viewModel.onAction(PermissionAction.PermissionGranted)
-
                     delay(500)
-
                     navHostController.navigate(MelodiaScreen.Library)
                     onUpdateRoute(MelodiaScreen.Library.toString().getScreenFromRoute())
                 } catch (e: Exception) {
@@ -134,7 +128,6 @@ private fun PermissionRequestContent(
     showRationalDialog: MutableState<Boolean>,
     context: Context
 ) {
-    // Display the rational dialog if needed
     if (showRationalDialog.value) {
         PermissionRationalDialog(
             onDismiss = { showRationalDialog.value = false },
@@ -145,7 +138,6 @@ private fun PermissionRequestContent(
         )
     }
 
-    // Main content
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -167,14 +159,14 @@ private fun PermissionRationalDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = "Permission",
+                text = "Storage Permission Required",
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp
             )
         },
         text = {
             Text(
-                "The notification is important for this app. Please grant the permission.",
+                "Storage access is required to read your media files. Please grant the permission.",
                 fontSize = 16.sp
             )
         },
@@ -199,14 +191,12 @@ private fun PermissionRequestBody(
     context: Context
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        // Permission request button
         PermissionButton(
             permissionState = permissionState,
             showRationalDialog = showRationalDialog,
             context = context
         )
 
-        // Status text
         PermissionStatusText(permissionState = permissionState)
     }
 }
@@ -227,7 +217,7 @@ private fun PermissionButton(
                     permissionState.launchPermissionRequest()
                 }
             } else {
-                Toast.makeText(context, "Permission Given Already", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Storage Permission Already Granted", Toast.LENGTH_SHORT).show()
             }
         },
         colors = ButtonColors(
@@ -237,7 +227,7 @@ private fun PermissionButton(
             disabledContentColor = MaterialTheme.colorScheme.onTertiary,
         )
     ) {
-        Text(text = "Ask for permission")
+        Text(text = "Request Storage Permission")
     }
 }
 
@@ -245,9 +235,9 @@ private fun PermissionButton(
 @Composable
 private fun PermissionStatusText(permissionState: PermissionState) {
     if (permissionState.status.shouldShowRationale) {
-        Text("The notification is important for this app. Please grant the permission.")
+        Text("Storage access is required to read your media files. Please grant the permission.")
     } else {
-        Text("The notification permission is required for some functionality.")
+        Text("Storage permission is required to access your media files.")
     }
 }
 

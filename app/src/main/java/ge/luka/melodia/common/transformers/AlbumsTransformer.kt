@@ -1,4 +1,4 @@
-package ge.luka.melodia.common.util
+package ge.luka.melodia.common.transformers
 
 import ge.luka.melodia.data.database.model.AlbumModelEntity
 import ge.luka.melodia.domain.model.AlbumModel
