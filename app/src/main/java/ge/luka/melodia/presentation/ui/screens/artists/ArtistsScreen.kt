@@ -79,7 +79,7 @@ fun ArtistsScreenContent(
                 GeneralArtistListItem(modifier = modifier.clickable {
                     viewModel.onAction(
                         ArtistsAction.OnArtistClicked(
-                            artistId = artistItem.id ?: 0,
+                            artistId = artistItem.artistId ?: 0,
                             artistName = artistItem.title ?: ""
                         )
                     )

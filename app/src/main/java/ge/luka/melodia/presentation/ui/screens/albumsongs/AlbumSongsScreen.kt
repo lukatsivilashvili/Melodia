@@ -78,8 +78,12 @@ fun AlbumSongsScreenContent(
         }
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.getAlbumSongs(albumId = albumId ?: 0)
+    }
+
     val derivedSongsList by remember {
-        derivedStateOf { viewState.songsList.filter { song -> song.albumId == albumId } }
+        derivedStateOf { viewState.songsList}
     }
 
     if (derivedSongsList.isNotEmpty()) {

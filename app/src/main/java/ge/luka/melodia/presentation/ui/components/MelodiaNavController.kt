@@ -3,18 +3,20 @@
 package ge.luka.melodia.presentation.ui.components
 
 import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Build
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.isGranted
-import com.google.accompanist.permissions.rememberPermissionState
 import ge.luka.melodia.common.navtype.AlbumNavType
 import ge.luka.melodia.domain.model.AlbumModel
 import ge.luka.melodia.presentation.ui.MelodiaScreen
@@ -27,20 +29,26 @@ import ge.luka.melodia.presentation.ui.screens.settings.SettingsScreen
 import ge.luka.melodia.presentation.ui.screens.songs.SongsScreen
 import kotlin.reflect.typeOf
 
-@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun MelodiaNavController(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     onUpdateRoute: (String?) -> Unit,
 ) {
-    val permissionState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        rememberPermissionState(permission = Manifest.permission.READ_MEDIA_AUDIO)
-    } else {
-        rememberPermissionState(permission = Manifest.permission.READ_EXTERNAL_STORAGE)
+    val context = LocalContext.current
+    // We create a separate permission check just for determining the initial screen
+    val initialPermissionGranted = remember {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            checkSelfPermission(context, Manifest.permission.READ_MEDIA_AUDIO) == PackageManager.PERMISSION_GRANTED
+        } else {
+            checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+        }
     }
-    val startDestinationScreen =
-        if (permissionState.status.isGranted) MelodiaScreen.Library else MelodiaScreen.Permission
+
+    // The initial screen is now determined once and remembered
+    val startDestinationScreen = remember {
+        if (initialPermissionGranted) MelodiaScreen.Library else MelodiaScreen.Permission
+    }
 
     NavHost(
         navController = navController,

@@ -21,8 +21,8 @@ android {
 
     defaultConfig {
         applicationId = "ge.luka.melodia"
-        minSdk = 24
-        targetSdk = 34
+        minSdk = 29
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -118,4 +118,9 @@ dependencies {
 
     // Coil
     implementation(libs.coil)
+
+    //Room
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
 }

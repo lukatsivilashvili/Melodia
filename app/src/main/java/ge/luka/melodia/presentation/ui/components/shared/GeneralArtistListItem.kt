@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import ge.luka.melodia.R
-import ge.luka.melodia.domain.model.AlbumModel
 import ge.luka.melodia.domain.model.ArtistModel
 import ge.luka.melodia.presentation.ui.theme.themecomponents.MelodiaTypography
 
@@ -54,7 +53,7 @@ fun GeneralArtistListItem(
                 error = painterResource(id = R.drawable.ic_artist),
                 fallback = painterResource(id = R.drawable.ic_artist),
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(artistItem.albums.first().artUri)
+                    .data(artistItem.artUri ?: R.drawable.ic_artist)
                     .crossfade(true)
                     .build(),
                 contentDescription = null,
@@ -79,16 +78,10 @@ fun GeneralArtistListItem(
 @Preview
 @Composable
 fun ArtistItemPreview(modifier: Modifier = Modifier) {
-    GeneralArtistListItem(modifier, ArtistModel(
-        title = "A$/AP ROCKY",
-        albums = listOf(AlbumModel(
-            albumId = 2,
-            title = "asdsad",
-            artist = "Asdasdad",
-            songCount = 2,
-            artUri = "null",
-            duration = "null"
-        ))
-    )
+    GeneralArtistListItem(
+        modifier, ArtistModel(
+            title = "A$/AP ROCKY",
+            artistId = 0
+        )
     )
 }

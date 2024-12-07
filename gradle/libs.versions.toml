@@ -16,6 +16,7 @@ accompanist = "0.24.13-rc"
 datastore = "1.1.1"
 lifecycleViewModel = "2.8.5"
 coil = "2.7.0"
+roomVersion = "2.6.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -42,6 +43,9 @@ preferences-datastore = { module = "androidx.datastore:datastore-preferences", v
 lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewModel" }
 coil = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
+room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomVersion"}
+room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomVersion"}
+room-ktx = {module = "androidx.room:room-ktx", version.ref = "roomVersion"}
 
 
 

@@ -3,6 +3,7 @@ package ge.luka.melodia.presentation.ui.screens.albums
 import BaseMviViewmodel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import ge.luka.melodia.domain.model.AlbumModel
 import ge.luka.melodia.domain.model.SongModel
 import ge.luka.melodia.domain.repository.MediaStoreRepository
 import kotlinx.coroutines.Dispatchers
@@ -36,7 +37,7 @@ class AlbumsScreenVM @Inject constructor(
                 }.stateIn(
                     scope = viewModelScope,
                     started = SharingStarted.Eagerly,
-                    initialValue = listOf<SongModel>()
+                    initialValue = listOf<AlbumModel>()
                 )
             }
         }
