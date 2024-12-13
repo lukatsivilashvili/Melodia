@@ -155,42 +155,69 @@ object MediaStoreLoader {
     suspend fun getArtistsList(context: Context): List<ArtistModel> {
         val artistList = mutableListOf<ArtistModel>()
         withContext(Dispatchers.IO) {
-            // First get all songs from our directory to get their artist IDs
+            // Query albums instead of songs to get primary artists
+            val albumsUri = MediaStore.Audio.Albums.getContentUri(MediaStore.VOLUME_EXTERNAL)
+            // First, get all songs from our directory to get their album IDs
             val songsUri = Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
             val songSelection = "${Media.RELATIVE_PATH} LIKE ? AND ${Media.IS_MUSIC} != 0"
             val songSelectionArgs = arrayOf("%MelodiaMusic%")
 
-            val songQuery = context.contentResolver.query(
+            // Get unique album IDs from our directory
+            val albumIds = mutableSetOf<Long>()
+            context.contentResolver.query(
                 songsUri,
-                arrayOf(Media.ARTIST_ID, Media.ARTIST),
+                arrayOf(Media.ALBUM_ID),
                 songSelection,
                 songSelectionArgs,
                 null
-            )
-
-            val artistsMap = mutableMapOf<String, Long>() // Artist name to ID mapping
-            songQuery?.use { cursor ->
-                val artistColumn = cursor.getColumnIndexOrThrow(Media.ARTIST)
-                val artistIdColumn = cursor.getColumnIndexOrThrow(Media.ARTIST_ID)
-
+            )?.use { cursor ->
+                val albumIdColumn = cursor.getColumnIndexOrThrow(Media.ALBUM_ID)
                 while (cursor.moveToNext()) {
-                    val artistName = cursor.getString(artistColumn)
-                    val artistId = cursor.getLong(artistIdColumn)
-                    if (artistName != null && artistName.isNotEmpty() && artistName != "<unknown>") {
-                        artistsMap[artistName] = artistId
-                    }
+                    albumIds.add(cursor.getLong(albumIdColumn))
                 }
             }
 
-            // Create artist models for each unique artist
-            artistsMap.forEach { (artistName, artistId) ->
-                artistList.add(
-                    ArtistModel(
-                        artistId = artistId,
-                        title = artistName,
-                        artUri = getArtistFirstAlbumArt(context, artistId)
-                    )
+            // If we found any albums, query for their artists
+            if (albumIds.isNotEmpty()) {
+                val albumSelection =
+                    "${MediaStore.Audio.Albums._ID} IN (${albumIds.joinToString(",")})"
+
+                val albumQuery = context.contentResolver.query(
+                    albumsUri,
+                    arrayOf(
+                        MediaStore.Audio.Albums.ARTIST,
+                        MediaStore.Audio.Albums.ARTIST_ID
+                    ),
+                    albumSelection,
+                    null,
+                    "${MediaStore.Audio.Albums.ARTIST} ASC"
                 )
+
+                val artistsMap = mutableMapOf<String, Long>() // Artist name to ID mapping
+                albumQuery?.use { cursor ->
+                    val artistColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums.ARTIST)
+                    val artistIdColumn =
+                        cursor.getColumnIndexOrThrow(MediaStore.Audio.Albums.ARTIST_ID)
+
+                    while (cursor.moveToNext()) {
+                        val artistName = cursor.getString(artistColumn)
+                        val artistId = cursor.getLong(artistIdColumn)
+                        if (artistName != null && artistName.isNotEmpty() && artistName != "<unknown>") {
+                            artistsMap[artistName] = artistId
+                        }
+                    }
+                }
+
+                // Create artist models for each unique artist
+                artistsMap.forEach { (artistName, artistId) ->
+                    artistList.add(
+                        ArtistModel(
+                            artistId = artistId,
+                            title = artistName,
+                            artUri = getArtistFirstAlbumArt(context, artistId)
+                        )
+                    )
+                }
             }
         }
         return artistList.sortedBy { it.title }
