@@ -21,6 +21,7 @@ import androidx.navigation.NavHostController
 import ge.luka.melodia.common.mvi.CollectSideEffects
 import ge.luka.melodia.presentation.ui.components.shared.GeneralMusicListItem
 import ge.luka.melodia.presentation.ui.components.shared.HelperControlButtons
+import ge.luka.melodia.presentation.ui.components.shared.MetadataDialog
 import ge.luka.melodia.presentation.ui.theme.themecomponents.MelodiaTypography
 
 @Composable
@@ -51,10 +52,27 @@ fun SongsScreenContent(
 
     CollectSideEffects(flow = viewModel.sideEffect) { effect ->
         when (effect) {
-            is SongsSideEffect.ThrowToast -> {
-                Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
-            }
+            is SongsSideEffect.ThrowToast -> { Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show() }
         }
+    }
+
+    if (viewState.isDialogVisible && viewState.currentEditingSong != null) {
+        MetadataDialog(
+            song = viewState.currentEditingSong,
+            onDismiss = { viewModel.onAction(SongsAction.DialogDismiss) },
+            onSave = { id, title, artist, album, artworkUri ->
+                viewModel.onAction(
+                    SongsAction.MetadataSaved(
+                        id = id,
+                        title = title,
+                        artist = artist,
+                        album = album,
+                        artworkUri = artworkUri
+                    )
+                )
+                viewModel.onAction(SongsAction.DialogDismiss) // Close dialog after save
+            }
+        )
     }
 
     if (viewState.songsList.isNotEmpty()) {
@@ -64,14 +82,20 @@ fun SongsScreenContent(
                     onPlayClick = { viewModel.onAction(SongsAction.PlayPressed) },
                     onShuffleClick = { viewModel.onAction(SongsAction.ShufflePressed) })
             }
-            items(items = viewState.songsList, key = {it.songId ?: 0}) { songItem ->
-                GeneralMusicListItem(songItem = songItem, onClick = {
-                    viewModel.onAction(
-                        SongsAction.SongPressed(
-                            song = songItem
+            items(items = viewState.songsList, key = { it.songId ?: 0 }) { songItem ->
+                GeneralMusicListItem(songItem = songItem,
+                    onClick = {
+                        viewModel.onAction(
+                            SongsAction.SongPressed(
+                                song = songItem
+                            )
                         )
-                    )
-                })
+                    },
+                    onLongClick = {
+                        viewModel.onAction(
+                            SongsAction.SongLongPressed(song = songItem)
+                        )
+                    })
             }
         }
     } else {

@@ -21,6 +21,10 @@ class SongsScreenVM @Inject constructor(
             is SongsAction.PlayPressed -> emitSideEffect(SongsSideEffect.ThrowToast("Play Pressed"))
             is SongsAction.ShufflePressed -> emitSideEffect(SongsSideEffect.ThrowToast("Shuffle Pressed"))
             is SongsAction.SongPressed -> emitSideEffect(SongsSideEffect.ThrowToast(uiAction.song.title ?: ""))
+            is SongsAction.SongLongPressed -> updateUiState { copy(isDialogVisible = true, currentEditingSong = uiAction.song) }
+            is SongsAction.DialogDismiss -> updateUiState { copy(isDialogVisible = false, currentEditingSong = null) }
+            is SongsAction.MetadataSaved -> emitSideEffect(SongsSideEffect.ThrowToast("Saved"))
+
         }
     }
 
