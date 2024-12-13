@@ -1,7 +1,9 @@
 package ge.luka.melodia.presentation.ui.components
 
 import BaseMviViewmodel
+import android.content.Context
 import dagger.hilt.android.lifecycle.HiltViewModel
+import ge.luka.melodia.common.utils.FileHelper
 import ge.luka.melodia.domain.repository.MediaStoreRepository
 import ge.luka.melodia.presentation.ui.components.singlepermission.PermissionAction
 import ge.luka.melodia.presentation.ui.components.singlepermission.PermissionSideEffect
@@ -25,5 +27,9 @@ class SinglePermissionViewModel @Inject constructor(
         mediaStoreRepository.cacheAllSongs()
         mediaStoreRepository.cacheAllAlbums()
         mediaStoreRepository.cacheAllArtists()
+    }
+
+    fun createMediaDirectory(context: Context) {
+        FileHelper.createAppDirectory(context = context, folderName = "MelodiaMusic")
     }
 }

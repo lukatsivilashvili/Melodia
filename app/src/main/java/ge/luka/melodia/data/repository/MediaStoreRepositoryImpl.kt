@@ -1,8 +1,8 @@
 package ge.luka.melodia.data.repository
 
 import android.content.Context
-import ge.luka.melodia.common.util.toDomain
-import ge.luka.melodia.common.util.toEntity
+import ge.luka.melodia.common.transformers.toDomain
+import ge.luka.melodia.common.transformers.toEntity
 import ge.luka.melodia.data.MediaStoreLoader
 import ge.luka.melodia.data.database.dao.AlbumsDao
 import ge.luka.melodia.data.database.dao.ArtistsDao
