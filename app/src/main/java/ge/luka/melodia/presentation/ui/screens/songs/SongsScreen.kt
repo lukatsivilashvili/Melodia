@@ -53,6 +53,7 @@ fun SongsScreenContent(
     CollectSideEffects(flow = viewModel.sideEffect) { effect ->
         when (effect) {
             is SongsSideEffect.ThrowToast -> { Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show() }
+            is SongsSideEffect.UpdateCurrentSong -> TODO()
         }
     }
 

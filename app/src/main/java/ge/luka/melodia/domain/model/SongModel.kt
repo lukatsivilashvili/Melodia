@@ -8,6 +8,7 @@ import android.provider.MediaStore
 data class SongModel(
     val songId: Long? = null,
     val albumId: Long? = null,
+    val artistId: Long? = null,
     val title: String? = null,
     val album: String? = null,
     val artist: String? = null,
@@ -20,16 +21,18 @@ data class SongModel(
         fun fromCursor(
             cursor: Cursor,
             albumIdColumn: Int,
+            songIdColumn: Int,
+            artistIdColumn: Int,
             titleColumn: Int,
             albumColumn: Int,
             artistColumn: Int,
             durationColumn: Int,
-            songIdColumn: Int,
             bitrateColumn: Int
         ): SongModel {
             return SongModel(
                 songId = cursor.getLong(songIdColumn),
                 albumId = cursor.getLong(albumIdColumn),
+                artistId = cursor.getLong(artistIdColumn),
                 title = cursor.getString(titleColumn),
                 album = cursor.getString(albumColumn),
                 artist = cursor.getString(artistColumn),

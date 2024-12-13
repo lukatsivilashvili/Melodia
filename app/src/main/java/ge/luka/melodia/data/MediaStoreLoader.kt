@@ -28,6 +28,7 @@ object MediaStoreLoader {
                 Media.ARTIST,
                 Media.DURATION,
                 Media.ALBUM_ID,
+                Media.ARTIST_ID,
                 Media.RELATIVE_PATH,
                 MediaStore.Audio.AudioColumns.BITRATE,
             )
@@ -43,6 +44,7 @@ object MediaStoreLoader {
 
                 val songIdColumn = cursor.getColumnIndexOrThrow(Media._ID)
                 val albumIdColumn = cursor.getColumnIndexOrThrow(Media.ALBUM_ID)
+                val artistIdColumn = cursor.getColumnIndexOrThrow(Media.ARTIST_ID)
                 val titleColumn = cursor.getColumnIndexOrThrow(Media.TITLE)
                 val albumColumn = cursor.getColumnIndexOrThrow(Media.ALBUM)
                 val artistColumn = cursor.getColumnIndexOrThrow(Media.ARTIST)
@@ -53,12 +55,13 @@ object MediaStoreLoader {
                     songs.add(
                         SongModel.fromCursor(
                             cursor,
+                            songIdColumn = songIdColumn,
                             albumIdColumn = albumIdColumn,
+                            artistIdColumn = artistIdColumn,
                             titleColumn = titleColumn,
                             albumColumn = albumColumn,
                             artistColumn = artistColumn,
                             durationColumn = durationColumn,
-                            songIdColumn = songIdColumn,
                             bitrateColumn = bitrateColumn
                         )
                     )

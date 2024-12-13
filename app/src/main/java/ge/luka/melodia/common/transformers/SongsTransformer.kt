@@ -7,6 +7,7 @@ fun SongModel.toEntity(): SongModelEntity {
     return SongModelEntity(
         songId = songId,
         albumId = albumId,
+        artistId = artistId,
         title = title,
         album = album,
         artist = artist,
@@ -21,6 +22,7 @@ fun SongModelEntity.toDomain(): SongModel {
     return SongModel(
         songId = songId,
         albumId = albumId,
+        artistId = artistId,
         title = title,
         album = album,
         artist = artist,
