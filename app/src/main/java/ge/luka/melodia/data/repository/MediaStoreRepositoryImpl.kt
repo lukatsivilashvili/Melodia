@@ -69,4 +69,21 @@ class MediaStoreRepositoryImpl @Inject constructor(
         val artists = mediaStoreLoader.getArtistsList(context).map { it.toEntity() }
         artistsDao.insertAllArtists(artists)
     }
+
+    override suspend fun updateSongRecord(
+        songId: Long,
+        title: String,
+        artist: String?,
+        album: String?,
+        artUri: String?,
+    ) {
+        songsDao.updateSongById(
+            songId = songId,
+            title = title,
+            artist = artist,
+            album = album,
+            artUri = artUri
+
+        )
+    }
 }

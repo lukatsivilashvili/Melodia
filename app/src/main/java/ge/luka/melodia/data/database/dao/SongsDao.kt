@@ -12,6 +12,22 @@ interface SongsDao {
     @Upsert
     suspend fun insertAllSongs(songs: List<SongModelEntity>)
 
+    @Query("""
+    UPDATE allSongs SET 
+        title = :title,
+        artist = :artist,
+        album = :album,
+        artUri = :artUri
+    WHERE songId = :songId
+""")
+    suspend fun updateSongById(
+        songId: Long,
+        title: String,
+        artist: String?,
+        album: String?,
+        artUri: String?,
+    ): Int
+
     @Query("SELECT * FROM allSongs ORDER BY title ASC")
     fun getAllSongsOrderedByTitle(): Flow<List<SongModelEntity>>
 

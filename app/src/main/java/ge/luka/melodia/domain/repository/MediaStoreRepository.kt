@@ -16,5 +16,11 @@ interface MediaStoreRepository {
     suspend fun cacheAllAlbums()
     suspend fun cacheAllArtists()
 
-
+    suspend fun updateSongRecord(
+        songId: Long,
+        title: String,
+        artist: String?,
+        album: String?,
+        artUri: String?,
+    )
 }

@@ -52,8 +52,23 @@ fun SongsScreenContent(
 
     CollectSideEffects(flow = viewModel.sideEffect) { effect ->
         when (effect) {
-            is SongsSideEffect.ThrowToast -> { Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show() }
-            is SongsSideEffect.UpdateCurrentSong -> TODO()
+            is SongsSideEffect.ThrowToast -> {
+                Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+            }
+
+            is SongsSideEffect.UpdateCurrentSong -> {
+                val updatedSong = viewState.currentEditingSong?.copy(
+                    title = effect.title,
+                    artist = effect.artist,
+                    album = effect.album,
+                    artUri = effect.artworkUri
+                )
+                if (updatedSong != null) {
+                    viewModel.updateSongMetadata(updatedSong = updatedSong)
+                } else {
+                    Toast.makeText(context, "Song not found", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 
@@ -84,7 +99,8 @@ fun SongsScreenContent(
                     onShuffleClick = { viewModel.onAction(SongsAction.ShufflePressed) })
             }
             items(items = viewState.songsList, key = { it.songId ?: 0 }) { songItem ->
-                GeneralMusicListItem(songItem = songItem,
+                GeneralMusicListItem(
+                    songItem = songItem,
                     onClick = {
                         viewModel.onAction(
                             SongsAction.SongPressed(
@@ -96,7 +112,8 @@ fun SongsScreenContent(
                         viewModel.onAction(
                             SongsAction.SongLongPressed(song = songItem)
                         )
-                    })
+                    }
+                )
             }
         }
     } else {
