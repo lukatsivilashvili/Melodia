@@ -76,14 +76,24 @@ class MediaStoreRepositoryImpl @Inject constructor(
         artist: String?,
         album: String?,
         artUri: String?,
-    ) {
+    ): Boolean {
+        if (album != null && !albumsDao.doesAlbumExist(album)) {
+            return false // Abort the update since the album doesn't exist
+        }
+
+        val albumId = album?.let { albumsDao.getAlbumIdByName(it) }
+        val artistId = artist?.let { artistsDao.getArtistIdByName(it) }
+
         songsDao.updateSongById(
             songId = songId,
             title = title,
             artist = artist,
             album = album,
             artUri = artUri
-
         )
+
+        songsDao.updateSongIdsById(songId, albumId, artistId)
+
+        return true
     }
 }

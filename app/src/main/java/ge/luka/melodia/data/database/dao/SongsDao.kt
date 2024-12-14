@@ -28,6 +28,18 @@ interface SongsDao {
         artUri: String?,
     ): Int
 
+    @Query("""
+    UPDATE allSongs SET 
+        albumId = :albumId,
+        artistId = :artistId
+    WHERE songId = :songId
+""")
+    suspend fun updateSongIdsById(
+        songId: Long,
+        albumId: Long?,
+        artistId: Long?,
+    ): Int
+
     @Query("SELECT * FROM allSongs ORDER BY title ASC")
     fun getAllSongsOrderedByTitle(): Flow<List<SongModelEntity>>
 

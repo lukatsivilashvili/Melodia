@@ -55,24 +55,25 @@ class SongsScreenVM @Inject constructor(
 
     fun updateSongMetadata(updatedSong: SongModel) {
         viewModelScope.launch {
-            try {
-                updateUiState {
-                    copy(
-                        songsList = songsList.map { song ->
-                            if (song.songId == updatedSong.songId) updatedSong else song
-                        }
-                    )
-                }
-                mediaStoreRepository.updateSongRecord(
-                    songId = updatedSong.songId ?: 0,
-                    title = updatedSong.title ?: "",
-                    artist = updatedSong.artist,
-                    album = updatedSong.album,
-                    artUri = updatedSong.artUri
+            updateUiState {
+                copy(
+                    songsList = songsList.map { song ->
+                        if (song.songId == updatedSong.songId) updatedSong else song
+                    }
                 )
+            }
+            val isSuccess = mediaStoreRepository.updateSongRecord(
+                songId = updatedSong.songId ?: 0,
+                title = updatedSong.title ?: "",
+                artist = updatedSong.artist,
+                album = updatedSong.album,
+                artUri = updatedSong.artUri
+            )
+            if (isSuccess) {
                 emitSideEffect(SongsSideEffect.ThrowToast("Metadata updated successfully"))
-            } catch (e: Exception) {
+            } else {
                 emitSideEffect(SongsSideEffect.ThrowToast("Failed to update metadata"))
+
             }
         }
     }

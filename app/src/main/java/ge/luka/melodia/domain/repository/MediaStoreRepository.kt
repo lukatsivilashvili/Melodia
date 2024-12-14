@@ -22,5 +22,5 @@ interface MediaStoreRepository {
         artist: String?,
         album: String?,
         artUri: String?,
-    )
+    ): Boolean
 }
