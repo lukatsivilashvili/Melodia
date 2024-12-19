@@ -92,8 +92,26 @@ class MediaStoreRepositoryImpl @Inject constructor(
             artUri = artUri
         )
 
-        songsDao.updateSongIdsById(songId, albumId, artistId)
+        songsDao.updateSongIdsById(songId = songId, albumId = albumId, artistId = artistId)
 
+        return true
+    }
+
+    override suspend fun updateAlbumRecord(
+        artistId: Long,
+        albumId: Long,
+        title: String,
+        artist: String?,
+        artUri: String?
+    ): Boolean {
+        albumsDao.updateAlbumById(
+            albumId = albumId,
+            title = title,
+            artist = artist,
+            artUri = artUri
+        )
+        artistsDao.updateArtistArt(artistId, artUri)
+        songsDao.updateSongArtByAlbumId(albumId, artUri)
         return true
     }
 }

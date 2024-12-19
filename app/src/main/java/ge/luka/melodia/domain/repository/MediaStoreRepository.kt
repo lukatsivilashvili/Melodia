@@ -23,4 +23,12 @@ interface MediaStoreRepository {
         album: String?,
         artUri: String?,
     ): Boolean
+
+    suspend fun updateAlbumRecord(
+        artistId: Long,
+        albumId: Long,
+        title: String,
+        artist: String?,
+        artUri: String?,
+    ): Boolean
 }

@@ -24,4 +24,18 @@ interface AlbumsDao {
 
     @Query("SELECT EXISTS(SELECT 1 FROM allAlbums WHERE title = :albumName)")
     suspend fun doesAlbumExist(albumName: String): Boolean
+
+    @Query("""
+    UPDATE allAlbums SET 
+        title = :title,
+        artist = :artist,
+        artUri = :artUri
+    WHERE albumId = :albumId
+""")
+    suspend fun updateAlbumById(
+        albumId: Long,
+        title: String,
+        artist: String?,
+        artUri: String?,
+    ): Int
 }

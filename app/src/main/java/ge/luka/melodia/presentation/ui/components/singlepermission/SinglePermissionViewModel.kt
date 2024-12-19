@@ -1,13 +1,10 @@
-package ge.luka.melodia.presentation.ui.components
+package ge.luka.melodia.presentation.ui.components.singlepermission
 
 import BaseMviViewmodel
 import android.content.Context
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ge.luka.melodia.common.utils.FileHelper
 import ge.luka.melodia.domain.repository.MediaStoreRepository
-import ge.luka.melodia.presentation.ui.components.singlepermission.PermissionAction
-import ge.luka.melodia.presentation.ui.components.singlepermission.PermissionSideEffect
-import ge.luka.melodia.presentation.ui.components.singlepermission.PermissionViewState
 import javax.inject.Inject
 
 @HiltViewModel

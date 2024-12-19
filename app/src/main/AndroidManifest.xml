@@ -5,6 +5,7 @@
         tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.PERSIST_URI_PERMISSIONS" />
 
     <application
         android:name=".MelodiaApplication"

@@ -1,5 +1,6 @@
 package ge.luka.melodia.presentation.ui.components.shared
 
+import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -30,24 +31,38 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import ge.luka.melodia.R
-import ge.luka.melodia.domain.model.SongModel
+import ge.luka.melodia.domain.model.BaseModel
 
 @Composable
 fun MetadataDialog(
-    song: SongModel?,
+    audioModel: BaseModel?,
     onDismiss: () -> Unit,
-    onSave: (id: Long, title: String, artist: String, album: String, artworkUri: String?) -> Unit
+    shouldShowAlbumField: Boolean,
+    onSave: (id: Long, title: String, artist: String, album: String?, artworkUri: String?) -> Unit
 ) {
-    var title by remember { mutableStateOf(song?.title ?: "") }
-    var artist by remember { mutableStateOf(song?.artist ?: "") }
-    var album by remember { mutableStateOf(song?.album ?: "") }
-    var artworkUri by remember { mutableStateOf(song?.artUri ?: "") }
+    var title by remember { mutableStateOf(audioModel?.title ?: "") }
+    var artist by remember { mutableStateOf(audioModel?.artist ?: "") }
+    var album by remember { mutableStateOf(audioModel?.album ?: "") }
+    var artworkUri by remember { mutableStateOf(audioModel?.artUri ?: "") }
+
+    val context = LocalContext.current
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
+        contract = ActivityResultContracts.OpenDocument()
     ) { uri: Uri? ->
-        uri?.let { artworkUri = it.toString() }
+        uri?.let {
+            // Persist URI permissions
+            try {
+                context.contentResolver.takePersistableUriPermission(
+                    it,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                )
+            } catch (e: SecurityException) {
+                e.printStackTrace() // Handle exception if permission cannot be persisted
+            }
+            // Store the URI as a string
+            artworkUri = it.toString()
+        }
     }
 
     AlertDialog(
@@ -70,7 +85,7 @@ fun MetadataDialog(
                     Image(
                         painter = rememberAsyncImagePainter(
                             ImageRequest.Builder(LocalContext.current)
-                                .data(artworkUri ?: R.drawable.madvillain)
+                                .data(artworkUri)
                                 .build()
                         ),
                         contentDescription = "Album Art",
@@ -81,7 +96,7 @@ fun MetadataDialog(
 
                 // Change Art Button
                 OutlinedButton(
-                    onClick = { imagePickerLauncher.launch("image/*") }
+                    onClick = { imagePickerLauncher.launch(arrayOf("image/*")) }
                 ) {
                     Text("Change Album Art")
                 }
@@ -99,18 +114,27 @@ fun MetadataDialog(
                     label = { Text("Artist") },
                     modifier = Modifier.fillMaxWidth()
                 )
-                OutlinedTextField(
-                    value = album,
-                    onValueChange = { album = it },
-                    label = { Text("Album") },
-                    modifier = Modifier.fillMaxWidth()
-                )
+                if (shouldShowAlbumField) {
+                    OutlinedTextField(
+                        value = album,
+                        onValueChange = { album = it },
+                        label = { Text("Album") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
         },
         confirmButton = {
             TextButton(
                 onClick = {
-                    onSave(song?.songId ?: 0, title, artist, album, artworkUri)
+                    onSave(
+                        if (shouldShowAlbumField) audioModel?.songId ?: 0 else audioModel?.albumId
+                            ?: 0,
+                        title,
+                        artist,
+                        album,
+                        artworkUri
+                    )
                     onDismiss()
                 }
             ) {

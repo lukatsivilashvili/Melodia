@@ -21,11 +21,36 @@ class AlbumsScreenVM @Inject constructor(
 
     override fun onAction(uiAction: AlbumsAction) {
         when (uiAction) {
-            is AlbumsAction.AlbumPressed -> emitSideEffect(
-                AlbumsSideEffect.ThrowToast(
-                    uiAction.album.title ?: ""
+            is AlbumsAction.AlbumItemPressed -> emitSideEffect(
+                AlbumsSideEffect.AlbumItemPressed(
+                    title = uiAction.title,
+                    albumId = uiAction.albumId,
+                    albumModel = uiAction.albumModel
                 )
             )
+
+            is AlbumsAction.MetadataSaved -> emitSideEffect(
+                AlbumsSideEffect.UpdateCurrentAlbum(
+                    id = uiAction.id,
+                    title = uiAction.title,
+                    artist = uiAction.artist,
+                    artworkUri = uiAction.artworkUri
+                )
+            )
+
+            AlbumsAction.DialogDismiss -> updateUiState {
+                copy(
+                    isDialogVisible = false,
+                    currentEditingAlbum = null
+                )
+            }
+
+            is AlbumsAction.AlbumLongPressed -> updateUiState {
+                copy(
+                    isDialogVisible = true,
+                    currentEditingAlbum = uiAction.album
+                )
+            }
         }
     }
 
@@ -57,4 +82,26 @@ class AlbumsScreenVM @Inject constructor(
         }
     }
 
+    fun updateAlbumMetadata(updatedAlbum: AlbumModel) {
+        viewModelScope.launch {
+            updateUiState {
+                copy(
+                    albumsList = albumsList.map { album ->
+                        if (album.albumId == updatedAlbum.albumId) updatedAlbum else album
+                    })
+            }
+            val isSuccess = mediaStoreRepository.updateAlbumRecord(
+                artistId = updatedAlbum.artistId ?: 0,
+                albumId = updatedAlbum.albumId ?: 0,
+                title = updatedAlbum.title ?: "",
+                artist = updatedAlbum.artist,
+                artUri = updatedAlbum.artUri
+            )
+            if (isSuccess) {
+                emitSideEffect(AlbumsSideEffect.ThrowToast("Metadata updated successfully"))
+            } else {
+                emitSideEffect(AlbumsSideEffect.ThrowToast("Failed to update metadata"))
+            }
+        }
+    }
 }

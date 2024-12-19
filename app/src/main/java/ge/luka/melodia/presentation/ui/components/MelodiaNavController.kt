@@ -20,6 +20,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import ge.luka.melodia.common.navtype.AlbumNavType
 import ge.luka.melodia.domain.model.AlbumModel
 import ge.luka.melodia.presentation.ui.MelodiaScreen
+import ge.luka.melodia.presentation.ui.components.singlepermission.SinglePermissionRequest
 import ge.luka.melodia.presentation.ui.screens.albums.AlbumsScreen
 import ge.luka.melodia.presentation.ui.screens.albumsongs.AlbumSongsScreen
 import ge.luka.melodia.presentation.ui.screens.artists.ArtistsScreen

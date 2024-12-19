@@ -3,7 +3,9 @@
 package ge.luka.melodia.presentation.ui.components.shared
 
 import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
@@ -30,15 +32,22 @@ import ge.luka.melodia.R
 import ge.luka.melodia.domain.model.AlbumModel
 import ge.luka.melodia.presentation.ui.theme.themecomponents.MelodiaTypography
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun GeneralAlbumListItem(
     modifier: Modifier = Modifier,
     albumItem: AlbumModel,
+    onClick: () -> Unit = {},
+    onLongClick: () -> Unit = {}
 ) {
     Column(
         modifier = modifier
             .background(MaterialTheme.colorScheme.surface)
-            .padding(10.dp),
+            .padding(10.dp)
+            .combinedClickable(
+                onClick = { onClick.invoke() },
+                onLongClick = { onLongClick.invoke() }
+            ),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(

@@ -74,15 +74,16 @@ fun SongsScreenContent(
 
     if (viewState.isDialogVisible && viewState.currentEditingSong != null) {
         MetadataDialog(
-            song = viewState.currentEditingSong,
+            audioModel = viewState.currentEditingSong,
             onDismiss = { viewModel.onAction(SongsAction.DialogDismiss) },
+            shouldShowAlbumField = true,
             onSave = { id, title, artist, album, artworkUri ->
                 viewModel.onAction(
                     SongsAction.MetadataSaved(
                         id = id,
                         title = title,
                         artist = artist,
-                        album = album,
+                        album = album ?: "",
                         artworkUri = artworkUri
                     )
                 )
