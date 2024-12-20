@@ -6,14 +6,16 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AlbumModel(
-    val albumId: Long? = null,
-    val artistId: Long? = null,
-    val title: String? = null,
-    val artist: String? = null,
+    override val songId: Long? = null,
+    override val albumId: Long? = null,
+    override val artistId: Long? = null,
+    override val title: String? = null,
+    override val artist: String? = null,
+    override val artUri: String? = null,
+    override val album: String? = null,
     val songCount: Int? = null,
-    val artUri: String? = null,
-    val duration: String? = null
-) {
+    val duration: String? = null,
+): BaseModel {
     companion object {
         fun fromCursor(
             cursor: Cursor,

@@ -1,6 +1,5 @@
 package ge.luka.melodia.presentation.ui
 
-import ge.luka.melodia.domain.model.AlbumModel
 import kotlinx.serialization.Serializable
 
 sealed class MelodiaScreen {
@@ -12,7 +11,13 @@ sealed class MelodiaScreen {
     data object Songs : MelodiaScreen()
 
     @Serializable
-    data class AlbumSongs(val albumId: Long, val albumModel: AlbumModel) : MelodiaScreen()
+    data class AlbumSongs(
+        val albumId: Long,
+        val albumTitle: String,
+        val albumArtist: String,
+        val albumArt: String,
+        val albumDuration: String
+    ) : MelodiaScreen()
 
     @Serializable
     data class Albums(val artistName: String? = null, val artistId: Long? = null) : MelodiaScreen()

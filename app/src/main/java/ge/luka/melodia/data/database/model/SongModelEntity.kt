@@ -9,6 +9,7 @@ data class SongModelEntity(
     val id: Int = 0,
     val songId: Long? = null,
     val albumId: Long? = null,
+    val artistId: Long? = null,
     val title: String? = null,
     val album: String? = null,
     val artist: String? = null,

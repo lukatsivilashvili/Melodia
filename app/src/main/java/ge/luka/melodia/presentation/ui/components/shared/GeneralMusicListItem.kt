@@ -1,7 +1,8 @@
 package ge.luka.melodia.presentation.ui.components.shared
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,11 +30,13 @@ import ge.luka.melodia.domain.model.SongModel
 import ge.luka.melodia.presentation.ui.theme.themecomponents.MelodiaTypography
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun GeneralMusicListItem(
     modifier: Modifier = Modifier,
     songItem: SongModel,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
+    onLongClick: () -> Unit = {}
 ) {
 
     Row(
@@ -41,7 +44,10 @@ fun GeneralMusicListItem(
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surface)
             .padding(10.dp)
-            .clickable { onClick.invoke() },
+            .combinedClickable(
+                onClick = { onClick.invoke() },
+                onLongClick = { onLongClick.invoke() }
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(

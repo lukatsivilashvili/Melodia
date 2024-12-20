@@ -2,7 +2,6 @@ package ge.luka.melodia.presentation.ui.screens.albums
 
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -20,9 +19,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import ge.luka.melodia.common.mvi.CollectSideEffects
-import ge.luka.melodia.domain.model.AlbumModel
+import ge.luka.melodia.common.utils.Base64Helper
 import ge.luka.melodia.presentation.ui.MelodiaScreen
 import ge.luka.melodia.presentation.ui.components.shared.GeneralAlbumListItem
+import ge.luka.melodia.presentation.ui.components.shared.MetadataDialog
 import ge.luka.melodia.presentation.ui.theme.themecomponents.MelodiaTypography
 
 @Composable
@@ -42,9 +42,12 @@ fun AlbumsScreen(
         navHostController.popBackStack()
     }
 
-    AlbumsScreenContent(modifier = modifier, artistId = artistId, artistName = artistName) {
-        navHostController.navigate(MelodiaScreen.AlbumSongs(it.second, it.third))
-    }
+    AlbumsScreenContent(
+        modifier = modifier,
+        artistId = artistId,
+        artistName = artistName,
+        navHostController = navHostController
+    )
 }
 
 @Composable
@@ -53,7 +56,7 @@ fun AlbumsScreenContent(
     viewModel: AlbumsScreenVM = hiltViewModel(),
     artistId: Long?,
     artistName: String?,
-    onClick: (Triple<String, Long, AlbumModel>) -> Unit
+    navHostController: NavHostController,
 ) {
     val viewState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -63,8 +66,47 @@ fun AlbumsScreenContent(
             is AlbumsSideEffect.ThrowToast -> {
                 Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
             }
+
+            is AlbumsSideEffect.UpdateCurrentAlbum -> {
+                val updatedAlbum = viewState.currentEditingAlbum?.copy(
+                    title = effect.title, artist = effect.artist, artUri = effect.artworkUri
+                )
+                if (updatedAlbum != null) {
+                    viewModel.updateAlbumMetadata(updatedAlbum = updatedAlbum)
+                } else {
+                    Toast.makeText(context, "Album not found", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            is AlbumsSideEffect.AlbumItemPressed -> {
+                val encodedArtUri = Base64Helper.encodeToBase64(effect.albumArt)
+                navHostController.navigate(
+                    MelodiaScreen.AlbumSongs(
+                        albumId = effect.albumId,
+                        albumTitle = effect.albumTitle,
+                        albumArtist = effect.albumArtist,
+                        albumArt = encodedArtUri,
+                        albumDuration = effect.albumDuration
+                    )
+                )
+            }
         }
     }
+
+    if (viewState.isDialogVisible && viewState.currentEditingAlbum != null) {
+        MetadataDialog(audioModel = viewState.currentEditingAlbum,
+            onDismiss = { viewModel.onAction(AlbumsAction.DialogDismiss) },
+            shouldShowAlbumField = false,
+            onSave = { id, title, artist, _, artworkUri ->
+                viewModel.onAction(
+                    AlbumsAction.MetadataSaved(
+                        id = id, title = title, artist = artist, artworkUri = artworkUri
+                    )
+                )
+                viewModel.onAction(AlbumsAction.DialogDismiss) // Close dialog after save
+            })
+    }
+
     LaunchedEffect(Unit) {
         if (artistId != null && artistName != null) {
             viewModel.getArtistAlbums(artistId = artistId)
@@ -75,26 +117,35 @@ fun AlbumsScreenContent(
 
     if (viewState.albumsList.isNotEmpty()) {
         LazyVerticalGrid(
-            modifier = modifier.fillMaxSize(),
-            columns = GridCells.Fixed(2)
+            modifier = modifier.fillMaxSize(), columns = GridCells.Fixed(2)
         ) {
             items(viewState.albumsList, key = { it.albumId ?: 0 }) { albumItem ->
-                GeneralAlbumListItem(albumItem = albumItem, modifier = modifier.clickable {
-                    viewModel.onAction(AlbumsAction.AlbumPressed(albumItem))
-                    onClick.invoke(
-                        Triple(
-                            first = albumItem.title ?: "",
-                            second = albumItem.albumId ?: 0,
-                            third = albumItem
+                GeneralAlbumListItem(albumItem = albumItem, onClick = {
+                    viewModel.onAction(
+                        AlbumsAction.AlbumItemPressed(
+                            albumId = albumItem.albumId ?: 0,
+                            albumTitle = albumItem.title ?: "",
+                            albumArtist = albumItem.artist ?: "",
+                            albumArt = albumItem.artUri ?: "",
+                            albumDuration = albumItem.duration ?: ""
+
                         )
+                    )
+                    Triple(
+                        first = albumItem.title ?: "",
+                        second = albumItem.albumId ?: 0,
+                        third = albumItem
+                    )
+                }, onLongClick = {
+                    viewModel.onAction(
+                        AlbumsAction.AlbumLongPressed(album = albumItem)
                     )
                 })
             }
         }
     } else {
         Box(
-            modifier = modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+            modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center
         ) {
             Text(
                 modifier = modifier.alpha(0.5F),

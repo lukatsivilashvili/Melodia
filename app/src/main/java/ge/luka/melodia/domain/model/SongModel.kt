@@ -6,30 +6,33 @@ import android.net.Uri
 import android.provider.MediaStore
 
 data class SongModel(
-    val songId: Long? = null,
-    val albumId: Long? = null,
-    val title: String? = null,
-    val album: String? = null,
-    val artist: String? = null,
+    override val songId: Long? = null,
+    override val albumId: Long? = null,
+    override val artistId: Long? = null,
+    override val title: String? = null,
+    override val artist: String? = null,
+    override val album: String? = null,
+    override val artUri: String? = null,
     val duration: Long? = null,
     val songPath: String? = null,
-    val artUri: String? = null,
     val bitrate: Int? = null
-) {
+) : BaseModel {
     companion object {
         fun fromCursor(
             cursor: Cursor,
             albumIdColumn: Int,
+            songIdColumn: Int,
+            artistIdColumn: Int,
             titleColumn: Int,
             albumColumn: Int,
             artistColumn: Int,
             durationColumn: Int,
-            songIdColumn: Int,
             bitrateColumn: Int
         ): SongModel {
             return SongModel(
                 songId = cursor.getLong(songIdColumn),
                 albumId = cursor.getLong(albumIdColumn),
+                artistId = cursor.getLong(artistIdColumn),
                 title = cursor.getString(titleColumn),
                 album = cursor.getString(albumColumn),
                 artist = cursor.getString(artistColumn),

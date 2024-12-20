@@ -69,4 +69,49 @@ class MediaStoreRepositoryImpl @Inject constructor(
         val artists = mediaStoreLoader.getArtistsList(context).map { it.toEntity() }
         artistsDao.insertAllArtists(artists)
     }
+
+    override suspend fun updateSongRecord(
+        songId: Long,
+        title: String,
+        artist: String?,
+        album: String?,
+        artUri: String?,
+    ): Boolean {
+        if (album != null && !albumsDao.doesAlbumExist(album)) {
+            return false // Abort the update since the album doesn't exist
+        }
+
+        val albumId = album?.let { albumsDao.getAlbumIdByName(it) }
+        val artistId = artist?.let { artistsDao.getArtistIdByName(it) }
+
+        songsDao.updateSongById(
+            songId = songId,
+            title = title,
+            artist = artist,
+            album = album,
+            artUri = artUri
+        )
+
+        songsDao.updateSongIdsById(songId = songId, albumId = albumId, artistId = artistId)
+
+        return true
+    }
+
+    override suspend fun updateAlbumRecord(
+        artistId: Long,
+        albumId: Long,
+        title: String,
+        artist: String?,
+        artUri: String?
+    ): Boolean {
+        albumsDao.updateAlbumById(
+            albumId = albumId,
+            title = title,
+            artist = artist,
+            artUri = artUri
+        )
+        artistsDao.updateArtistArt(artistId, artUri)
+        songsDao.updateSongArtByAlbumId(albumId, artUri)
+        return true
+    }
 }

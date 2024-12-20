@@ -1,4 +1,4 @@
-package ge.luka.melodia.presentation.ui.components
+package ge.luka.melodia.presentation.ui.components.singlepermission
 
 import android.Manifest
 import android.content.Context
@@ -39,8 +39,6 @@ import com.google.accompanist.permissions.shouldShowRationale
 import ge.luka.melodia.common.extensions.getScreenFromRoute
 import ge.luka.melodia.common.mvi.CollectSideEffects
 import ge.luka.melodia.presentation.ui.MelodiaScreen
-import ge.luka.melodia.presentation.ui.components.singlepermission.PermissionAction
-import ge.luka.melodia.presentation.ui.components.singlepermission.PermissionSideEffect
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

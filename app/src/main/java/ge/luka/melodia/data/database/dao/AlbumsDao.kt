@@ -18,4 +18,24 @@ interface AlbumsDao {
 
     @Query("SELECT * FROM allAlbums WHERE artistId = :artistId ORDER BY title ASC")
     fun getAlbumsForArtist(artistId: Long): Flow<List<AlbumModelEntity>>
+
+    @Query("SELECT albumId FROM allAlbums WHERE title = :albumName LIMIT 1")
+    suspend fun getAlbumIdByName(albumName: String): Long?
+
+    @Query("SELECT EXISTS(SELECT 1 FROM allAlbums WHERE title = :albumName)")
+    suspend fun doesAlbumExist(albumName: String): Boolean
+
+    @Query("""
+    UPDATE allAlbums SET 
+        title = :title,
+        artist = :artist,
+        artUri = :artUri
+    WHERE albumId = :albumId
+""")
+    suspend fun updateAlbumById(
+        albumId: Long,
+        title: String,
+        artist: String?,
+        artUri: String?,
+    ): Int
 }

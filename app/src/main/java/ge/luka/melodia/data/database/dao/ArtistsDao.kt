@@ -15,4 +15,16 @@ interface ArtistsDao {
     @Query("SELECT * FROM allArtists ORDER BY title ASC")
     fun getAllArtistsOrderedByTitle(): Flow<List<ArtistModelEntity>>
 
+    @Query("SELECT artistId FROM allArtists WHERE title = :artistName LIMIT 1")
+    suspend fun getArtistIdByName(artistName: String): Long?
+
+    @Query("""
+    UPDATE allArtists SET 
+        artUri = :artUri
+    WHERE artistId = :artistId
+""")
+    suspend fun updateArtistArt(
+        artistId: Long,
+        artUri: String?,
+    ): Int
 }
