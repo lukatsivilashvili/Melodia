@@ -26,7 +26,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -35,7 +34,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import ge.luka.melodia.R
 import ge.luka.melodia.common.mvi.CollectSideEffects
-import ge.luka.melodia.domain.model.AlbumModel
+import ge.luka.melodia.common.utils.Base64Helper
 import ge.luka.melodia.presentation.ui.components.shared.GeneralMusicListItem
 import ge.luka.melodia.presentation.ui.components.shared.HelperControlButtons
 import ge.luka.melodia.presentation.ui.theme.themecomponents.MelodiaTypography
@@ -45,30 +44,44 @@ fun AlbumSongsScreen(
     modifier: Modifier = Modifier,
     navHostController: NavHostController,
     onUpdateRoute: (String?) -> Unit,
-    albumId: Long? = null,
-    albumModel: AlbumModel
+    albumId: Long,
+    albumTitle: String,
+    albumArtist: String,
+    albumArt: String,
+    albumDuration: String
 ) {
 
     LaunchedEffect(Unit) {
-        onUpdateRoute.invoke(albumModel.title)
+        onUpdateRoute.invoke(albumTitle)
     }
 
     BackHandler {
         navHostController.popBackStack()
     }
 
-    AlbumSongsScreenContent(modifier = modifier, albumModel = albumModel, albumId = albumId)
+    AlbumSongsScreenContent(
+        modifier = modifier,
+        albumId = albumId,
+        albumTitle = albumTitle,
+        albumArtist = albumArtist,
+        albumArt = albumArt,
+        albumDuration = albumDuration
+    )
 }
 
 @Composable
 fun AlbumSongsScreenContent(
     modifier: Modifier,
     viewModel: AlbumSongsScreenVM = hiltViewModel(),
-    albumModel: AlbumModel,
-    albumId: Long?
+    albumId: Long,
+    albumTitle: String,
+    albumArtist: String,
+    albumArt: String,
+    albumDuration: String
 ) {
     val viewState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val decodedArtUri = Base64Helper.decodeFromBase64(albumArt)
 
     CollectSideEffects(flow = viewModel.sideEffect) { effect ->
         when (effect) {
@@ -79,17 +92,22 @@ fun AlbumSongsScreenContent(
     }
 
     LaunchedEffect(Unit) {
-        viewModel.getAlbumSongs(albumId = albumId ?: 0)
+        viewModel.getAlbumSongs(albumId = albumId)
     }
 
     val derivedSongsList by remember {
-        derivedStateOf { viewState.songsList}
+        derivedStateOf { viewState.songsList }
     }
 
     if (derivedSongsList.isNotEmpty()) {
         LazyColumn(modifier = modifier.fillMaxSize(), state = rememberLazyListState()) {
             item {
-                InfoBoxView(modifier = modifier, albumModel = albumModel)
+                InfoBoxView(
+                    modifier = modifier,
+                    albumTitle = albumTitle,
+                    albumArtist = albumArtist,
+                    albumArt = decodedArtUri,
+                    albumDuration = albumDuration,)
                 HelperControlButtons()
             }
             items(derivedSongsList, key = { it.songId ?: 0 }) { songItem ->
@@ -117,7 +135,13 @@ fun AlbumSongsScreenContent(
 }
 
 @Composable
-fun InfoBoxView(modifier: Modifier, albumModel: AlbumModel) {
+fun InfoBoxView(
+    modifier: Modifier,
+    albumTitle: String,
+    albumArtist: String,
+    albumArt: String,
+    albumDuration: String
+) {
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -132,27 +156,27 @@ fun InfoBoxView(modifier: Modifier, albumModel: AlbumModel) {
             fallback = painterResource(id = R.drawable.ic_albums),
             contentScale = ContentScale.FillBounds,
             model = ImageRequest.Builder(LocalContext.current)
-                .data(albumModel.artUri)
+                .data(albumArt)
                 .crossfade(true)
                 .build(),
             contentDescription = null,
         )
         Text(
-            text = albumModel.artist ?: "Artist",
+            text = albumArtist,
             style = MelodiaTypography.labelSmall,
             modifier = modifier
                 .align(Alignment.CenterHorizontally)
                 .padding(top = 16.dp),
         )
         Text(
-            text = albumModel.title ?: "Album",
+            text = albumTitle,
             fontWeight = FontWeight.SemiBold,
             style = MelodiaTypography.labelMedium,
             modifier = modifier
                 .align(Alignment.CenterHorizontally)
         )
         Text(
-            text = albumModel.duration ?: "Duration",
+            text = albumDuration,
             style = MelodiaTypography.labelSmall,
             modifier = modifier
                 .align(Alignment.CenterHorizontally)
@@ -162,33 +186,25 @@ fun InfoBoxView(modifier: Modifier, albumModel: AlbumModel) {
 }
 
 
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun AlbumSongsScreenPreview() {
-    AlbumSongsScreenContent(
-        modifier = Modifier,
-        albumModel = AlbumModel(
-            albumId = 1,
-            title = "Madvillainy",
-            artist = "Madvillain",
-            songCount = 99,
-            artUri = "",
-            duration = "4min"
-        ), albumId = 1
-    )
-}
-
-@Preview(showSystemUi = true)
-@Composable
-fun InfoBoxViewPreview(modifier: Modifier = Modifier) {
-    InfoBoxView(
-        modifier, AlbumModel(
-            albumId = 1,
-            title = "Madvillainy",
-            artist = "Madvillain",
-            songCount = 99,
-            artUri = "",
-            duration = "4min"
-        )
-    )
-}
+//@Preview(showBackground = true, showSystemUi = true)
+//@Composable
+//fun AlbumSongsScreenPreview() {
+//    AlbumSongsScreenContent(
+//        modifier = Modifier,
+//    )
+//}
+//
+//@Preview(showSystemUi = true)
+//@Composable
+//fun InfoBoxViewPreview(modifier: Modifier = Modifier) {
+//    InfoBoxView(
+//        modifier, AlbumModel(
+//            albumId = 1,
+//            title = "Madvillainy",
+//            artist = "Madvillain",
+//            songCount = 99,
+//            artUri = "",
+//            duration = "4min"
+//        )
+//    )
+//}

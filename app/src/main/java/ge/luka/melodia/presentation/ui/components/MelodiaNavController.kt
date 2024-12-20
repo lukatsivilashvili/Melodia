@@ -17,8 +17,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import ge.luka.melodia.common.navtype.AlbumNavType
-import ge.luka.melodia.domain.model.AlbumModel
 import ge.luka.melodia.presentation.ui.MelodiaScreen
 import ge.luka.melodia.presentation.ui.components.singlepermission.SinglePermissionRequest
 import ge.luka.melodia.presentation.ui.screens.albums.AlbumsScreen
@@ -28,7 +26,6 @@ import ge.luka.melodia.presentation.ui.screens.library.LibraryScreen
 import ge.luka.melodia.presentation.ui.screens.playlists.PlaylistsScreen
 import ge.luka.melodia.presentation.ui.screens.settings.SettingsScreen
 import ge.luka.melodia.presentation.ui.screens.songs.SongsScreen
-import kotlin.reflect.typeOf
 
 @Composable
 fun MelodiaNavController(
@@ -37,7 +34,6 @@ fun MelodiaNavController(
     onUpdateRoute: (String?) -> Unit,
 ) {
     val context = LocalContext.current
-    // We create a separate permission check just for determining the initial screen
     val initialPermissionGranted = remember {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             checkSelfPermission(context, Manifest.permission.READ_MEDIA_AUDIO) == PackageManager.PERMISSION_GRANTED
@@ -46,7 +42,6 @@ fun MelodiaNavController(
         }
     }
 
-    // The initial screen is now determined once and remembered
     val startDestinationScreen = remember {
         if (initialPermissionGranted) MelodiaScreen.Library else MelodiaScreen.Permission
     }
@@ -88,13 +83,16 @@ fun MelodiaNavController(
         composable<MelodiaScreen.Songs> {
             SongsScreen(navHostController = navController, onUpdateRoute = onUpdateRoute)
         }
-        composable<MelodiaScreen.AlbumSongs>(typeMap = mapOf(typeOf<AlbumModel>() to AlbumNavType.AlbumType)) {
+        composable<MelodiaScreen.AlbumSongs> {
             val args = it.toRoute<MelodiaScreen.AlbumSongs>()
             AlbumSongsScreen(
                 navHostController = navController,
                 onUpdateRoute = onUpdateRoute,
                 albumId = args.albumId,
-                albumModel = args.albumModel
+                albumTitle = args.albumTitle,
+                albumArtist = args.albumArtist,
+                albumArt = args.albumArt,
+                albumDuration = args.albumDuration
             )
         }
 

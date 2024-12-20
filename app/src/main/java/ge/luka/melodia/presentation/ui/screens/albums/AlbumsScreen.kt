@@ -19,7 +19,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import ge.luka.melodia.common.mvi.CollectSideEffects
-import ge.luka.melodia.domain.model.AlbumModel
+import ge.luka.melodia.common.utils.Base64Helper
 import ge.luka.melodia.presentation.ui.MelodiaScreen
 import ge.luka.melodia.presentation.ui.components.shared.GeneralAlbumListItem
 import ge.luka.melodia.presentation.ui.components.shared.MetadataDialog
@@ -79,10 +79,14 @@ fun AlbumsScreenContent(
             }
 
             is AlbumsSideEffect.AlbumItemPressed -> {
+                val encodedArtUri = Base64Helper.encodeToBase64(effect.albumArt)
                 navHostController.navigate(
                     MelodiaScreen.AlbumSongs(
-                        effect.albumId ?: 0,
-                        effect.albumModel ?: AlbumModel()
+                        albumId = effect.albumId,
+                        albumTitle = effect.albumTitle,
+                        albumArtist = effect.albumArtist,
+                        albumArt = encodedArtUri,
+                        albumDuration = effect.albumDuration
                     )
                 )
             }
@@ -119,9 +123,12 @@ fun AlbumsScreenContent(
                 GeneralAlbumListItem(albumItem = albumItem, onClick = {
                     viewModel.onAction(
                         AlbumsAction.AlbumItemPressed(
-                            title = albumItem.title,
-                            albumId = albumItem.albumId,
-                            albumModel = albumItem
+                            albumId = albumItem.albumId ?: 0,
+                            albumTitle = albumItem.title ?: "",
+                            albumArtist = albumItem.artist ?: "",
+                            albumArt = albumItem.artUri ?: "",
+                            albumDuration = albumItem.duration ?: ""
+
                         )
                     )
                     Triple(

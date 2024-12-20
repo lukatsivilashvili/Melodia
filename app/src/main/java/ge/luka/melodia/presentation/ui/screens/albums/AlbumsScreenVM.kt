@@ -23,9 +23,12 @@ class AlbumsScreenVM @Inject constructor(
         when (uiAction) {
             is AlbumsAction.AlbumItemPressed -> emitSideEffect(
                 AlbumsSideEffect.AlbumItemPressed(
-                    title = uiAction.title,
                     albumId = uiAction.albumId,
-                    albumModel = uiAction.albumModel
+                    albumTitle = uiAction.albumTitle,
+                    albumArtist = uiAction.albumArtist,
+                    albumArt = uiAction.albumArt,
+                    albumDuration = uiAction.albumDuration
+
                 )
             )
 
