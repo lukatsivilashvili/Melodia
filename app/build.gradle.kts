@@ -34,14 +34,28 @@ android {
 
     buildTypes {
         release {
+            // Enable code shrinking and resource shrinking
             isMinifyEnabled = true
-            isDebuggable = true
             isShrinkResources = true
+
+            // Disable debugging for release builds
+            isDebuggable = false
+
+            // Set signing configuration for release builds
             signingConfig = signingConfigs.findByName("release")
+
+            // Optimize ProGuard files
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android-optimize.txt"), // Default optimized ProGuard rules
+                "proguard-rules.pro" // Your custom rules
             )
+
+            // Configure advanced optimizations (if safe for your app)
+            buildConfigField("boolean", "ENABLE_LOGGING", "false") // Turn off logging in release builds
+            renderscriptOptimLevel = 3 // Optimize RenderScript performance
+
+            // Remove unused code and resources
+            isCrunchPngs = true // Compress PNGs during the build
         }
         debug {
             isMinifyEnabled = false
