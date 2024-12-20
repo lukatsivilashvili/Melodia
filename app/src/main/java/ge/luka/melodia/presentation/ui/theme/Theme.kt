@@ -35,6 +35,7 @@ fun MelodiaTheme(
             val window = (view.context as Activity).window
             window.statusBarColor = colorScheme.primary.toArgb()
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = viewState.isDarkMode
+            WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = !viewState.isDarkMode
         }
     }
 
