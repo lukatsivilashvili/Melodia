@@ -10,7 +10,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import ge.luka.melodia.data.datastore.DataStoreManagerImpl
+import ge.luka.melodia.data.repository.DataStoreManagerImpl
 import ge.luka.melodia.domain.datastore.DataStoreManager
 import javax.inject.Singleton
 
