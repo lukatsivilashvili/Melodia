@@ -17,7 +17,7 @@ android {
         }
     }
     namespace = "ge.luka.melodia"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "ge.luka.melodia"
