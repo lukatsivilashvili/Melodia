@@ -100,7 +100,6 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.material.icons.extended)
 
-
     implementation(libs.androidx.material3)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -127,14 +126,18 @@ dependencies {
     // Datastore
     implementation(libs.preferences.datastore)
 
-    //LifeCycle
+    // LifeCycle
     implementation(libs.lifecycle.viewmodel)
 
     // Coil
     implementation(libs.coil)
 
-    //Room
+    // Room
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
+
+    // Media3
+    implementation(libs.media3.exoplayer)
+    implementation(libs.media3.ui)
 }

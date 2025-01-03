@@ -5,7 +5,10 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -28,11 +31,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import ge.luka.melodia.R
 import ge.luka.melodia.common.extensions.getScreenFromRoute
+import ge.luka.melodia.domain.model.PlayerState
+import ge.luka.melodia.domain.model.RepeatMode
+import ge.luka.melodia.domain.model.SongModel
 import ge.luka.melodia.presentation.ui.components.MelodiaNavController
-import ge.luka.melodia.presentation.ui.theme.MelodiaTheme
+import ge.luka.melodia.presentation.ui.components.bottomplayer.BottomPlayer
+import ge.luka.melodia.presentation.ui.components.bottomplayer.NowPlayingState
+import ge.luka.melodia.presentation.ui.theme.MelodiaThemeWithViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,7 +58,7 @@ fun MelodiaApp() {
         scrollBehavior.state.contentOffset = 0f
     }
 
-    MelodiaTheme {
+    MelodiaThemeWithViewModel {
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
@@ -112,17 +121,50 @@ fun MelodiaApp() {
                 )
             },
             content = { innerPadding ->
-                Box(
+                Column(
                     modifier = Modifier
                         .padding(innerPadding)
                         .fillMaxSize()
                 ) {
-                    MelodiaNavController(
+                    Box(
                         modifier = Modifier
-                            .padding(innerPadding)
-                            .fillMaxSize(),
-                        navController = navController,
-                        onUpdateRoute = ::updateCurrentRoute,
+                            .fillMaxWidth()
+                            .weight(1f)
+                    ) {
+                        MelodiaNavController(
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            navController = navController,
+                            onUpdateRoute = ::updateCurrentRoute,
+                        )
+                    }
+
+                    BottomPlayer(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(70.dp),
+                        nowPlayingState = NowPlayingState.Playing(
+                            song = SongModel(
+                                songId = 1L,
+                                albumId = 101L,
+                                artistId = 201L,
+                                title = "Song One",
+                                artist = "Artist One",
+                                album = "Album One",
+                                artUri = "",
+                                duration = 210000L,
+                                songPath = "/music/song_one.mp3",
+                                bitrate = 320
+                            ),
+                            playbackState = PlayerState.PAUSED,
+                            repeatMode = RepeatMode.NO_REPEAT,
+                            isShuffleOn = false
+                        ),
+                        songProgressProvider = { 1f },
+                        enabled = true,
+                        onTogglePlayback = {},
+                        onNext = {},
+                        onPrevious = {}
                     )
                 }
             }
