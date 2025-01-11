@@ -16,8 +16,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
@@ -72,15 +75,41 @@ private fun NowPlayingContent() {
 }
 
 @Composable
-private fun AlbumArtSection(modifier: Modifier) {
+private fun AlbumArtSection(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
+        // Background Image with Blur and Gradient Overlay
         AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data("content://media/external/audio/albumart/831838724258952365")
+                .crossfade(true)
+                .build(),
+            contentDescription = "Blurred Album Background",
             contentScale = ContentScale.Crop,
-            model = ImageRequest
-                .Builder(LocalContext.current)
+            modifier = Modifier
+                .fillMaxSize()
+                .alpha(0.5f)
+        )
+        // Gradient Overlay
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(Color.Transparent, MaterialTheme.colorScheme.surfaceContainer),
+                        startY = 0f,
+                        endY = Float.POSITIVE_INFINITY
+                    )
+                )
+        )
+        // Foreground Album Art
+        AsyncImage(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(48.dp),
+            model = ImageRequest.Builder(LocalContext.current)
                 .data("content://media/external/audio/albumart/831838724258952365")
                 .crossfade(true)
                 .build(),
@@ -88,6 +117,7 @@ private fun AlbumArtSection(modifier: Modifier) {
             error = painterResource(id = R.drawable.ic_albums),
             fallback = painterResource(id = R.drawable.ic_albums),
             contentDescription = "Album Cover",
+            contentScale = ContentScale.Crop,
         )
     }
 }
