@@ -38,7 +38,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import ge.luka.melodia.common.extensions.getScreenFromRoute
 import ge.luka.melodia.common.mvi.CollectSideEffects
-import ge.luka.melodia.presentation.ui.MelodiaScreen
+import ge.luka.melodia.presentation.ui.screens.MelodiaScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

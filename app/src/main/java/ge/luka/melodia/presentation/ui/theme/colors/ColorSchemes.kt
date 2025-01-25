@@ -1,46 +1,8 @@
 package ge.luka.melodia.presentation.ui.theme.colors
 
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
 
 object ColorSchemes {
-    val lightGreenScheme = lightColorScheme(
-        primary = GreenColors.primaryLight,
-        onPrimary = GreenColors.onPrimaryLight,
-        primaryContainer = GreenColors.primaryContainerLight,
-        onPrimaryContainer = GreenColors.onPrimaryContainerLight,
-        secondary = GreenColors.secondaryLight,
-        onSecondary = GreenColors.onSecondaryLight,
-        secondaryContainer = GreenColors.secondaryContainerLight,
-        onSecondaryContainer = GreenColors.onSecondaryContainerLight,
-        tertiary = GreenColors.tertiaryLight,
-        onTertiary = GreenColors.onTertiaryLight,
-        tertiaryContainer = GreenColors.tertiaryContainerLight,
-        onTertiaryContainer = GreenColors.onTertiaryContainerLight,
-        error = GreenColors.errorLight,
-        onError = GreenColors.onErrorLight,
-        errorContainer = GreenColors.errorContainerLight,
-        onErrorContainer = GreenColors.onErrorContainerLight,
-        background = GreenColors.backgroundLight,
-        onBackground = GreenColors.onBackgroundLight,
-        surface = GreenColors.surfaceLight,
-        onSurface = GreenColors.onSurfaceLight,
-        surfaceVariant = GreenColors.surfaceVariantLight,
-        onSurfaceVariant = GreenColors.onSurfaceVariantLight,
-        outline = GreenColors.outlineLight,
-        outlineVariant = GreenColors.outlineVariantLight,
-        scrim = GreenColors.scrimLight,
-        inverseSurface = GreenColors.inverseSurfaceLight,
-        inverseOnSurface = GreenColors.inverseOnSurfaceLight,
-        inversePrimary = GreenColors.inversePrimaryLight,
-        surfaceDim = GreenColors.surfaceDimLight,
-        surfaceBright = GreenColors.surfaceBrightLight,
-        surfaceContainerLowest = GreenColors.surfaceContainerLowestLight,
-        surfaceContainerLow = GreenColors.surfaceContainerLowLight,
-        surfaceContainer = GreenColors.surfaceContainerLight,
-        surfaceContainerHigh = GreenColors.surfaceContainerHighLight,
-        surfaceContainerHighest = GreenColors.surfaceContainerHighestLight,
-    )
 
     val darkGreenScheme = darkColorScheme(
         primary = GreenColors.primaryDark,
@@ -78,44 +40,6 @@ object ColorSchemes {
         surfaceContainer = GreenColors.surfaceContainerDark,
         surfaceContainerHigh = GreenColors.surfaceContainerHighDark,
         surfaceContainerHighest = GreenColors.surfaceContainerHighestDark,
-    )
-
-    val lightBlueScheme = lightColorScheme(
-        primary = BlueColors.primaryLight,
-        onPrimary = BlueColors.onPrimaryLight,
-        primaryContainer = BlueColors.primaryContainerLight,
-        onPrimaryContainer = BlueColors.onPrimaryContainerLight,
-        secondary = BlueColors.secondaryLight,
-        onSecondary = BlueColors.onSecondaryLight,
-        secondaryContainer = BlueColors.secondaryContainerLight,
-        onSecondaryContainer = BlueColors.onSecondaryContainerLight,
-        tertiary = BlueColors.tertiaryLight,
-        onTertiary = BlueColors.onTertiaryLight,
-        tertiaryContainer = BlueColors.tertiaryContainerLight,
-        onTertiaryContainer = BlueColors.onTertiaryContainerLight,
-        error = BlueColors.errorLight,
-        onError = BlueColors.onErrorLight,
-        errorContainer = BlueColors.errorContainerLight,
-        onErrorContainer = BlueColors.onErrorContainerLight,
-        background = BlueColors.backgroundLight,
-        onBackground = BlueColors.onBackgroundLight,
-        surface = BlueColors.surfaceLight,
-        onSurface = BlueColors.onSurfaceLight,
-        surfaceVariant = BlueColors.surfaceVariantLight,
-        onSurfaceVariant = BlueColors.onSurfaceVariantLight,
-        outline = BlueColors.outlineLight,
-        outlineVariant = BlueColors.outlineVariantLight,
-        scrim = BlueColors.scrimLight,
-        inverseSurface = BlueColors.inverseSurfaceLight,
-        inverseOnSurface = BlueColors.inverseOnSurfaceLight,
-        inversePrimary = BlueColors.inversePrimaryLight,
-        surfaceDim = BlueColors.surfaceDimLight,
-        surfaceBright = BlueColors.surfaceBrightLight,
-        surfaceContainerLowest = BlueColors.surfaceContainerLowestLight,
-        surfaceContainerLow = BlueColors.surfaceContainerLowLight,
-        surfaceContainer = BlueColors.surfaceContainerLight,
-        surfaceContainerHigh = BlueColors.surfaceContainerHighLight,
-        surfaceContainerHighest = BlueColors.surfaceContainerHighestLight,
     )
 
     val darkBlueScheme = darkColorScheme(

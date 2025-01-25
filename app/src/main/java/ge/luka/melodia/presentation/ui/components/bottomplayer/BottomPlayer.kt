@@ -25,6 +25,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -64,81 +65,88 @@ fun BottomPlayer(
     }
     val state = (nowPlayingState as NowPlayingState.Playing)
     val song = state.song
-
-    Box(
-        modifier = Modifier.padding(8.dp) // Add padding around the Row
+    Surface(
+        color = MaterialTheme.colorScheme.background // Set your desired background color
     ) {
-        Row(
-            modifier = modifier
-                .clip(RoundedCornerShape(50.dp))
-                .background(MaterialTheme.colorScheme.surfaceContainer),
-            verticalAlignment = Alignment.CenterVertically
+        Box(
+            modifier = Modifier
+                .padding(start = 8.dp, end = 8.dp) // Add padding around the Row
         ) {
-            AsyncImage(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .padding(
-                        start = 8.dp,
-                        end = 8.dp,
-                        top = 8.dp,
-                        bottom = 8.dp
-                    ) // Add padding to move image to the right
-                    .aspectRatio(1.0f)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop,
-                placeholder = painterResource(id = R.drawable.ic_albums),
-                error = painterResource(id = R.drawable.ic_albums),
-                fallback = painterResource(id = R.drawable.ic_albums),
-                model = ImageRequest
-                    .Builder(LocalContext.current)
-                    .data("content://media/external/audio/albumart/831838724258952365")
-                    .crossfade(true)
-                    .build(),
-                contentDescription = "AlbumCover",
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-
-            Column(
-                modifier = Modifier.weight(1f),
-                horizontalAlignment = Alignment.Start
+            Row(
+                modifier = modifier
+                    .clip(RoundedCornerShape(50.dp))
+                    .background(MaterialTheme.colorScheme.surfaceContainer),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    modifier = Modifier.basicMarquee(Int.MAX_VALUE),
-                    text = song.title ?: "",
-                    style = MaterialTheme.typography.bodyMedium
+                AsyncImage(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .padding(
+                            start = 8.dp,
+                            end = 8.dp,
+                            top = 8.dp,
+                            bottom = 8.dp
+                        ) // Add padding to move image to the right
+                        .aspectRatio(1.0f)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop,
+                    placeholder = painterResource(id = R.drawable.ic_albums),
+                    error = painterResource(id = R.drawable.ic_albums),
+                    fallback = painterResource(id = R.drawable.ic_albums),
+                    model = ImageRequest
+                        .Builder(LocalContext.current)
+                        .data("content://media/external/audio/albumart/831838724258952365")
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = "AlbumCover",
                 )
-                Text(
-                    modifier = Modifier,
-                    text = song.artist.orEmpty(),
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Light,
-                    maxLines = 1
-                )
-            }
+                Spacer(modifier = Modifier.width(4.dp))
 
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Row {
-                IconButton(onClick = onPrevious, enabled = enabled) {
-                    Icon(imageVector = Icons.TwoTone.SkipPrevious, contentDescription = "Previous")
-                }
-                Box(contentAlignment = Alignment.Center) {
-                    IconButton(
-                        modifier = Modifier.padding(end = 4.dp),
-                        onClick = onTogglePlayback,
-                        enabled = enabled
-                    ) {
-                        val icon =
-                            if (state.playbackState == PlayerState.PLAYING) Icons.TwoTone.Pause else Icons.TwoTone.PlayArrow
-                        Icon(imageVector = icon, contentDescription = null)
-                    }
-                    SongCircularProgressIndicator(
-                        modifier = Modifier.padding(end = 4.dp),
-                        songProgressProvider
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Text(
+                        modifier = Modifier.basicMarquee(Int.MAX_VALUE),
+                        text = song.title ?: "",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        modifier = Modifier,
+                        text = song.artist.orEmpty(),
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Light,
+                        maxLines = 1
                     )
                 }
-                IconButton(onClick = onNext, enabled = enabled) {
-                    Icon(imageVector = Icons.TwoTone.SkipNext, contentDescription = "Next")
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Row {
+                    IconButton(onClick = onPrevious, enabled = enabled) {
+                        Icon(
+                            imageVector = Icons.TwoTone.SkipPrevious,
+                            contentDescription = "Previous"
+                        )
+                    }
+                    Box(contentAlignment = Alignment.Center) {
+                        IconButton(
+                            modifier = Modifier.padding(end = 4.dp),
+                            onClick = onTogglePlayback,
+                            enabled = enabled
+                        ) {
+                            val icon =
+                                if (state.playbackState == PlayerState.PLAYING) Icons.TwoTone.Pause else Icons.TwoTone.PlayArrow
+                            Icon(imageVector = icon, contentDescription = null)
+                        }
+                        SongCircularProgressIndicator(
+                            modifier = Modifier.padding(end = 4.dp),
+                            songProgressProvider
+                        )
+                    }
+                    IconButton(onClick = onNext, enabled = enabled) {
+                        Icon(imageVector = Icons.TwoTone.SkipNext, contentDescription = "Next")
+                    }
                 }
             }
         }
