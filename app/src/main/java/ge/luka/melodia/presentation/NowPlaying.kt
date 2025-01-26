@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.animation.core.exponentialDecay
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.gestures.Orientation
@@ -39,12 +40,12 @@ import ge.luka.melodia.presentation.ui.components.bottomplayer.NowPlayingState
 import ge.luka.melodia.presentation.ui.screens.nowplaying.NowPlayingScreen
 
 
-
 @SuppressLint("RememberReturnType")
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NowPlaying(
     modifier: Modifier = Modifier,
+    songModel: SongModel,
     onExpandNowPlaying: () -> Unit,
     bottomPlayerPadding: PaddingValues
 ) {
@@ -108,7 +109,8 @@ fun NowPlaying(
                     modifier = Modifier
                         .anchoredDraggable(
                             state = bottomPlayerDragState,
-                            orientation = Orientation.Vertical)
+                            orientation = Orientation.Vertical),
+                    songModel = songModel
                 )
             }
 
@@ -132,24 +134,14 @@ fun NowPlaying(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(Utils.calculateBottomBarHeight())
+                        .clickable { onExpandNowPlaying.invoke() }
                         .anchoredDraggable(
                         state = bottomPlayerDragState,
                         orientation = Orientation.Vertical
                     ),
 
                     nowPlayingState = NowPlayingState.Playing(
-                        song = SongModel(
-                            songId = 1L,
-                            albumId = 101L,
-                            artistId = 201L,
-                            title = "Song One",
-                            artist = "Artist One",
-                            album = "Album One",
-                            artUri = "",
-                            duration = 210000L,
-                            songPath = "/music/song_one.mp3",
-                            bitrate = 320
-                        ),
+                        song = songModel,
                         playbackState = PlayerState.PAUSED,
                         repeatMode = RepeatMode.NO_REPEAT,
                         isShuffleOn = false

@@ -37,6 +37,7 @@ import ge.luka.melodia.R
 import ge.luka.melodia.common.extensions.copy
 import ge.luka.melodia.common.extensions.getScreenFromRoute
 import ge.luka.melodia.common.utils.Utils
+import ge.luka.melodia.domain.model.SongModel
 import ge.luka.melodia.presentation.NowPlaying
 import ge.luka.melodia.presentation.ui.components.bottomplayer.BarState
 import ge.luka.melodia.presentation.ui.screens.MelodiaScreen
@@ -143,6 +144,18 @@ fun MelodiaApp() {
                 NowPlaying(
                     onExpandNowPlaying = {},
                     bottomPlayerPadding = bottomPlayerPadding,
+                    songModel = SongModel(
+                        songId = 1L,
+                        albumId = 101L,
+                        artistId = 201L,
+                        title = "Song One",
+                        artist = "Artist One",
+                        album = "Album One",
+                        artUri = "content://com.android.externalstorage.documents/document/primary%3AMusic%2FMelodiaMusic%2FPantera%2FVulgar%20Display%20Of%20Power%2Fvulgardisplayofpower.jpg",
+                        duration = 210000L,
+                        songPath = "content://media/external/audio/albumart/831838724258952365",
+                        bitrate = 320
+                    )
                 )
             }
         }

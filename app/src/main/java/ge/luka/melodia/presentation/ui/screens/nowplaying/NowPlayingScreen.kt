@@ -11,10 +11,6 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -37,19 +33,25 @@ import ge.luka.melodia.presentation.ui.screens.nowplaying.components.Controls
 import ge.luka.melodia.presentation.ui.theme.MelodiaTheme
 
 @Composable
-fun NowPlayingScreen(modifier: Modifier = Modifier) {
+fun NowPlayingScreen(
+    modifier: Modifier = Modifier,
+    songModel: SongModel
+) {
 
-    Box(modifier = modifier
-        .fillMaxSize()
-        .background(MaterialTheme.colorScheme.surface)) {
-        NowPlayingContent()
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface)
+    ) {
+        NowPlayingContent(songModel = songModel)
     }
 }
 
 @Composable
-private fun NowPlayingContent() {
+private fun NowPlayingContent(
+    songModel: SongModel
+) {
     val navBarHeight = with(LocalDensity.current) { WindowInsets.systemBars.getBottom(this).toDp() }
-    var height by remember { mutableIntStateOf(0) }
     val insets = WindowInsets.systemBars.asPaddingValues()
     val statusBarHeight = insets.calculateTopPadding()
 
@@ -67,9 +69,9 @@ private fun NowPlayingContent() {
 
     Box(modifier = containerModifier) {
         Column {
-            AlbumArtSection(Modifier.weight(1f))  // Pass only weight modifier
+            AlbumArtSection(modifier = Modifier.weight(1f), songModel = songModel)  // Pass only weight modifier
             Controls(
-                activeItem = SongModel(title = "Song One", artist = "Lil Uzi Vert"),
+                songModel = songModel,
                 playerState = PlayerState.PLAYING
             )
         }
@@ -77,7 +79,10 @@ private fun NowPlayingContent() {
 }
 
 @Composable
-private fun AlbumArtSection(modifier: Modifier = Modifier) {
+private fun AlbumArtSection(
+    modifier: Modifier = Modifier,
+    songModel: SongModel
+) {
     Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -85,7 +90,7 @@ private fun AlbumArtSection(modifier: Modifier = Modifier) {
         // Background Image with Blur and Gradient Overlay
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data("content://media/external/audio/albumart/831838724258952365")
+                .data(songModel.artUri)
                 .crossfade(true)
                 .build(),
             contentDescription = "Blurred Album Background",
@@ -100,7 +105,10 @@ private fun AlbumArtSection(modifier: Modifier = Modifier) {
                 .fillMaxSize()
                 .background(
                     Brush.verticalGradient(
-                        colors = listOf(Color.Transparent, MaterialTheme.colorScheme.surfaceContainer),
+                        colors = listOf(
+                            Color.Transparent,
+                            MaterialTheme.colorScheme.surfaceContainer
+                        ),
                         startY = 0f,
                         endY = Float.POSITIVE_INFINITY
                     )
@@ -112,7 +120,7 @@ private fun AlbumArtSection(modifier: Modifier = Modifier) {
                 .fillMaxSize()
                 .padding(48.dp),
             model = ImageRequest.Builder(LocalContext.current)
-                .data("content://media/external/audio/albumart/831838724258952365")
+                .data(songModel.artUri)
                 .crossfade(true)
                 .build(),
             placeholder = painterResource(id = R.drawable.ic_albums),
@@ -128,6 +136,6 @@ private fun AlbumArtSection(modifier: Modifier = Modifier) {
 @Composable
 fun NowPlayingScreenPreview() {
     MelodiaTheme {
-        NowPlayingScreen()
+        NowPlayingScreen(songModel = SongModel())
     }
 }

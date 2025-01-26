@@ -45,7 +45,7 @@ import ge.luka.melodia.domain.model.SongModel
 @Composable
 fun Controls(
     modifier: Modifier = Modifier,
-    activeItem: SongModel,
+    songModel: SongModel?,
     playerState: PlayerState,
 ) {
     var showRemaining by remember { mutableStateOf(false) }
@@ -57,7 +57,7 @@ fun Controls(
     )
     Column(modifier.padding(start = 30.dp, end = 30.dp, bottom = 30.dp)) {
         Text(
-            text = activeItem.title ?: "",
+            text = songModel?.title ?: "",
             color = MaterialTheme.colorScheme.onBackground,
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.fillMaxWidth(),
@@ -67,7 +67,7 @@ fun Controls(
         )
         Spacer(Modifier.height(12.dp))
         Text(
-            text = activeItem.artist ?: "",
+            text = songModel?.artist ?: "",
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.fillMaxWidth(),

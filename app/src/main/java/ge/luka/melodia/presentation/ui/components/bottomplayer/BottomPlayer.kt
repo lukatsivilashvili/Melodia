@@ -93,7 +93,7 @@ fun BottomPlayer(
                     fallback = painterResource(id = R.drawable.ic_albums),
                     model = ImageRequest
                         .Builder(LocalContext.current)
-                        .data("content://media/external/audio/albumart/831838724258952365")
+                        .data(song.artUri)
                         .crossfade(true)
                         .build(),
                     contentDescription = "AlbumCover",
