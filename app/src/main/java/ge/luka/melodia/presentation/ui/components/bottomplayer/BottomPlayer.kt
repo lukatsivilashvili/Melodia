@@ -25,7 +25,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,6 +38,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -46,6 +46,7 @@ import ge.luka.melodia.R
 import ge.luka.melodia.domain.model.PlayerState
 import ge.luka.melodia.domain.model.RepeatMode
 import ge.luka.melodia.domain.model.SongModel
+import ge.luka.melodia.presentation.ui.components.shared.TransparentSurface
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 
@@ -55,6 +56,7 @@ fun BottomPlayer(
     modifier: Modifier,
     nowPlayingState: NowPlayingState,
     songProgressProvider: () -> Float,
+    statusBarHeight: Dp,
     enabled: Boolean,
     onTogglePlayback: () -> Unit,
     onNext: () -> Unit,
@@ -65,17 +67,13 @@ fun BottomPlayer(
     }
     val state = (nowPlayingState as NowPlayingState.Playing)
     val song = state.song
-    Surface(
-        color = MaterialTheme.colorScheme.background // Set your desired background color
-    ) {
-        Box(
-            modifier = Modifier
-                .padding(start = 8.dp, end = 8.dp) // Add padding around the Row
-        ) {
+    TransparentSurface {
+        Box {
             Row(
                 modifier = modifier
-                    .clip(RoundedCornerShape(50.dp))
-                    .background(MaterialTheme.colorScheme.surfaceContainer),
+                    .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
+                    .background(MaterialTheme.colorScheme.surfaceContainer)
+                    .padding(bottom = statusBarHeight), // Add bottom padding to shift content up
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 AsyncImage(
@@ -86,7 +84,7 @@ fun BottomPlayer(
                             end = 8.dp,
                             top = 8.dp,
                             bottom = 8.dp
-                        ) // Add padding to move image to the right
+                        )
                         .aspectRatio(1.0f)
                         .clip(CircleShape),
                     contentScale = ContentScale.Crop,
@@ -101,7 +99,6 @@ fun BottomPlayer(
                     contentDescription = "AlbumCover",
                 )
                 Spacer(modifier = Modifier.width(4.dp))
-
                 Column(
                     modifier = Modifier.weight(1f),
                     horizontalAlignment = Alignment.Start
@@ -119,9 +116,7 @@ fun BottomPlayer(
                         maxLines = 1
                     )
                 }
-
                 Spacer(modifier = Modifier.width(8.dp))
-
                 Row {
                     IconButton(onClick = onPrevious, enabled = enabled) {
                         Icon(
@@ -149,6 +144,8 @@ fun BottomPlayer(
                     }
                 }
             }
+            // Add a Spacer at the bottom to create empty space
+            Spacer(modifier = Modifier.height(32.dp)) // Adjust the height as needed
         }
     }
 }
@@ -209,6 +206,7 @@ fun BottomPlayerPreview(modifier: Modifier = Modifier) {
         enabled = true,
         onTogglePlayback = {},
         onNext = {},
-        onPrevious = {}
+        onPrevious = {},
+        statusBarHeight = 16.dp
     )
 }

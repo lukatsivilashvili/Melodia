@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
@@ -22,7 +23,6 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -38,10 +38,11 @@ import ge.luka.melodia.presentation.ui.theme.MelodiaTheme
 
 @Composable
 fun NowPlayingScreen(modifier: Modifier = Modifier) {
+
     Box(modifier = modifier
         .fillMaxSize()
         .background(MaterialTheme.colorScheme.surface)) {
-        NowPlayingContent()  // Remove modifier pass
+        NowPlayingContent()
     }
 }
 
@@ -49,12 +50,13 @@ fun NowPlayingScreen(modifier: Modifier = Modifier) {
 private fun NowPlayingContent() {
     val navBarHeight = with(LocalDensity.current) { WindowInsets.systemBars.getBottom(this).toDp() }
     var height by remember { mutableIntStateOf(0) }
+    val insets = WindowInsets.systemBars.asPaddingValues()
+    val statusBarHeight = insets.calculateTopPadding()
 
 
     val containerModifier =
         Modifier
-            .onGloballyPositioned { height = it.size.height }
-            .padding(bottom = 80.dp + navBarHeight)
+            .padding(bottom = navBarHeight + statusBarHeight)
             .fillMaxSize()
             .background(
                 MaterialTheme.colorScheme.surfaceContainer,
