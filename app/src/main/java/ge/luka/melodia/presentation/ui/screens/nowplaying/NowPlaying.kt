@@ -1,4 +1,4 @@
-package ge.luka.melodia.presentation
+package ge.luka.melodia.presentation.ui.screens.nowplaying
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.core.exponentialDecay
@@ -21,7 +21,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
@@ -29,15 +32,15 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ge.luka.melodia.common.mvi.CollectSideEffects
 import ge.luka.melodia.common.utils.Utils
 import ge.luka.melodia.common.utils.Utils.BOTTOM_PLAYER_HEIGHT
-import ge.luka.melodia.domain.model.PlayerState
-import ge.luka.melodia.domain.model.RepeatMode
 import ge.luka.melodia.domain.model.SongModel
 import ge.luka.melodia.presentation.ui.components.bottomplayer.BarState
 import ge.luka.melodia.presentation.ui.components.bottomplayer.BottomPlayer
-import ge.luka.melodia.presentation.ui.components.bottomplayer.NowPlayingState
-import ge.luka.melodia.presentation.ui.screens.nowplaying.NowPlayingScreen
+import ge.luka.melodia.presentation.ui.screens.nowplaying.components.NowPlayingScreen
 
 
 @SuppressLint("RememberReturnType")
@@ -45,10 +48,22 @@ import ge.luka.melodia.presentation.ui.screens.nowplaying.NowPlayingScreen
 @Composable
 fun NowPlaying(
     modifier: Modifier = Modifier,
-    songModel: SongModel,
+    viewModel: NowPlayingVM = hiltViewModel(),
     onExpandNowPlaying: () -> Unit,
     bottomPlayerPadding: PaddingValues
 ) {
+
+    val viewState by viewModel.uiState.collectAsStateWithLifecycle()
+    var currentSongProgress by remember {
+        mutableFloatStateOf(0.0f)
+    }
+
+    CollectSideEffects(flow = viewModel.sideEffect) { effect ->
+        when (effect) {
+            is NowPlayingSideEffect.ProgressBarProgress -> currentSongProgress = effect.progress
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -109,8 +124,21 @@ fun NowPlaying(
                     modifier = Modifier
                         .anchoredDraggable(
                             state = bottomPlayerDragState,
-                            orientation = Orientation.Vertical),
-                    songModel = songModel
+                            orientation = Orientation.Vertical
+                        ),
+                    songModel = viewState.currentSong ?: SongModel(),
+                    onPlayPausePressed = { viewModel.onAction(NowPlayingAction.PlayPressed) },
+                    onNextPressed = { viewModel.onAction(NowPlayingAction.NextSongPressed) },
+                    onPreviousPressed = { viewModel.onAction(NowPlayingAction.PreviousSongPressed) },
+                    onProgressBarDragged = {
+                        viewModel.onAction(
+                            NowPlayingAction.ProgressBarDragged(
+                                it
+                            )
+                        )
+                    },
+                    playerState = viewState.currentPlayBackState,
+                    currentSongProgress = currentSongProgress
                 )
             }
 
@@ -128,7 +156,7 @@ fun NowPlaying(
                                 .toInt()
                         )
                     }
-                    .graphicsLayer { alpha = alphaBottomPlayer }
+                    .graphicsLayer { alpha = alphaBottomPlayer },
             ) {
                 BottomPlayer(
                     modifier = Modifier
@@ -136,22 +164,18 @@ fun NowPlaying(
                         .height(Utils.calculateBottomBarHeight())
                         .clickable { onExpandNowPlaying.invoke() }
                         .anchoredDraggable(
-                        state = bottomPlayerDragState,
-                        orientation = Orientation.Vertical
-                    ),
-
-                    nowPlayingState = NowPlayingState.Playing(
-                        song = songModel,
-                        playbackState = PlayerState.PAUSED,
-                        repeatMode = RepeatMode.NO_REPEAT,
-                        isShuffleOn = false
-                    ),
+                            state = bottomPlayerDragState,
+                            orientation = Orientation.Vertical
+                        ),
                     songProgressProvider = { 1f },
                     statusBarHeight = statusBarHeight,
                     enabled = true,
-                    onTogglePlayback = {},
-                    onNext = {},
-                    onPrevious = {}
+                    songModel = viewState.currentSong ?: SongModel(),
+                    onPlayPausePressed = { viewModel.onAction(NowPlayingAction.PlayPressed) },
+                    onNextPressed = { viewModel.onAction(NowPlayingAction.NextSongPressed) },
+                    onPreviousPressed = { viewModel.onAction(NowPlayingAction.PreviousSongPressed) },
+                    playerState = viewState.currentPlayBackState,
+                    currentSongProgress = currentSongProgress
                 )
             }
         }

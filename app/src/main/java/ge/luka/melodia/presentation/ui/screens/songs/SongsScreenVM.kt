@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ge.luka.melodia.domain.model.SongModel
 import ge.luka.melodia.domain.repository.MediaStoreRepository
+import ge.luka.melodia.media3.PlayBackManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
@@ -12,10 +13,21 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SongsScreenVM @Inject constructor(
-    private val mediaStoreRepository: MediaStoreRepository
+    private val mediaStoreRepository: MediaStoreRepository,
+    private val playbackManager: PlayBackManager
 ) : BaseMviViewmodel<SongsViewState, SongsAction, SongsSideEffect>(
     initialUiState = SongsViewState()
 ) {
+
+    init {
+        viewModelScope.launch {
+            mediaStoreRepository.getAllSongs()
+                .flowOn(Dispatchers.IO)
+                .collect { allSongs ->
+                    updateUiState { copy(songsList = allSongs) }
+                }
+        }
+    }
 
     override fun onAction(uiAction: SongsAction) {
         when (uiAction) {
@@ -35,11 +47,7 @@ class SongsScreenVM @Inject constructor(
                 )
             }
 
-            is SongsAction.SongPressed -> emitSideEffect(
-                SongsSideEffect.ThrowToast(
-                    uiAction.song.title ?: ""
-                )
-            )
+            is SongsAction.SongPressed -> playbackManager.setPlaylistAndPlayAtIndex(uiAction.songs, uiAction.index)
 
             is SongsAction.MetadataSaved -> emitSideEffect(
                 SongsSideEffect.UpdateCurrentSong(
@@ -75,16 +83,6 @@ class SongsScreenVM @Inject constructor(
                 emitSideEffect(SongsSideEffect.ThrowToast("Failed to update metadata"))
 
             }
-        }
-    }
-
-    init {
-        viewModelScope.launch {
-            mediaStoreRepository.getAllSongs()
-                .flowOn(Dispatchers.IO)
-                .collect { allSongs ->
-                    updateUiState { copy(songsList = allSongs) }
-                }
         }
     }
 }

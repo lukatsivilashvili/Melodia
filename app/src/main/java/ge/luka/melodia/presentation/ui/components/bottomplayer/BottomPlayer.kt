@@ -44,7 +44,6 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import ge.luka.melodia.R
 import ge.luka.melodia.domain.model.PlayerState
-import ge.luka.melodia.domain.model.RepeatMode
 import ge.luka.melodia.domain.model.SongModel
 import ge.luka.melodia.presentation.ui.components.shared.TransparentSurface
 import kotlinx.coroutines.delay
@@ -54,19 +53,16 @@ import kotlinx.coroutines.isActive
 @Composable
 fun BottomPlayer(
     modifier: Modifier,
-    nowPlayingState: NowPlayingState,
     songProgressProvider: () -> Float,
     statusBarHeight: Dp,
     enabled: Boolean,
-    onTogglePlayback: () -> Unit,
-    onNext: () -> Unit,
-    onPrevious: () -> Unit,
+    songModel: SongModel,
+    playerState: PlayerState,
+    currentSongProgress: Float,
+    onPlayPausePressed: () -> Unit,
+    onPreviousPressed: () -> Unit,
+    onNextPressed: () -> Unit,
 ) {
-    if (nowPlayingState is NowPlayingState.NotPlaying) {
-        return
-    }
-    val state = (nowPlayingState as NowPlayingState.Playing)
-    val song = state.song
     TransparentSurface {
         Box {
             Row(
@@ -93,7 +89,7 @@ fun BottomPlayer(
                     fallback = painterResource(id = R.drawable.ic_albums),
                     model = ImageRequest
                         .Builder(LocalContext.current)
-                        .data(song.artUri)
+                        .data(songModel.artUri)
                         .crossfade(true)
                         .build(),
                     contentDescription = "AlbumCover",
@@ -105,12 +101,12 @@ fun BottomPlayer(
                 ) {
                     Text(
                         modifier = Modifier.basicMarquee(Int.MAX_VALUE),
-                        text = song.title ?: "",
+                        text = songModel.title ?: "",
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Text(
                         modifier = Modifier,
-                        text = song.artist.orEmpty(),
+                        text = songModel.artist.orEmpty(),
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Light,
                         maxLines = 1
@@ -118,7 +114,7 @@ fun BottomPlayer(
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 Row {
-                    IconButton(onClick = onPrevious, enabled = enabled) {
+                    IconButton(onClick = onPreviousPressed, enabled = enabled) {
                         Icon(
                             imageVector = Icons.TwoTone.SkipPrevious,
                             contentDescription = "Previous"
@@ -127,11 +123,11 @@ fun BottomPlayer(
                     Box(contentAlignment = Alignment.Center) {
                         IconButton(
                             modifier = Modifier.padding(end = 4.dp),
-                            onClick = onTogglePlayback,
+                            onClick = onPlayPausePressed,
                             enabled = enabled
                         ) {
                             val icon =
-                                if (state.playbackState == PlayerState.PLAYING) Icons.TwoTone.Pause else Icons.TwoTone.PlayArrow
+                                if (playerState == PlayerState.PLAYING) Icons.TwoTone.Pause else Icons.TwoTone.PlayArrow
                             Icon(imageVector = icon, contentDescription = null)
                         }
                         SongCircularProgressIndicator(
@@ -139,7 +135,7 @@ fun BottomPlayer(
                             songProgressProvider
                         )
                     }
-                    IconButton(onClick = onNext, enabled = enabled) {
+                    IconButton(onClick = onNextPressed, enabled = enabled) {
                         Icon(imageVector = Icons.TwoTone.SkipNext, contentDescription = "Next")
                     }
                 }
@@ -183,30 +179,15 @@ enum class BarState {
 fun BottomPlayerPreview(modifier: Modifier = Modifier) {
     BottomPlayer(
         modifier = Modifier
-            .fillMaxWidth()
-            .height(70.dp),
-        nowPlayingState = NowPlayingState.Playing(
-            song = SongModel(
-                songId = 1L,
-                albumId = 101L,
-                artistId = 201L,
-                title = "Song One",
-                artist = "Artist One",
-                album = "Album One",
-                artUri = "",
-                duration = 210000L,
-                songPath = "/music/song_one.mp3",
-                bitrate = 320
-            ),
-            playbackState = PlayerState.PAUSED,
-            repeatMode = RepeatMode.NO_REPEAT,
-            isShuffleOn = false
-        ),
+            .fillMaxWidth(),
         songProgressProvider = { 1f },
         enabled = true,
-        onTogglePlayback = {},
-        onNext = {},
-        onPrevious = {},
-        statusBarHeight = 16.dp
+        statusBarHeight = 70.dp,
+        songModel = SongModel(),
+        playerState = PlayerState.PAUSED,
+        onPlayPausePressed = {},
+        onPreviousPressed = {},
+        onNextPressed = {},
+        currentSongProgress = 0.0f
     )
 }

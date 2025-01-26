@@ -1,4 +1,4 @@
-package ge.luka.melodia.presentation.ui.screens.nowplaying
+package ge.luka.melodia.presentation.ui.screens.nowplaying.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -29,13 +29,18 @@ import coil.request.ImageRequest
 import ge.luka.melodia.R
 import ge.luka.melodia.domain.model.PlayerState
 import ge.luka.melodia.domain.model.SongModel
-import ge.luka.melodia.presentation.ui.screens.nowplaying.components.Controls
 import ge.luka.melodia.presentation.ui.theme.MelodiaTheme
 
 @Composable
 fun NowPlayingScreen(
     modifier: Modifier = Modifier,
-    songModel: SongModel
+    songModel: SongModel,
+    playerState: PlayerState,
+    currentSongProgress: Float,
+    onPlayPausePressed: () -> Unit,
+    onPreviousPressed: () -> Unit,
+    onNextPressed: () -> Unit,
+    onProgressBarDragged: (Float) -> Unit
 ) {
 
     Box(
@@ -43,13 +48,26 @@ fun NowPlayingScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface)
     ) {
-        NowPlayingContent(songModel = songModel)
+        NowPlayingContent(songModel = songModel,
+            playerState = playerState,
+            onPlayPausePressed = onPlayPausePressed,
+            onPreviousPressed = onPreviousPressed,
+            onNextPressed = onNextPressed,
+            onProgressBarDragged = onProgressBarDragged,
+            currentSongProgress = currentSongProgress
+        )
     }
 }
 
 @Composable
 private fun NowPlayingContent(
-    songModel: SongModel
+    songModel: SongModel,
+    playerState: PlayerState,
+    currentSongProgress: Float,
+    onPlayPausePressed: () -> Unit,
+    onPreviousPressed: () -> Unit,
+    onNextPressed: () -> Unit,
+    onProgressBarDragged: (Float) -> Unit
 ) {
     val navBarHeight = with(LocalDensity.current) { WindowInsets.systemBars.getBottom(this).toDp() }
     val insets = WindowInsets.systemBars.asPaddingValues()
@@ -72,7 +90,12 @@ private fun NowPlayingContent(
             AlbumArtSection(modifier = Modifier.weight(1f), songModel = songModel)  // Pass only weight modifier
             Controls(
                 songModel = songModel,
-                playerState = PlayerState.PLAYING
+                playerState = playerState,
+                onPlayPausePressed = onPlayPausePressed,
+                onPreviousPressed = onPreviousPressed,
+                onNextPressed = onNextPressed,
+                onProgressBarDragged = onProgressBarDragged,
+                currentSongProgress = currentSongProgress
             )
         }
     }
@@ -136,6 +159,13 @@ private fun AlbumArtSection(
 @Composable
 fun NowPlayingScreenPreview() {
     MelodiaTheme {
-        NowPlayingScreen(songModel = SongModel())
+        NowPlayingScreen(songModel = SongModel(),
+            onPlayPausePressed = {},
+            onPreviousPressed = {},
+            onNextPressed = {},
+            onProgressBarDragged = {},
+            playerState = PlayerState.PAUSED,
+            currentSongProgress = 0.0f
+        )
     }
 }

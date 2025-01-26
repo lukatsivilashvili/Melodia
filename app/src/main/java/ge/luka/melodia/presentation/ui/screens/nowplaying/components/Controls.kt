@@ -47,6 +47,11 @@ fun Controls(
     modifier: Modifier = Modifier,
     songModel: SongModel?,
     playerState: PlayerState,
+    currentSongProgress: Float,
+    onPlayPausePressed: () -> Unit,
+    onPreviousPressed: () -> Unit,
+    onNextPressed: () -> Unit,
+    onProgressBarDragged: (Float) -> Unit
 ) {
     var showRemaining by remember { mutableStateOf(false) }
     var sliderValue by remember { mutableFloatStateOf(0f) }
@@ -79,13 +84,14 @@ fun Controls(
         Box(Modifier.fillMaxWidth()) {
             Slider(
                 modifier = Modifier.fillMaxWidth(),
-                value =sliderValue,
+                value = currentSongProgress,
                 onValueChange = {
                     sliderValue = it
                     dragging = true
                 },
                 onValueChangeFinished = {
                     dragging = false
+                    onProgressBarDragged.invoke(sliderValue)
                 },
             )
         }
@@ -113,7 +119,7 @@ fun Controls(
                 ),
             ) {
                 Text(
-                    text ="3:23",
+                    text = "3:23",
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
@@ -127,7 +133,7 @@ fun Controls(
         ) {
             AnimatedVisibility(visible = true) {
                 FilledIconButton(
-                    onClick = { },
+                    onClick = { onPreviousPressed.invoke() },
                     modifier = Modifier.size(80.dp),
                     colors = nextPrevColors,
                 ) {
@@ -139,7 +145,7 @@ fun Controls(
                 }
             }
             FilledIconButton(
-                onClick = { },
+                onClick = { onPlayPausePressed.invoke() },
                 modifier =
                 Modifier
                     .height(100.dp)
@@ -153,7 +159,7 @@ fun Controls(
                 ),
             ) {
                 Icon(
-                    if (true) {
+                    if (playerState == PlayerState.PAUSED) {
                         Icons.Default.Pause
                     } else {
                         Icons.Default.PlayArrow
@@ -164,7 +170,7 @@ fun Controls(
             }
             AnimatedVisibility(visible = true) {
                 FilledIconButton(
-                    onClick = {  },
+                    onClick = { onNextPressed.invoke() },
                     modifier = Modifier.size(80.dp),
                     colors = nextPrevColors,
                 ) {
