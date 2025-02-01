@@ -33,18 +33,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
-import ge.luka.melodia.R
 import ge.luka.melodia.domain.model.PlayerState
 import ge.luka.melodia.domain.model.SongModel
+import ge.luka.melodia.presentation.ui.components.shared.CrossFadingAlbumArt
+import ge.luka.melodia.presentation.ui.components.shared.ErrorPainterType
 import ge.luka.melodia.presentation.ui.components.shared.TransparentSurface
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -58,7 +54,6 @@ fun BottomPlayer(
     enabled: Boolean,
     songModel: SongModel,
     playerState: PlayerState,
-    currentSongProgress: Float,
     onPlayPausePressed: () -> Unit,
     onPreviousPressed: () -> Unit,
     onNextPressed: () -> Unit,
@@ -72,27 +67,14 @@ fun BottomPlayer(
                     .padding(bottom = statusBarHeight), // Add bottom padding to shift content up
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                AsyncImage(
+                CrossFadingAlbumArt(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .padding(
-                            start = 8.dp,
-                            end = 8.dp,
-                            top = 8.dp,
-                            bottom = 8.dp
-                        )
+                        .padding(8.dp)
                         .aspectRatio(1.0f)
                         .clip(CircleShape),
-                    contentScale = ContentScale.Crop,
-                    placeholder = painterResource(id = R.drawable.ic_albums),
-                    error = painterResource(id = R.drawable.ic_albums),
-                    fallback = painterResource(id = R.drawable.ic_albums),
-                    model = ImageRequest
-                        .Builder(LocalContext.current)
-                        .data(songModel.artUri)
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = "AlbumCover",
+                    artUri = songModel.artUri ?: "",
+                    errorPainterType = ErrorPainterType.PLACEHOLDER,
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Column(
@@ -100,7 +82,7 @@ fun BottomPlayer(
                     horizontalAlignment = Alignment.Start
                 ) {
                     Text(
-                        modifier = Modifier.basicMarquee(Int.MAX_VALUE),
+                        modifier = Modifier.basicMarquee(),
                         text = songModel.title ?: "",
                         style = MaterialTheme.typography.bodyMedium
                     )
@@ -188,6 +170,5 @@ fun BottomPlayerPreview(modifier: Modifier = Modifier) {
         onPlayPausePressed = {},
         onPreviousPressed = {},
         onNextPressed = {},
-        currentSongProgress = 0.0f
     )
 }

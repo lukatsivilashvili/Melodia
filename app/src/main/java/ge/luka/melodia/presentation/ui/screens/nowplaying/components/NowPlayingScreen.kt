@@ -1,5 +1,6 @@
 package ge.luka.melodia.presentation.ui.screens.nowplaying.components
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,17 +19,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
-import ge.luka.melodia.R
 import ge.luka.melodia.domain.model.PlayerState
 import ge.luka.melodia.domain.model.SongModel
+import ge.luka.melodia.presentation.ui.components.shared.CrossFadingAlbumArt
+import ge.luka.melodia.presentation.ui.components.shared.ErrorPainterType
 import ge.luka.melodia.presentation.ui.theme.MelodiaTheme
 
 @Composable
@@ -36,7 +33,8 @@ fun NowPlayingScreen(
     modifier: Modifier = Modifier,
     songModel: SongModel,
     playerState: PlayerState,
-    currentSongProgress: Float,
+    songProgressProvider: () -> Float,
+    songProgressMillisProvider: () -> Long,
     onPlayPausePressed: () -> Unit,
     onPreviousPressed: () -> Unit,
     onNextPressed: () -> Unit,
@@ -48,13 +46,15 @@ fun NowPlayingScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface)
     ) {
-        NowPlayingContent(songModel = songModel,
+        NowPlayingContent(
+            songModel = songModel,
             playerState = playerState,
             onPlayPausePressed = onPlayPausePressed,
             onPreviousPressed = onPreviousPressed,
             onNextPressed = onNextPressed,
             onProgressBarDragged = onProgressBarDragged,
-            currentSongProgress = currentSongProgress
+            songProgressProvider = songProgressProvider,
+            songProgressMillisProvider = songProgressMillisProvider
         )
     }
 }
@@ -63,7 +63,8 @@ fun NowPlayingScreen(
 private fun NowPlayingContent(
     songModel: SongModel,
     playerState: PlayerState,
-    currentSongProgress: Float,
+    songProgressProvider: () -> Float,
+    songProgressMillisProvider: () -> Long,
     onPlayPausePressed: () -> Unit,
     onPreviousPressed: () -> Unit,
     onNextPressed: () -> Unit,
@@ -87,7 +88,10 @@ private fun NowPlayingContent(
 
     Box(modifier = containerModifier) {
         Column {
-            AlbumArtSection(modifier = Modifier.weight(1f), songModel = songModel)  // Pass only weight modifier
+            AlbumArtSection(
+                modifier = Modifier.weight(1f),
+                songModel = songModel
+            )  // Pass only weight modifier
             Controls(
                 songModel = songModel,
                 playerState = playerState,
@@ -95,12 +99,14 @@ private fun NowPlayingContent(
                 onPreviousPressed = onPreviousPressed,
                 onNextPressed = onNextPressed,
                 onProgressBarDragged = onProgressBarDragged,
-                currentSongProgress = currentSongProgress
+                songProgressProvider = songProgressProvider,
+                songProgressMillisProvider = songProgressMillisProvider
             )
         }
     }
 }
 
+@SuppressLint("UnusedCrossfadeTargetStateParameter")
 @Composable
 private fun AlbumArtSection(
     modifier: Modifier = Modifier,
@@ -110,17 +116,12 @@ private fun AlbumArtSection(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        // Background Image with Blur and Gradient Overlay
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(songModel.artUri)
-                .crossfade(true)
-                .build(),
-            contentDescription = "Blurred Album Background",
-            contentScale = ContentScale.Crop,
+        CrossFadingAlbumArt(
             modifier = Modifier
                 .fillMaxSize()
-                .alpha(0.5f)
+                .alpha(0.5f),
+            artUri = songModel.artUri ?: "",
+            errorPainterType = ErrorPainterType.SOLID_COLOR,
         )
         // Gradient Overlay
         Box(
@@ -138,19 +139,13 @@ private fun AlbumArtSection(
                 )
         )
         // Foreground Album Art
-        AsyncImage(
-            modifier = modifier
+        CrossFadingAlbumArt(
+            modifier = Modifier
                 .fillMaxSize()
-                .padding(48.dp),
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(songModel.artUri)
-                .crossfade(true)
-                .build(),
-            placeholder = painterResource(id = R.drawable.ic_albums),
-            error = painterResource(id = R.drawable.ic_albums),
-            fallback = painterResource(id = R.drawable.ic_albums),
-            contentDescription = "Album Cover",
-            contentScale = ContentScale.Crop,
+                .padding(48.dp)
+                .clip(RoundedCornerShape(8.dp)),
+            artUri = songModel.artUri ?: "",
+            errorPainterType = ErrorPainterType.PLACEHOLDER,
         )
     }
 }
@@ -159,13 +154,15 @@ private fun AlbumArtSection(
 @Composable
 fun NowPlayingScreenPreview() {
     MelodiaTheme {
-        NowPlayingScreen(songModel = SongModel(),
+        NowPlayingScreen(
+            songModel = SongModel(),
             onPlayPausePressed = {},
             onPreviousPressed = {},
             onNextPressed = {},
             onProgressBarDragged = {},
             playerState = PlayerState.PAUSED,
-            currentSongProgress = 0.0f
+            songProgressProvider = { 0.0f },
+            songProgressMillisProvider = { 0L }
         )
     }
 }

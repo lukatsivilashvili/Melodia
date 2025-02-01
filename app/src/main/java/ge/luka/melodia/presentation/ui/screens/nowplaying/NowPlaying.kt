@@ -22,9 +22,7 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
@@ -34,7 +32,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import ge.luka.melodia.common.mvi.CollectSideEffects
 import ge.luka.melodia.common.utils.Utils
 import ge.luka.melodia.common.utils.Utils.BOTTOM_PLAYER_HEIGHT
 import ge.luka.melodia.domain.model.SongModel
@@ -54,15 +51,6 @@ fun NowPlaying(
 ) {
 
     val viewState by viewModel.uiState.collectAsStateWithLifecycle()
-    var currentSongProgress by remember {
-        mutableFloatStateOf(0.0f)
-    }
-
-    CollectSideEffects(flow = viewModel.sideEffect) { effect ->
-        when (effect) {
-            is NowPlayingSideEffect.ProgressBarProgress -> currentSongProgress = effect.progress
-        }
-    }
 
     Box(
         modifier = Modifier
@@ -138,7 +126,8 @@ fun NowPlaying(
                         )
                     },
                     playerState = viewState.currentPlayBackState,
-                    currentSongProgress = currentSongProgress
+                    songProgressProvider = viewModel::currentSongProgress,
+                    songProgressMillisProvider = viewModel::currentSongProgressMillis
                 )
             }
 
@@ -167,7 +156,7 @@ fun NowPlaying(
                             state = bottomPlayerDragState,
                             orientation = Orientation.Vertical
                         ),
-                    songProgressProvider = { 1f },
+                    songProgressProvider =  viewModel::currentSongProgress,
                     statusBarHeight = statusBarHeight,
                     enabled = true,
                     songModel = viewState.currentSong ?: SongModel(),
@@ -175,7 +164,6 @@ fun NowPlaying(
                     onNextPressed = { viewModel.onAction(NowPlayingAction.NextSongPressed) },
                     onPreviousPressed = { viewModel.onAction(NowPlayingAction.PreviousSongPressed) },
                     playerState = viewState.currentPlayBackState,
-                    currentSongProgress = currentSongProgress
                 )
             }
         }

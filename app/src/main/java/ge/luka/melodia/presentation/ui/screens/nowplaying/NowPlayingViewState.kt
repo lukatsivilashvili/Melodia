@@ -6,4 +6,5 @@ import ge.luka.melodia.domain.model.SongModel
 data class NowPlayingViewState(
     val currentSong: SongModel? = null,
     val currentPlayBackState: PlayerState = PlayerState.PAUSED,
+    val currentSongProgress: Float = 0.0f
 )

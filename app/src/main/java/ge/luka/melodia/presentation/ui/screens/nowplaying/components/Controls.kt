@@ -29,25 +29,31 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import ge.luka.melodia.common.extensions.formatDuration
 import ge.luka.melodia.domain.model.PlayerState
 import ge.luka.melodia.domain.model.SongModel
+import kotlinx.coroutines.delay
 
 @Composable
 fun Controls(
     modifier: Modifier = Modifier,
     songModel: SongModel?,
     playerState: PlayerState,
-    currentSongProgress: Float,
+    songProgressProvider: () -> Float,
+    songProgressMillisProvider: () -> Long,
     onPlayPausePressed: () -> Unit,
     onPreviousPressed: () -> Unit,
     onNextPressed: () -> Unit,
@@ -55,11 +61,24 @@ fun Controls(
 ) {
     var showRemaining by remember { mutableStateOf(false) }
     var sliderValue by remember { mutableFloatStateOf(0f) }
+    var progressMillisValue by remember { mutableLongStateOf(0L) }
     var dragging by remember { mutableStateOf(false) }
-    val nextPrevColors = IconButtonDefaults.filledIconButtonColors(
-        contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-    )
+
+    // Keep track of the latest progress provider result
+    val currentProgress by rememberUpdatedState(songProgressProvider())
+    val currentProgressMillis by rememberUpdatedState(songProgressMillisProvider())
+
+    // Coroutine to update slider progress in real-time
+    LaunchedEffect(playerState) {
+        while (playerState == PlayerState.PLAYING && !dragging) {
+            sliderValue = currentProgress
+            progressMillisValue = currentProgressMillis
+            delay(500) // Update every 500ms (adjust if needed)
+        }
+    }
+
+    val sliderProgress = if (dragging) sliderValue else currentProgress
+
     Column(modifier.padding(start = 30.dp, end = 30.dp, bottom = 30.dp)) {
         Text(
             text = songModel?.title ?: "",
@@ -84,31 +103,27 @@ fun Controls(
         Box(Modifier.fillMaxWidth()) {
             Slider(
                 modifier = Modifier.fillMaxWidth(),
-                value = currentSongProgress,
+                value = sliderProgress,
                 onValueChange = {
                     sliderValue = it
                     dragging = true
                 },
                 onValueChangeFinished = {
-                    dragging = false
                     onProgressBarDragged.invoke(sliderValue)
+                    dragging = false
                 },
             )
         }
         Row(
-            Modifier
-                .fillMaxWidth(),
+            Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             TextButton(
                 onClick = { },
                 contentPadding = PaddingValues(4.dp),
-                colors =
-                ButtonDefaults.textButtonColors(
-                    contentColor =
-                    animateColorAsState(
-                        targetValue =
-                        if (dragging) {
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = animateColorAsState(
+                        targetValue = if (dragging) {
                             MaterialTheme.colorScheme.onBackground
                         } else {
                             MaterialTheme.colorScheme.onSurfaceVariant
@@ -119,15 +134,34 @@ fun Controls(
                 ),
             ) {
                 Text(
-                    text = "3:23",
+                    text =currentProgressMillis.toLong().formatDuration() ?: "00:00",
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+
+            TextButton(
+                onClick = { },
+                contentPadding = PaddingValues(4.dp),
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = animateColorAsState(
+                        targetValue = if (dragging) {
+                            MaterialTheme.colorScheme.onBackground
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        },
+                        animationSpec = tween(),
+                        label = "",
+                    ).value,
+                ),
+            ) {
+                Text(
+                    text = songModel?.duration?.formatDuration() ?: "00:00",
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
         }
         Row(
-            modifier =
-            Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -135,7 +169,10 @@ fun Controls(
                 FilledIconButton(
                     onClick = { onPreviousPressed.invoke() },
                     modifier = Modifier.size(80.dp),
-                    colors = nextPrevColors,
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    ),
                 ) {
                     Icon(
                         Icons.Outlined.SkipPrevious,
@@ -146,23 +183,21 @@ fun Controls(
             }
             FilledIconButton(
                 onClick = { onPlayPausePressed.invoke() },
-                modifier =
-                Modifier
+                modifier = Modifier
                     .height(100.dp)
                     .fillMaxWidth()
                     .weight(1f),
                 shape = CircleShape,
-                colors =
-                IconButtonDefaults.iconButtonColors(
+                colors = IconButtonDefaults.iconButtonColors(
                     contentColor = MaterialTheme.colorScheme.primaryContainer,
                     containerColor = MaterialTheme.colorScheme.primary,
                 ),
             ) {
                 Icon(
                     if (playerState == PlayerState.PAUSED) {
-                        Icons.Default.Pause
-                    } else {
                         Icons.Default.PlayArrow
+                    } else {
+                        Icons.Default.Pause
                     },
                     null,
                     modifier = Modifier.size(40.dp),
@@ -172,7 +207,10 @@ fun Controls(
                 FilledIconButton(
                     onClick = { onNextPressed.invoke() },
                     modifier = Modifier.size(80.dp),
-                    colors = nextPrevColors,
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    ),
                 ) {
                     Icon(
                         Icons.Outlined.SkipNext,
