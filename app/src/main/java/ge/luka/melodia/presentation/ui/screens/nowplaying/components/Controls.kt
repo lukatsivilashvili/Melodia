@@ -134,7 +134,7 @@ fun Controls(
                 ),
             ) {
                 Text(
-                    text =currentProgressMillis.toLong().formatDuration() ?: "00:00",
+                    text = currentProgressMillis.formatDuration(),
                     style = MaterialTheme.typography.bodySmall,
                 )
             }

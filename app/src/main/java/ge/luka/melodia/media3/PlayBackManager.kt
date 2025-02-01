@@ -62,6 +62,9 @@ class PlayBackManager @Inject constructor(
         }
 
 
+    /**
+     *  Updates the state of the player
+     */
     fun updateState() {
         val currentMediaItem = mediaController.currentMediaItem
         val song = currentMediaItem?.toSongModel()
@@ -111,19 +114,17 @@ class PlayBackManager @Inject constructor(
         mediaController.seekToPrevious()
     }
 
-    fun playSongAtIndex(index: Int) {
-        mediaController.seekTo(index, 0)
-    }
-
+    /**
+     *  Seek to a specific position in the current song
+     */
     fun seekToPosition(progress: Float) {
         val songDuration = mediaController.duration
         mediaController.seekTo((songDuration * progress).toLong())
     }
 
-    fun seekToPositionMillis(millis: Long) {
-        mediaController.seekTo(millis)
-    }
-
+    /**
+     *  Stops the playback (Releases all resources)
+     */
     private fun stopPlayback() {
         mediaController.stop()
     }
