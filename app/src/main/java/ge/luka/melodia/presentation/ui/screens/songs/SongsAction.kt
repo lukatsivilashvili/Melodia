@@ -3,8 +3,8 @@ package ge.luka.melodia.presentation.ui.screens.songs
 import ge.luka.melodia.domain.model.SongModel
 
 sealed interface SongsAction {
-    data object PlayPressed : SongsAction
-    data object ShufflePressed : SongsAction
+    data class PlayPressed(val songs: List<SongModel>) : SongsAction
+    data class ShufflePressed(val songs: List<SongModel>) : SongsAction
     data object DialogDismiss : SongsAction
     data class MetadataSaved(
         val id: Long,

@@ -22,7 +22,7 @@ object DataModule {
     fun provideDatabase(
         @ApplicationContext context: Context
     ): MelodiaDatabase =
-        Room.databaseBuilder(context, MelodiaDatabase::class.java, "data.db").build()
+        Room.databaseBuilder(context, MelodiaDatabase::class.java, "data.db").fallbackToDestructiveMigration().build()
 
     @Provides
     @Singleton

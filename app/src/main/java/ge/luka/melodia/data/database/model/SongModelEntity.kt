@@ -13,6 +13,7 @@ data class SongModelEntity(
     val title: String? = null,
     val album: String? = null,
     val artist: String? = null,
+    val trackNumber: Int? = null,
     val duration: Long? = null,
     val songPath: String? = null,
     val artUri: String? = null,

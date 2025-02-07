@@ -27,6 +27,7 @@ object MediaStoreLoader {
                 Media.ALBUM,
                 Media.ARTIST,
                 Media.DURATION,
+                Media.TRACK,
                 Media.ALBUM_ID,
                 Media.ARTIST_ID,
                 Media.RELATIVE_PATH,
@@ -48,6 +49,7 @@ object MediaStoreLoader {
                 val titleColumn = cursor.getColumnIndexOrThrow(Media.TITLE)
                 val albumColumn = cursor.getColumnIndexOrThrow(Media.ALBUM)
                 val artistColumn = cursor.getColumnIndexOrThrow(Media.ARTIST)
+                val trackNumberColumn = cursor.getColumnIndexOrThrow(Media.TRACK)
                 val durationColumn = cursor.getColumnIndexOrThrow(Media.DURATION)
                 val bitrateColumn = cursor.getColumnIndexOrThrow(Media.BITRATE)
 
@@ -60,6 +62,7 @@ object MediaStoreLoader {
                             artistIdColumn = artistIdColumn,
                             titleColumn = titleColumn,
                             albumColumn = albumColumn,
+                            trackNumberColumn = trackNumberColumn,
                             artistColumn = artistColumn,
                             durationColumn = durationColumn,
                             bitrateColumn = bitrateColumn

@@ -31,8 +31,8 @@ class SongsScreenVM @Inject constructor(
 
     override fun onAction(uiAction: SongsAction) {
         when (uiAction) {
-            is SongsAction.PlayPressed -> emitSideEffect(SongsSideEffect.ThrowToast("Play Pressed"))
-            is SongsAction.ShufflePressed -> emitSideEffect(SongsSideEffect.ThrowToast("Shuffle Pressed"))
+            is SongsAction.PlayPressed -> playbackManager.setPlaylistAndPlayAtIndex(uiAction.songs, 0)
+            is SongsAction.ShufflePressed -> playbackManager.shufflePlaylist(uiAction.songs)
             is SongsAction.DialogDismiss -> updateUiState {
                 copy(
                     isDialogVisible = false,

@@ -91,6 +91,20 @@ class PlayBackManager @Inject constructor(
     }
 
     /**
+     * Shuffles the current playlist and starts playing the first song
+     */
+    fun shufflePlaylist(playlist: List<SongModel>) {
+        if (playlist.isEmpty()) return
+        val shuffled = playlist.shuffled()
+        stopPlayback()
+        mediaController.apply {
+            setMediaItems(shuffled.toMediaItems(0), 0, 0)
+            prepare()
+            play()
+        }
+    }
+
+    /**
      * Toggle the player state
      */
     fun togglePlayback() {
@@ -130,7 +144,8 @@ class PlayBackManager @Inject constructor(
     }
 
     private fun initMediaController(context: Context) {
-        val sessionToken = SessionToken(context, ComponentName(context, PlayBackService::class.java))
+        val sessionToken =
+            SessionToken(context, ComponentName(context, PlayBackService::class.java))
         val mediaControllerFuture = MediaController.Builder(context, sessionToken)
             .setApplicationLooper(context.mainLooper)
             .buildAsync()

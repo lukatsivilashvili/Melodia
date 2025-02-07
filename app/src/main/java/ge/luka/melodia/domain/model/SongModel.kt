@@ -13,6 +13,7 @@ data class SongModel(
     override val artist: String? = null,
     override val album: String? = null,
     override val artUri: String? = null,
+    val trackNumber: Int? = null,
     val duration: Long? = null,
     val songPath: String? = null,
     val bitrate: Int? = null
@@ -26,6 +27,7 @@ data class SongModel(
             titleColumn: Int,
             albumColumn: Int,
             artistColumn: Int,
+            trackNumberColumn: Int,
             durationColumn: Int,
             bitrateColumn: Int
         ): SongModel {
@@ -36,6 +38,7 @@ data class SongModel(
                 title = cursor.getString(titleColumn),
                 album = cursor.getString(albumColumn),
                 artist = cursor.getString(artistColumn),
+                trackNumber = cursor.getInt(trackNumberColumn),
                 duration = cursor.getLong(durationColumn),
                 songPath = ContentUris.withAppendedId(
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,

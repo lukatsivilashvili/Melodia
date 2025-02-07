@@ -47,10 +47,6 @@ fun SongModel.toMediaItem(index: Int) =
         )
         .build()
 
-fun List<SongModel>.toMediaItems(startingIndex: Int) = mapIndexed { index, song ->
-    song.toMediaItem(startingIndex + index)
-}
-
 fun MediaItem.toSongModel(): SongModel {
     return SongModel(
         songPath = requestMetadata.mediaUri.toString(),
@@ -64,4 +60,15 @@ fun MediaItem.toSongModel(): SongModel {
         duration = requestMetadata.extras?.getLong(DURATION, 0L),
         bitrate = requestMetadata.extras?.getInt(BITRATE, 0),
     )
+}
+
+fun List<SongModel>.toMediaItems(startingIndex: Int) = mapIndexed { index, song ->
+    song.toMediaItem(startingIndex + index)
+}
+
+fun List<SongModel>.sortedByTrackNumber(): List<SongModel> {
+    return sortedWith(compareBy {
+        // If trackNumber is 1000 or above, subtract 1000 so that 1001 becomes 1, etc.
+        if (it.trackNumber!! >= 1000) it.trackNumber - 1000 else it.trackNumber
+    })
 }

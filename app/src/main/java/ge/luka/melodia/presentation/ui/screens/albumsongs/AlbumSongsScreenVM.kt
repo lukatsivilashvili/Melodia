@@ -3,6 +3,7 @@ package ge.luka.melodia.presentation.ui.screens.albumsongs
 import BaseMviViewmodel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import ge.luka.melodia.common.extensions.sortedByTrackNumber
 import ge.luka.melodia.domain.model.SongModel
 import ge.luka.melodia.domain.repository.MediaStoreRepository
 import ge.luka.melodia.media3.PlayBackManager
@@ -25,7 +26,7 @@ class AlbumSongsScreenVM@Inject constructor(
     override fun onAction(uiAction: AlbumSongsAction) {
         when (uiAction) {
             is AlbumSongsAction.PlayPressed -> playbackManager.setPlaylistAndPlayAtIndex(uiAction.songs, 0)
-            is AlbumSongsAction.ShufflePressed -> emitSideEffect(AlbumSongsSideEffect.ThrowToast("Shuffle Pressed"))
+            is AlbumSongsAction.ShufflePressed -> playbackManager.shufflePlaylist(uiAction.songs)
             is AlbumSongsAction.SongPressed -> playbackManager.setPlaylistAndPlayAtIndex(uiAction.songs, uiAction.index)
         }
     }
@@ -34,7 +35,7 @@ class AlbumSongsScreenVM@Inject constructor(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 mediaStoreRepository.getAlbumSongs(albumId = albumId).map { albumSongs ->
-                    updateUiState { copy(songsList = albumSongs) }
+                    updateUiState { copy(songsList = albumSongs.sortedByTrackNumber()) }
                 }.stateIn(
                     scope = viewModelScope,
                     started = SharingStarted.Eagerly,

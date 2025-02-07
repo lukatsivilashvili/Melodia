@@ -51,7 +51,6 @@ fun BottomPlayer(
     modifier: Modifier,
     songProgressProvider: () -> Float,
     statusBarHeight: Dp,
-    enabled: Boolean,
     songModel: SongModel,
     playerState: PlayerState,
     onPlayPausePressed: () -> Unit,
@@ -96,7 +95,7 @@ fun BottomPlayer(
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 Row {
-                    IconButton(onClick = onPreviousPressed, enabled = enabled) {
+                    IconButton(onClick = onPreviousPressed) {
                         Icon(
                             imageVector = Icons.TwoTone.SkipPrevious,
                             contentDescription = "Previous"
@@ -105,8 +104,7 @@ fun BottomPlayer(
                     Box(contentAlignment = Alignment.Center) {
                         IconButton(
                             modifier = Modifier.padding(end = 4.dp),
-                            onClick = onPlayPausePressed,
-                            enabled = enabled
+                            onClick = onPlayPausePressed
                         ) {
                             val icon =
                                 if (playerState == PlayerState.PLAYING) Icons.TwoTone.Pause else Icons.TwoTone.PlayArrow
@@ -117,7 +115,7 @@ fun BottomPlayer(
                             songProgressProvider
                         )
                     }
-                    IconButton(onClick = onNextPressed, enabled = enabled) {
+                    IconButton(onClick = onNextPressed) {
                         Icon(imageVector = Icons.TwoTone.SkipNext, contentDescription = "Next")
                     }
                 }
@@ -163,7 +161,6 @@ fun BottomPlayerPreview(modifier: Modifier = Modifier) {
         modifier = Modifier
             .fillMaxWidth(),
         songProgressProvider = { 1f },
-        enabled = true,
         statusBarHeight = 70.dp,
         songModel = SongModel(),
         playerState = PlayerState.PAUSED,

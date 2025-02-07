@@ -101,16 +101,26 @@ fun AlbumSongsScreenContent(
                     albumTitle = albumTitle,
                     albumArtist = albumArtist,
                     albumArt = decodedArtUri,
-                    albumDuration = albumDuration,)
+                    albumDuration = albumDuration,
+                )
                 HelperControlButtons(onPlayClick = {
                     viewModel.onAction(
                         AlbumSongsAction.PlayPressed(
                             songs = viewState.songsList,
                         )
                     )
-                })
+                },
+                    onShuffleClick = {
+                        viewModel.onAction(
+                            AlbumSongsAction.ShufflePressed(
+                                songs = viewState.songsList
+                            )
+                        )
+                    })
             }
-            itemsIndexed(items = viewState.songsList, key = { _, song -> song.songId ?: 0 }) { index, songItem ->
+            itemsIndexed(
+                items = viewState.songsList,
+                key = { _, song -> song.songId ?: 0 }) { index, songItem ->
                 GeneralMusicListItem(songItem = songItem, onClick = {
                     viewModel.onAction(
                         AlbumSongsAction.SongPressed(
