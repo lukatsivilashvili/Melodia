@@ -17,8 +17,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import ge.luka.melodia.presentation.ui.MelodiaScreen
 import ge.luka.melodia.presentation.ui.components.singlepermission.SinglePermissionRequest
+import ge.luka.melodia.presentation.ui.screens.MelodiaScreen
 import ge.luka.melodia.presentation.ui.screens.albums.AlbumsScreen
 import ge.luka.melodia.presentation.ui.screens.albumsongs.AlbumSongsScreen
 import ge.luka.melodia.presentation.ui.screens.artists.ArtistsScreen

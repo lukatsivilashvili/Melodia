@@ -20,8 +20,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import ge.luka.melodia.common.mvi.CollectSideEffects
-import ge.luka.melodia.presentation.ui.MelodiaScreen
 import ge.luka.melodia.presentation.ui.components.shared.GeneralArtistListItem
+import ge.luka.melodia.presentation.ui.screens.MelodiaScreen
 import ge.luka.melodia.presentation.ui.theme.themecomponents.MelodiaTypography
 
 @Composable

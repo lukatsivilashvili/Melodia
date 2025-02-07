@@ -19,10 +19,6 @@ class ThemeVM @Inject constructor(
 ) {
     override fun onAction(uiAction: ThemeAction) {
         when (uiAction) {
-            is ThemeAction.DarkModeReceived -> updateUiState {
-                copy(isDarkMode = uiAction.isDarkMode)
-            }
-
             is ThemeAction.ThemeColorReceived -> updateUiState {
                 copy(currentTheme = uiAction.newTheme)
             }
@@ -31,15 +27,6 @@ class ThemeVM @Inject constructor(
 
     init {
         viewModelScope.launch {
-
-            themeRepository.getDarkMode().map { isDarkMode ->
-                updateUiState { copy(isDarkMode = isDarkMode) }
-            }.stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.Eagerly,
-                initialValue = false
-            )
-
             themeRepository.getCurrentTheme().map { currentTheme ->
                 updateUiState { copy(currentTheme = currentTheme) }
             }.stateIn(

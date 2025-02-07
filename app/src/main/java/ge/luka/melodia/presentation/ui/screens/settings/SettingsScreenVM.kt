@@ -20,13 +20,6 @@ class SettingsScreenVM @Inject constructor(
 ) {
     init {
         launch {
-            themeRepository.getDarkMode()
-                .map { isDarkMode -> updateUiState { copy(darkMode = isDarkMode) } }.stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.Eagerly,
-                initialValue = false
-            )
-
             themeRepository.getCurrentTheme()
                 .map { currentTheme -> updateUiState { copy(currentTheme = currentTheme) } }
                 .stateIn(
@@ -39,23 +32,8 @@ class SettingsScreenVM @Inject constructor(
 
     override fun onAction(uiAction: SettingsAction) {
         when (uiAction) {
-            is SettingsAction.DarkModeReceived -> updateUiState {
-                copy(darkMode = uiAction.receivedDarkMode)
-            }
-
             is SettingsAction.ThemeReceived -> updateUiState {
                 copy(currentTheme = uiAction.receivedTheme)
-            }
-
-            is SettingsAction.DarkModeSwitched -> {
-                if (uiAction.darkMode) {
-                    updateUiState { copy(darkMode = true) }
-                    setIsDarkMode(isDarkMode = true)
-                } else {
-                    updateUiState { copy(darkMode = false) }
-                    setIsDarkMode(isDarkMode = false)
-
-                }
             }
 
             is SettingsAction.ThemeChanged -> {
@@ -63,11 +41,6 @@ class SettingsScreenVM @Inject constructor(
                 setCurrentTheme(theme = uiAction.newTheme)            }
         }
     }
-
-    private fun setIsDarkMode(isDarkMode: Boolean) = viewModelScope.launch {
-        themeRepository.setDarkMode(isDarkMode)
-    }
-
     private fun setCurrentTheme(theme: AppTheme) = viewModelScope.launch {
         themeRepository.setCurrentTheme(theme)
     }

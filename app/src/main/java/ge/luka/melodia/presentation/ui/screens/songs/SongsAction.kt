@@ -14,6 +14,6 @@ sealed interface SongsAction {
         val artworkUri: String?
     ) : SongsAction
 
-    data class SongPressed(val song: SongModel) : SongsAction
+    data class SongPressed(val songs: List<SongModel>, val index: Int) : SongsAction
     data class SongLongPressed(val song: SongModel) : SongsAction
 }

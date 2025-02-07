@@ -4,10 +4,8 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,16 +33,6 @@ fun SettingsScreen(
     }
 
     Column(modifier = modifier) {
-        Row {
-            Text("Dark mode")
-            Switch(
-                checked = viewState.darkMode,
-                onCheckedChange = {
-                    viewModel.onAction(SettingsAction.DarkModeSwitched(darkMode = viewState.darkMode.not()))
-                }
-            )
-        }
-        Spacer(modifier.height(16.dp))
 
         ColorSchemeRadioButtons(modifier = modifier, selectedScheme = viewState.currentTheme) { newTheme ->
             viewModel.onAction(SettingsAction.ThemeChanged(newTheme = newTheme))

@@ -5,7 +5,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -99,13 +99,14 @@ fun SongsScreenContent(
                     onPlayClick = { viewModel.onAction(SongsAction.PlayPressed) },
                     onShuffleClick = { viewModel.onAction(SongsAction.ShufflePressed) })
             }
-            items(items = viewState.songsList, key = { it.songId ?: 0 }) { songItem ->
+            itemsIndexed(items = viewState.songsList, key = { _, song -> song.songId ?: 0 }) { index, songItem ->
                 GeneralMusicListItem(
                     songItem = songItem,
                     onClick = {
                         viewModel.onAction(
                             SongsAction.SongPressed(
-                                song = songItem
+                                songs = viewState.songsList,
+                                index = index
                             )
                         )
                     },
