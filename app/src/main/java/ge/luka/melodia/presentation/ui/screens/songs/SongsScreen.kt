@@ -96,8 +96,8 @@ fun SongsScreenContent(
         LazyColumn(modifier = modifier.fillMaxSize(), state = rememberLazyListState()) {
             item {
                 HelperControlButtons(
-                    onPlayClick = { viewModel.onAction(SongsAction.PlayPressed) },
-                    onShuffleClick = { viewModel.onAction(SongsAction.ShufflePressed) })
+                    onPlayClick = { viewModel.onAction(SongsAction.PlayPressed(viewState.songsList)) },
+                    onShuffleClick = { viewModel.onAction(SongsAction.ShufflePressed(viewState.songsList)) })
             }
             itemsIndexed(items = viewState.songsList, key = { _, song -> song.songId ?: 0 }) { index, songItem ->
                 GeneralMusicListItem(

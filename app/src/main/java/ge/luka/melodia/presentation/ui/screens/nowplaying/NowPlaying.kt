@@ -9,6 +9,7 @@ import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.anchoredDraggable
+import androidx.compose.foundation.gestures.animateTo
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
@@ -23,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
@@ -38,6 +40,7 @@ import ge.luka.melodia.domain.model.SongModel
 import ge.luka.melodia.presentation.ui.components.bottomplayer.BarState
 import ge.luka.melodia.presentation.ui.components.bottomplayer.BottomPlayer
 import ge.luka.melodia.presentation.ui.screens.nowplaying.components.NowPlayingScreen
+import kotlinx.coroutines.launch
 
 
 @SuppressLint("RememberReturnType")
@@ -46,7 +49,6 @@ import ge.luka.melodia.presentation.ui.screens.nowplaying.components.NowPlayingS
 fun NowPlaying(
     modifier: Modifier = Modifier,
     viewModel: NowPlayingVM = hiltViewModel(),
-    onExpandNowPlaying: () -> Unit,
     bottomPlayerPadding: PaddingValues
 ) {
 
@@ -92,6 +94,14 @@ fun NowPlaying(
         val offsetBottomPlayer = -(bottomPlayerDragState.offset)
         val alphaBottomPlayer = 1f - offsetBottomPlayer / (screenHeight.value)
         val alphaNowPlaying = 0f + offsetBottomPlayer / (screenHeight.value * 3.0f)
+
+        val coroutineScope = rememberCoroutineScope()
+
+        fun expandBottomPlayer() {
+            coroutineScope.launch {
+                bottomPlayerDragState.animateTo(BarState.EXPANDED)
+            }
+        }
 
         SideEffect { bottomPlayerDragState.updateAnchors(anchors) }
         Box(
@@ -151,14 +161,13 @@ fun NowPlaying(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(Utils.calculateBottomBarHeight())
-                        .clickable { onExpandNowPlaying.invoke() }
+                        .clickable { expandBottomPlayer() }
                         .anchoredDraggable(
                             state = bottomPlayerDragState,
                             orientation = Orientation.Vertical
                         ),
                     songProgressProvider =  viewModel::currentSongProgress,
                     statusBarHeight = statusBarHeight,
-                    enabled = true,
                     songModel = viewState.currentSong ?: SongModel(),
                     onPlayPausePressed = { viewModel.onAction(NowPlayingAction.PlayPressed) },
                     onNextPressed = { viewModel.onAction(NowPlayingAction.NextSongPressed) },

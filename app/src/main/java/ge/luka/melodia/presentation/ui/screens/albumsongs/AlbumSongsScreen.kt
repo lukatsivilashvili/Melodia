@@ -9,15 +9,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -95,11 +93,7 @@ fun AlbumSongsScreenContent(
         viewModel.getAlbumSongs(albumId = albumId)
     }
 
-    val derivedSongsList by remember {
-        derivedStateOf { viewState.songsList }
-    }
-
-    if (derivedSongsList.isNotEmpty()) {
+    if (viewState.songsList.isNotEmpty()) {
         LazyColumn(modifier = modifier.fillMaxSize(), state = rememberLazyListState()) {
             item {
                 InfoBoxView(
@@ -107,14 +101,31 @@ fun AlbumSongsScreenContent(
                     albumTitle = albumTitle,
                     albumArtist = albumArtist,
                     albumArt = decodedArtUri,
-                    albumDuration = albumDuration,)
-                HelperControlButtons()
+                    albumDuration = albumDuration,
+                )
+                HelperControlButtons(onPlayClick = {
+                    viewModel.onAction(
+                        AlbumSongsAction.PlayPressed(
+                            songs = viewState.songsList,
+                        )
+                    )
+                },
+                    onShuffleClick = {
+                        viewModel.onAction(
+                            AlbumSongsAction.ShufflePressed(
+                                songs = viewState.songsList
+                            )
+                        )
+                    })
             }
-            items(derivedSongsList, key = { it.songId ?: 0 }) { songItem ->
+            itemsIndexed(
+                items = viewState.songsList,
+                key = { _, song -> song.songId ?: 0 }) { index, songItem ->
                 GeneralMusicListItem(songItem = songItem, onClick = {
                     viewModel.onAction(
                         AlbumSongsAction.SongPressed(
-                            song = songItem
+                            songs = viewState.songsList,
+                            index = index
                         )
                     )
                 })

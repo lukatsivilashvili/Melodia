@@ -141,7 +141,6 @@ fun MelodiaApp() {
             // Overlay Now Playing screen
             if (true) { // `isNowPlayingVisible` controls visibility
                 NowPlaying(
-                    onExpandNowPlaying = {},
                     bottomPlayerPadding = bottomPlayerPadding
                 )
             }
