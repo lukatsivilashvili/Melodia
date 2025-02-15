@@ -7,6 +7,8 @@ import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,6 +40,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import ge.luka.melodia.common.extensions.getScreenFromRoute
 import ge.luka.melodia.common.mvi.CollectSideEffects
+import ge.luka.melodia.data.MediaStoreLoader
 import ge.luka.melodia.presentation.ui.screens.MelodiaScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -58,7 +61,6 @@ fun SinglePermissionRequest(
         when (effect) {
             is PermissionSideEffect.PermissionGranted -> {
                 viewModel.cacheData()
-                viewModel.createMediaDirectory(context = context)
             }
         }
     }
@@ -78,6 +80,7 @@ fun SinglePermissionRequest(
     )
 }
 
+
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 private fun createPermissionState(
@@ -87,14 +90,26 @@ private fun createPermissionState(
     navHostController: NavHostController,
     onUpdateRoute: (String?) -> Unit
 ): PermissionState {
+
+    val activityLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocumentTree()
+    ) { uri ->
+        if (uri != null) {
+            scope.launch {
+                MediaStoreLoader.setSelectedFolderUri(uri)
+                viewModel.onAction(PermissionAction.PermissionGranted)
+                delay(2500)
+                navHostController.navigate(MelodiaScreen.Library)
+                onUpdateRoute(MelodiaScreen.Library.toString().getScreenFromRoute())
+            }
+        }
+    }
+
     val permissionCallback: (Boolean) -> Unit = { isGranted ->
         if (isGranted) {
             scope.launch {
                 try {
-                    viewModel.onAction(PermissionAction.PermissionGranted)
-                    delay(500)
-                    navHostController.navigate(MelodiaScreen.Library)
-                    onUpdateRoute(MelodiaScreen.Library.toString().getScreenFromRoute())
+                    activityLauncher.launch(null)
                 } catch (e: Exception) {
                     Toast.makeText(
                         context,
@@ -118,6 +133,7 @@ private fun createPermissionState(
         )
     }
 }
+
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable

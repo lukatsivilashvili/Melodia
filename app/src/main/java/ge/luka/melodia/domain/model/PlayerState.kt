@@ -9,19 +9,19 @@ package ge.luka.melodia.domain.model
 data class PlaybackState(
     val playerState: PlayerState,
     val isShuffleOn: Boolean = false,
-    val repeatMode: RepeatMode
+    val repeatMode: RepeatMode = RepeatMode.NO_REPEAT
 ) {
 
     companion object {
         val emptyState = PlaybackState(
             PlayerState.PAUSED,
             false,
-            RepeatMode.REPEAT_ALL
+            RepeatMode.NO_REPEAT
         )
     }
 }
 
 
 enum class PlayerState {
-    PLAYING, PAUSED, BUFFERING
+    PLAYING, PAUSED, BUFFERING, NOT_PLAYING
 }
