@@ -50,6 +50,13 @@ class PlayBackService : MediaSessionService() {
         return PendingIntent.getActivity(this, 1, intent, PendingIntent.FLAG_IMMUTABLE)
     }
 
+    // The user dismissed the app from the recent tasks
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        player.release()
+        mediaSession.release()
+        stopSelf()
+    }
+
     override fun onDestroy() {
         mediaSession.run {
             player.release()
@@ -62,7 +69,6 @@ class PlayBackService : MediaSessionService() {
     }
 
     companion object {
-        const val TAG = "MEDIA_SESSION"
         const val VIEW_MEDIA_SCREEN_ACTION = "MEDIA_SCREEN_ACTION"
     }
 }

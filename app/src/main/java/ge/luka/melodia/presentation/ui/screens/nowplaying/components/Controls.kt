@@ -1,6 +1,5 @@
 package ge.luka.melodia.presentation.ui.screens.nowplaying.components
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
@@ -32,7 +31,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -61,19 +59,19 @@ fun Controls(
 ) {
     var showRemaining by remember { mutableStateOf(false) }
     var sliderValue by remember { mutableFloatStateOf(0f) }
-    var progressMillisValue by remember { mutableLongStateOf(0L) }
     var dragging by remember { mutableStateOf(false) }
 
     // Keep track of the latest progress provider result
     val currentProgress by rememberUpdatedState(songProgressProvider())
     val currentProgressMillis by rememberUpdatedState(songProgressMillisProvider())
 
-    // Coroutine to update slider progress in real-time
-    LaunchedEffect(playerState) {
-        while (playerState == PlayerState.PLAYING && !dragging) {
-            sliderValue = currentProgress
-            progressMillisValue = currentProgressMillis
-            delay(500) // Update every 500ms (adjust if needed)
+    // Add songModel and playerState as keys to restart the effect
+    LaunchedEffect(songModel, playerState) {
+        while (true) {
+            if (playerState == PlayerState.PLAYING || !dragging) {
+                sliderValue = currentProgress
+            }
+            delay(500) // Update every 500ms
         }
     }
 
@@ -165,21 +163,19 @@ fun Controls(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            AnimatedVisibility(visible = true) {
-                FilledIconButton(
-                    onClick = { onPreviousPressed.invoke() },
-                    modifier = Modifier.size(80.dp),
-                    colors = IconButtonDefaults.filledIconButtonColors(
-                        contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                    ),
-                ) {
-                    Icon(
-                        Icons.Outlined.SkipPrevious,
-                        null,
-                        modifier = Modifier.fillMaxSize(.5f),
-                    )
-                }
+            FilledIconButton(
+                onClick = { onPreviousPressed.invoke() },
+                modifier = Modifier.size(80.dp),
+                colors = IconButtonDefaults.filledIconButtonColors(
+                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                ),
+            ) {
+                Icon(
+                    Icons.Outlined.SkipPrevious,
+                    null,
+                    modifier = Modifier.fillMaxSize(.5f),
+                )
             }
             FilledIconButton(
                 onClick = { onPlayPausePressed.invoke() },
@@ -194,7 +190,7 @@ fun Controls(
                 ),
             ) {
                 Icon(
-                    if (playerState == PlayerState.PAUSED) {
+                    if (playerState != PlayerState.PLAYING) {
                         Icons.Default.PlayArrow
                     } else {
                         Icons.Default.Pause
@@ -203,21 +199,24 @@ fun Controls(
                     modifier = Modifier.size(40.dp),
                 )
             }
-            AnimatedVisibility(visible = true) {
-                FilledIconButton(
-                    onClick = { onNextPressed.invoke() },
-                    modifier = Modifier.size(80.dp),
-                    colors = IconButtonDefaults.filledIconButtonColors(
-                        contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                    ),
-                ) {
-                    Icon(
-                        Icons.Outlined.SkipNext,
-                        null,
-                        modifier = Modifier.fillMaxSize(.5f),
-                    )
-                }
+            FilledIconButton(
+                onClick = {
+                    onNextPressed.invoke()
+                    if (playerState != PlayerState.PLAYING) {
+                        onPlayPausePressed.invoke()  // Auto-resume playback when next is pressed while paused
+                    }
+                },
+                modifier = Modifier.size(80.dp),
+                colors = IconButtonDefaults.filledIconButtonColors(
+                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                ),
+            ) {
+                Icon(
+                    Icons.Outlined.SkipNext,
+                    null,
+                    modifier = Modifier.fillMaxSize(.5f),
+                )
             }
         }
     }

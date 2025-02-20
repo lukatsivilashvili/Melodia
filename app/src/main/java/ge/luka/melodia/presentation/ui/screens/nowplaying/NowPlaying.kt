@@ -1,8 +1,11 @@
 package ge.luka.melodia.presentation.ui.screens.nowplaying
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.exponentialDecay
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.AnchoredDraggableState
@@ -41,6 +44,7 @@ import ge.luka.melodia.presentation.ui.components.bottomplayer.BarState
 import ge.luka.melodia.presentation.ui.components.bottomplayer.BottomPlayer
 import ge.luka.melodia.presentation.ui.screens.nowplaying.components.NowPlayingScreen
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 
 @SuppressLint("RememberReturnType")
@@ -49,6 +53,7 @@ import kotlinx.coroutines.launch
 fun NowPlaying(
     modifier: Modifier = Modifier,
     viewModel: NowPlayingVM = hiltViewModel(),
+    onShowBottomPlayer: @Composable () -> Unit,
     bottomPlayerPadding: PaddingValues
 ) {
 
@@ -104,78 +109,91 @@ fun NowPlaying(
         }
 
         SideEffect { bottomPlayerDragState.updateAnchors(anchors) }
-        Box(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-        ) {
-            Box(
-                modifier = Modifier
-                    .offset {
-                        IntOffset(
-                            x = 0,
-                            y = (bottomPlayerDragState.requireOffset() + screenHeightPx - bottomPlayerHeightPx).toInt()
-                        )
-                    }
-                    .graphicsLayer { alpha = alphaNowPlaying.coerceIn(0.0f, 1.0f) }
-            ) {
-                NowPlayingScreen(
-                    modifier = Modifier
-                        .anchoredDraggable(
-                            state = bottomPlayerDragState,
-                            orientation = Orientation.Vertical
-                        ),
-                    songModel = viewState.currentSong ?: SongModel(),
-                    onPlayPausePressed = { viewModel.onAction(NowPlayingAction.PlayPressed) },
-                    onNextPressed = { viewModel.onAction(NowPlayingAction.NextSongPressed) },
-                    onPreviousPressed = { viewModel.onAction(NowPlayingAction.PreviousSongPressed) },
-                    onProgressBarDragged = {
-                        viewModel.onAction(
-                            NowPlayingAction.ProgressBarDragged(
-                                it
-                            )
-                        )
-                    },
-                    playerState = viewState.currentPlayBackState,
-                    songProgressProvider = viewModel::currentSongProgress,
-                    songProgressMillisProvider = viewModel::currentSongProgressMillis
-                )
-            }
 
-            // BottomPlayer
+        AnimatedVisibility(
+            visible = viewState.shouldShowBottomPlayer,
+            enter = slideInVertically(
+                tween(600),
+                initialOffsetY = { bottomPlayerHeightPx.roundToInt() * 2 }),
+            exit = slideOutVertically(
+                tween(600),
+                targetOffsetY = { -bottomPlayerHeightPx.roundToInt() })
+        ) {
+            onShowBottomPlayer.invoke()
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(Utils.calculateBottomBarHeight())
                     .align(Alignment.BottomCenter)
-                    .offset {
-                        IntOffset(
-                            x = 0,
-                            y = bottomPlayerDragState
-                                .requireOffset()
-                                .toInt()
-                        )
-                    }
-                    .graphicsLayer { alpha = alphaBottomPlayer },
             ) {
-                BottomPlayer(
+                Box(
+                    modifier = Modifier
+                        .offset {
+                            IntOffset(
+                                x = 0,
+                                y = (bottomPlayerDragState.requireOffset() + screenHeightPx - bottomPlayerHeightPx).toInt()
+                            )
+                        }
+                        .graphicsLayer { alpha = alphaNowPlaying.coerceIn(0.0f, 1.0f) }
+                ) {
+                    NowPlayingScreen(
+                        modifier = Modifier
+                            .anchoredDraggable(
+                                state = bottomPlayerDragState,
+                                orientation = Orientation.Vertical
+                            ),
+                        songModel = viewState.currentSong ?: SongModel(),
+                        onPlayPausePressed = { viewModel.onAction(NowPlayingAction.PlayPressed) },
+                        onNextPressed = { viewModel.onAction(NowPlayingAction.NextSongPressed) },
+                        onPreviousPressed = { viewModel.onAction(NowPlayingAction.PreviousSongPressed) },
+                        onProgressBarDragged = {
+                            viewModel.onAction(
+                                NowPlayingAction.ProgressBarDragged(
+                                    it
+                                )
+                            )
+                        },
+                        playerState = viewState.currentPlayBackState,
+                        songProgressProvider = viewModel::currentSongProgress,
+                        songProgressMillisProvider = viewModel::currentSongProgressMillis
+                    )
+                }
+
+                // BottomPlayer
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(Utils.calculateBottomBarHeight())
-                        .clickable { expandBottomPlayer() }
-                        .anchoredDraggable(
-                            state = bottomPlayerDragState,
-                            orientation = Orientation.Vertical
-                        ),
-                    songProgressProvider =  viewModel::currentSongProgress,
-                    statusBarHeight = statusBarHeight,
-                    songModel = viewState.currentSong ?: SongModel(),
-                    onPlayPausePressed = { viewModel.onAction(NowPlayingAction.PlayPressed) },
-                    onNextPressed = { viewModel.onAction(NowPlayingAction.NextSongPressed) },
-                    onPreviousPressed = { viewModel.onAction(NowPlayingAction.PreviousSongPressed) },
-                    playerState = viewState.currentPlayBackState,
-                )
+                        .align(Alignment.BottomCenter)
+                        .offset {
+                            IntOffset(
+                                x = 0,
+                                y = bottomPlayerDragState
+                                    .requireOffset()
+                                    .toInt()
+                            )
+                        }
+                        .graphicsLayer { alpha = alphaBottomPlayer },
+                ) {
+                    BottomPlayer(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(Utils.calculateBottomBarHeight())
+                            .clickable { expandBottomPlayer() }
+                            .anchoredDraggable(
+                                state = bottomPlayerDragState,
+                                orientation = Orientation.Vertical
+                            ),
+                        songProgressProvider = viewModel::currentSongProgress,
+                        statusBarHeight = statusBarHeight,
+                        songModel = viewState.currentSong ?: SongModel(),
+                        onPlayPausePressed = { viewModel.onAction(NowPlayingAction.PlayPressed) },
+                        onNextPressed = { viewModel.onAction(NowPlayingAction.NextSongPressed) },
+                        onPreviousPressed = { viewModel.onAction(NowPlayingAction.PreviousSongPressed) },
+                        playerState = viewState.currentPlayBackState,
+                    )
+                }
             }
         }
+
     }
 }
 

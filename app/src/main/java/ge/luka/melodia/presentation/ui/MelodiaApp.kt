@@ -9,6 +9,7 @@ import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -49,8 +50,8 @@ fun MelodiaApp() {
     val navController = rememberNavController()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     var currentRoute by remember { mutableStateOf<String?>(null) }
-    var bottomPlayerPadding by remember { mutableStateOf(androidx.compose.foundation.layout.PaddingValues()) }
-
+    var bottomPlayerPadding by remember { mutableStateOf(PaddingValues()) }
+    var mainContentInnerPadding by remember { mutableStateOf(PaddingValues()) }
 
 
     // Callback function to update currentRoute
@@ -130,20 +131,20 @@ fun MelodiaApp() {
                 },
                 content = { innerPadding ->
                     bottomPlayerPadding = innerPadding.copy(top = 0.dp, bottom = 0.dp)
+                    mainContentInnerPadding = innerPadding
                     MainContent(
-                        innerPadding = innerPadding.copy(bottom = Utils.calculateBottomBarHeight()),
+                        innerPadding = mainContentInnerPadding,
                         navController = navController,
                         updateCurrentRoute = ::updateCurrentRoute,
                     )
                 }
             )
-
-            // Overlay Now Playing screen
-            if (true) { // `isNowPlayingVisible` controls visibility
-                NowPlaying(
-                    bottomPlayerPadding = bottomPlayerPadding
-                )
-            }
+            NowPlaying(
+                bottomPlayerPadding = bottomPlayerPadding,
+                onShowBottomPlayer = {
+                    mainContentInnerPadding.copy(bottom = Utils.calculateBottomBarHeight())
+                }
+            )
         }
     }
 }

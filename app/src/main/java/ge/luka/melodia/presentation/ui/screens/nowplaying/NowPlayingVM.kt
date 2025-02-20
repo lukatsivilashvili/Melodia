@@ -3,6 +3,9 @@ package ge.luka.melodia.presentation.ui.screens.nowplaying
 import BaseMviViewmodel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import ge.luka.melodia.domain.model.MediaPlayerState
+import ge.luka.melodia.domain.model.PlaybackState
+import ge.luka.melodia.domain.model.PlayerState
 import ge.luka.melodia.media3.PlayBackManager
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
@@ -22,9 +25,20 @@ class NowPlayingVM @Inject constructor(
                 val song = mediaPlayerState.currentPlayingSong
                     ?: return@map null
                 updateUiState {
-                    copy(currentSong = song, currentPlayBackState = mediaPlayerState.playbackState.playerState)
+                    copy(
+                        currentSong = song,
+                        currentPlayBackState = mediaPlayerState.playbackState.playerState,
+                        shouldShowBottomPlayer = mediaPlayerState.playbackState.playerState != PlayerState.NOT_PLAYING
+                    )
                 }
-            }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
+            }.stateIn(
+                viewModelScope,
+                SharingStarted.Eagerly,
+                MediaPlayerState(
+                    null,
+                    PlaybackState(playerState = PlayerState.NOT_PLAYING)
+                )
+            )
     }
 
     override fun onAction(uiAction: NowPlayingAction) {
@@ -32,6 +46,7 @@ class NowPlayingVM @Inject constructor(
             NowPlayingAction.PlayPressed -> {
                 playBackManager.togglePlayback()
             }
+
             NowPlayingAction.NextSongPressed -> playBackManager.playNextSong()
             NowPlayingAction.PreviousSongPressed -> playBackManager.playPreviousSong()
             NowPlayingAction.ShufflePressed -> {}

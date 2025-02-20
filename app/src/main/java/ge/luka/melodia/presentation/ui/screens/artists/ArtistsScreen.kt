@@ -10,9 +10,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -69,13 +67,9 @@ fun ArtistsScreenContent(
         }
     }
 
-    val derivedArtistsList by remember {
-        derivedStateOf { viewState.artistsList }
-    }
-
-    if (derivedArtistsList.isNotEmpty()) {
+    if (viewState.artistsList.isNotEmpty()) {
         LazyColumn(modifier = modifier.fillMaxSize(), state = rememberLazyListState()) {
-            items(items = derivedArtistsList, key = { it.title ?: 0 }) { artistItem ->
+            items(items = viewState.artistsList, key = { it.title ?: 0 }) { artistItem ->
                 GeneralArtistListItem(modifier = modifier.clickable {
                     viewModel.onAction(
                         ArtistsAction.OnArtistClicked(
