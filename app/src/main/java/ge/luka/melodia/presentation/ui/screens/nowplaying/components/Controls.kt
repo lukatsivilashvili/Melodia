@@ -1,6 +1,5 @@
 package ge.luka.melodia.presentation.ui.screens.nowplaying.components
 
-import android.util.Log.d
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
@@ -66,18 +65,17 @@ fun Controls(
     val currentProgress by rememberUpdatedState(songProgressProvider())
     val currentProgressMillis by rememberUpdatedState(songProgressMillisProvider())
 
-    // Coroutine to update slider progress in real-time
-    LaunchedEffect(Unit) {
-        while (playerState == PlayerState.PLAYING && !dragging) {
-            sliderValue = currentProgress
-            delay(500) // Update every 500ms (adjust if needed)
+    // Add songModel and playerState as keys to restart the effect
+    LaunchedEffect(songModel, playerState) {
+        while (true) {
+            if (playerState == PlayerState.PLAYING || !dragging) {
+                sliderValue = currentProgress
+            }
+            delay(500) // Update every 500ms
         }
     }
 
     val sliderProgress = if (dragging) sliderValue else currentProgress
-
-    d("Controls", "sliderProgress: $sliderProgress")
-    d("Controls", "currentProgressMillis: $currentProgressMillis")
 
     Column(modifier.padding(start = 30.dp, end = 30.dp, bottom = 30.dp)) {
         Text(
@@ -202,7 +200,12 @@ fun Controls(
                 )
             }
             FilledIconButton(
-                onClick = { onNextPressed.invoke() },
+                onClick = {
+                    onNextPressed.invoke()
+                    if (playerState != PlayerState.PLAYING) {
+                        onPlayPausePressed.invoke()  // Auto-resume playback when next is pressed while paused
+                    }
+                },
                 modifier = Modifier.size(80.dp),
                 colors = IconButtonDefaults.filledIconButtonColors(
                     contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
