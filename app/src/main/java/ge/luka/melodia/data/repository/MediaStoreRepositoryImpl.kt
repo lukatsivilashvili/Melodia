@@ -55,9 +55,9 @@ class MediaStoreRepositoryImpl @Inject constructor(
             .flowOn(Dispatchers.IO)
     }
 
-    override suspend fun cacheAllSongs() {
-        val songs = mediaStoreLoader.getSongsList(context).map { it.toEntity() }
-        songsDao.insertAllSongs(songs)
+    override suspend fun cacheAllSongs(songModel: SongModel) {
+        val song = songModel.toEntity()
+        songsDao.insertSingleSong(song)
     }
 
     override suspend fun cacheAllAlbums() {

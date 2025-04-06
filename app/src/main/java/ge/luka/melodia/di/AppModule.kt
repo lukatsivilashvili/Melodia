@@ -21,5 +21,5 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideMusicDatabase() = MediaStoreLoader
+    fun provideMusicDatabase() = MediaStoreLoader()
 }
