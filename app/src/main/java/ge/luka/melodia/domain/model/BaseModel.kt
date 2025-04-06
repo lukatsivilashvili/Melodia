@@ -1,5 +1,8 @@
 package ge.luka.melodia.domain.model
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 interface BaseModel {
     val songId: Long?
     val albumId: Long?

@@ -4,7 +4,9 @@ import android.content.ContentUris
 import android.database.Cursor
 import android.net.Uri
 import android.provider.MediaStore
+import androidx.compose.runtime.Immutable
 
+@Immutable
 data class SongModel(
     override val songId: Long? = null,
     override val albumId: Long? = null,

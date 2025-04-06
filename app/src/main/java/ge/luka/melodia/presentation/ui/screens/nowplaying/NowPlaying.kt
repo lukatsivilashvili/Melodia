@@ -26,8 +26,10 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
@@ -58,23 +60,33 @@ fun NowPlaying(
 ) {
 
     val viewState by viewModel.uiState.collectAsStateWithLifecycle()
+    var invoked by remember { mutableStateOf(false) } // Track invocation
 
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+
+    val density = LocalDensity.current
+    val bottomPlayerHeightPx = with(density) { BOTTOM_PLAYER_HEIGHT.toPx() }
+    val expandedOffset = with(density) { screenHeight.toPx() - bottomPlayerHeightPx }
+    val screenHeightPx = with(density) { screenHeight.toPx() }
+
+    val insets = WindowInsets.systemBars.asPaddingValues()
+    val statusBarHeight = insets.calculateTopPadding()
+
+    if (viewState.shouldShowBottomPlayer) {
+        if (!invoked) {
+            onShowBottomPlayer.invoke()
+            invoked = true
+        }
+    } else {
+        invoked = false // Reset when bottom player is hidden
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(bottomPlayerPadding),
         contentAlignment = Alignment.BottomCenter
     ) {
-        val configuration = LocalConfiguration.current
-
-        val screenHeight = configuration.screenHeightDp.dp
-        val density = LocalDensity.current
-        val bottomPlayerHeightPx = with(density) { BOTTOM_PLAYER_HEIGHT.toPx() }
-        val expandedOffset = with(density) { screenHeight.toPx() - bottomPlayerHeightPx }
-        val screenHeightPx = with(density) { screenHeight.toPx() }
-
-        val insets = WindowInsets.systemBars.asPaddingValues()
-        val statusBarHeight = insets.calculateTopPadding()
 
         // Anchored draggable state
         val bottomPlayerDragState = remember {
@@ -98,7 +110,7 @@ fun NowPlaying(
 
         val offsetBottomPlayer = -(bottomPlayerDragState.offset)
         val alphaBottomPlayer = 1f - offsetBottomPlayer / (screenHeight.value)
-        val alphaNowPlaying = 0f + offsetBottomPlayer / (screenHeight.value * 3.0f)
+        val alphaNowPlaying = 0f + offsetBottomPlayer / (screenHeight.value * 1.5f)
 
         val coroutineScope = rememberCoroutineScope()
 
@@ -119,7 +131,6 @@ fun NowPlaying(
                 tween(600),
                 targetOffsetY = { -bottomPlayerHeightPx.roundToInt() })
         ) {
-            onShowBottomPlayer.invoke()
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)

@@ -44,20 +44,18 @@ import ge.luka.melodia.presentation.ui.screens.nowplaying.NowPlaying
 import ge.luka.melodia.presentation.ui.theme.MelodiaThemeWithViewModel
 
 @SuppressLint("RememberReturnType")
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MelodiaApp() {
     val navController = rememberNavController()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     var currentRoute by remember { mutableStateOf<String?>(null) }
     var bottomPlayerPadding by remember { mutableStateOf(PaddingValues()) }
-    var mainContentInnerPadding by remember { mutableStateOf(PaddingValues()) }
-
+    var isBottomPlayerVisible by remember { mutableStateOf(false) }
 
     // Callback function to update currentRoute
     fun updateCurrentRoute(route: String?) {
         currentRoute = route
-
         scrollBehavior.state.heightOffset = 0f
         scrollBehavior.state.contentOffset = 0f
     }
@@ -131,19 +129,22 @@ fun MelodiaApp() {
                 },
                 content = { innerPadding ->
                     bottomPlayerPadding = innerPadding.copy(top = 0.dp, bottom = 0.dp)
-                    mainContentInnerPadding = innerPadding
                     MainContent(
-                        innerPadding = mainContentInnerPadding,
+                        innerPadding = if (isBottomPlayerVisible) {
+                            innerPadding.copy(bottom = Utils.calculateBottomBarHeight())
+                        } else {
+                            innerPadding
+                        },
                         navController = navController,
                         updateCurrentRoute = ::updateCurrentRoute,
                     )
                 }
             )
             NowPlaying(
-                bottomPlayerPadding = bottomPlayerPadding,
                 onShowBottomPlayer = {
-                    mainContentInnerPadding.copy(bottom = Utils.calculateBottomBarHeight())
-                }
+                    isBottomPlayerVisible = true
+                },
+                bottomPlayerPadding = bottomPlayerPadding
             )
         }
     }

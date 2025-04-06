@@ -46,7 +46,6 @@ fun SongsScreenContent(
     modifier: Modifier,
     viewModel: SongsScreenVM = hiltViewModel(),
 ) {
-
     val viewState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
@@ -92,29 +91,21 @@ fun SongsScreenContent(
         )
     }
 
-    if (viewState.songsList.isNotEmpty()) {
+    val songsList = viewState.songsList
+
+    if (songsList.isNotEmpty()) {
         LazyColumn(modifier = modifier.fillMaxSize(), state = rememberLazyListState()) {
             item {
                 HelperControlButtons(
-                    onPlayClick = { viewModel.onAction(SongsAction.PlayPressed(viewState.songsList)) },
-                    onShuffleClick = { viewModel.onAction(SongsAction.ShufflePressed(viewState.songsList)) })
+                    onPlayClick = { viewModel.onAction(SongsAction.PlayPressed(songsList)) },
+                    onShuffleClick = { viewModel.onAction(SongsAction.ShufflePressed(songsList)) }
+                )
             }
-            itemsIndexed(items = viewState.songsList, key = { _, song -> song.songId ?: 0 }) { index, songItem ->
+            itemsIndexed(items = songsList, key = { _, song -> song.songId ?: 0 }) { index, songItem ->
                 GeneralMusicListItem(
                     songItem = songItem,
-                    onClick = {
-                        viewModel.onAction(
-                            SongsAction.SongPressed(
-                                songs = viewState.songsList,
-                                index = index
-                            )
-                        )
-                    },
-                    onLongClick = {
-                        viewModel.onAction(
-                            SongsAction.SongLongPressed(song = songItem)
-                        )
-                    }
+                    onClick = { viewModel.onAction(SongsAction.SongPressed(songs = songsList, index = index)) },
+                    onLongClick = { viewModel.onAction(SongsAction.SongLongPressed(song = songItem)) }
                 )
             }
         }

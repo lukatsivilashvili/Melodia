@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -59,6 +60,7 @@ fun GeneralMusicListItem(
         )
         {
             AsyncImage(
+                contentScale = ContentScale.Crop,
                 placeholder = painterResource(id = R.drawable.ic_songs),
                 error = painterResource(id = R.drawable.ic_songs),
                 fallback = painterResource(id = R.drawable.ic_songs),

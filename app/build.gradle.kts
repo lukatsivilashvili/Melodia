@@ -50,10 +50,6 @@ android {
                 "proguard-rules.pro" // Your custom rules
             )
 
-            // Configure advanced optimizations (if safe for your app)
-            buildConfigField("boolean", "ENABLE_LOGGING", "false") // Turn off logging in release builds
-            renderscriptOptimLevel = 3 // Optimize RenderScript performance
-
             // Remove unused code and resources
             isCrunchPngs = true // Compress PNGs during the build
         }
@@ -103,6 +99,7 @@ dependencies {
 
     implementation(libs.androidx.material3)
     implementation(libs.androidx.media3.session)
+    implementation(libs.androidx.ui.tooling.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

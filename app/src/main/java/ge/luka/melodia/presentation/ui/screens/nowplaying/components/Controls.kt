@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Pause
@@ -41,6 +42,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ge.luka.melodia.common.extensions.formatDuration
+import ge.luka.melodia.common.utils.WindowType
+import ge.luka.melodia.common.utils.rememberWindowSize
 import ge.luka.melodia.domain.model.PlayerState
 import ge.luka.melodia.domain.model.SongModel
 import kotlinx.coroutines.delay
@@ -57,7 +60,9 @@ fun Controls(
     onNextPressed: () -> Unit,
     onProgressBarDragged: (Float) -> Unit
 ) {
-    var showRemaining by remember { mutableStateOf(false) }
+    var playButtonSize by remember { mutableStateOf(0.dp) }
+    var skipButtonSize by remember { mutableStateOf(0.dp) }
+
     var sliderValue by remember { mutableFloatStateOf(0f) }
     var dragging by remember { mutableStateOf(false) }
 
@@ -76,6 +81,25 @@ fun Controls(
     }
 
     val sliderProgress = if (dragging) sliderValue else currentProgress
+
+    val windowSize = rememberWindowSize()
+
+    when (windowSize.height) {
+        WindowType.Compact -> {
+            playButtonSize = 60.dp
+            skipButtonSize = 50.dp
+        }
+
+        WindowType.Medium -> {
+            playButtonSize = 60.dp
+            skipButtonSize = 50.dp
+        }
+
+        WindowType.Expanded -> {
+            playButtonSize = 100.dp
+            skipButtonSize = 80.dp
+        }
+    }
 
     Column(modifier.padding(start = 30.dp, end = 30.dp, bottom = 30.dp)) {
         Text(
@@ -160,12 +184,12 @@ fun Controls(
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             FilledIconButton(
                 onClick = { onPreviousPressed.invoke() },
-                modifier = Modifier.size(80.dp),
+                modifier = Modifier.size(skipButtonSize),
                 colors = IconButtonDefaults.filledIconButtonColors(
                     contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
                     containerColor = MaterialTheme.colorScheme.tertiaryContainer,
@@ -174,15 +198,17 @@ fun Controls(
                 Icon(
                     Icons.Outlined.SkipPrevious,
                     null,
-                    modifier = Modifier.fillMaxSize(.5f),
+                    modifier = Modifier.fillMaxSize(0.5f)
                 )
             }
+
+            Spacer(modifier = Modifier.width(24.dp))  // Adds space between buttons
+
             FilledIconButton(
                 onClick = { onPlayPausePressed.invoke() },
                 modifier = Modifier
-                    .height(100.dp)
-                    .fillMaxWidth()
-                    .weight(1f),
+                    .height(playButtonSize)
+                    .width(playButtonSize),
                 shape = CircleShape,
                 colors = IconButtonDefaults.iconButtonColors(
                     contentColor = MaterialTheme.colorScheme.primaryContainer,
@@ -196,17 +222,20 @@ fun Controls(
                         Icons.Default.Pause
                     },
                     null,
-                    modifier = Modifier.size(40.dp),
+                    modifier = Modifier.size(32.dp),  // Properly sized icon inside the button
                 )
             }
+
+            Spacer(modifier = Modifier.width(24.dp))  // Adds space between buttons
+
             FilledIconButton(
                 onClick = {
                     onNextPressed.invoke()
                     if (playerState != PlayerState.PLAYING) {
-                        onPlayPausePressed.invoke()  // Auto-resume playback when next is pressed while paused
+                        onPlayPausePressed.invoke()
                     }
                 },
-                modifier = Modifier.size(80.dp),
+                modifier = Modifier.size(skipButtonSize),
                 colors = IconButtonDefaults.filledIconButtonColors(
                     contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
                     containerColor = MaterialTheme.colorScheme.tertiaryContainer,
@@ -215,7 +244,7 @@ fun Controls(
                 Icon(
                     Icons.Outlined.SkipNext,
                     null,
-                    modifier = Modifier.fillMaxSize(.5f),
+                    modifier = Modifier.fillMaxSize(0.5f)
                 )
             }
         }

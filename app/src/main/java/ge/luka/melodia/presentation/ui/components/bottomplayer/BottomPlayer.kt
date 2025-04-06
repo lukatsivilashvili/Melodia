@@ -62,13 +62,12 @@ fun BottomPlayer(
             Row(
                 modifier = modifier
                     .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
-                    .background(MaterialTheme.colorScheme.surfaceContainer)
-                    .padding(bottom = statusBarHeight), // Add bottom padding to shift content up
+                    .background(MaterialTheme.colorScheme.surfaceContainer),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 CrossFadingAlbumArt(
                     modifier = Modifier
-                        .fillMaxHeight()
+                        .fillMaxHeight(fraction = 0.7f)
                         .padding(8.dp)
                         .aspectRatio(1.0f)
                         .clip(CircleShape),

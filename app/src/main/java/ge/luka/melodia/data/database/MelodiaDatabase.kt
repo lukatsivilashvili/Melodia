@@ -11,7 +11,7 @@ import ge.luka.melodia.data.database.model.SongModelEntity
 
 @Database(
     entities = [SongModelEntity::class, AlbumModelEntity::class, ArtistModelEntity::class],
-    version = 2
+    version = 3
 )
 abstract class MelodiaDatabase: RoomDatabase() {
 

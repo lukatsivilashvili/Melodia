@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
 import android.provider.MediaStore.Audio.Media
+import android.util.Log.d
 import ge.luka.melodia.common.extensions.formatAlbumDuration
 import ge.luka.melodia.domain.model.AlbumModel
 import ge.luka.melodia.domain.model.ArtistModel
@@ -84,6 +85,18 @@ object MediaStoreLoader {
 
                 }
             }
+        }
+        val duplicates = songs.groupingBy { it.title }
+            .eachCount()
+            .filter { it.value > 1 }
+            .keys
+            .toList()
+
+        if (duplicates.isNotEmpty()) {
+            d("dupes","Duplicate songs found:")
+            songs.filter { it.title in duplicates }.forEach { println("  - ${it.title} by ${it.artist}") }
+        } else {
+            d("dupes","No duplicate songs found.")
         }
         return songs
     }
