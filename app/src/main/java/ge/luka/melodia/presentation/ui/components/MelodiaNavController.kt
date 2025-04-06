@@ -117,7 +117,7 @@ fun MelodiaNavController(
         composable<MelodiaScreen.Permission> {
             SinglePermissionRequest(
                 navHostController = navController,
-                onUpdateRoute = onUpdateRoute
+                onUpdateRoute = onUpdateRoute,
             )
         }
     }

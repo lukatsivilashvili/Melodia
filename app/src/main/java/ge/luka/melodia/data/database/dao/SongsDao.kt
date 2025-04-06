@@ -12,6 +12,9 @@ interface SongsDao {
     @Upsert
     suspend fun insertAllSongs(songs: List<SongModelEntity>)
 
+    @Upsert
+    suspend fun insertSingleSong(songs: SongModelEntity)
+
     @Query("""
     UPDATE allSongs SET 
         title = :title,

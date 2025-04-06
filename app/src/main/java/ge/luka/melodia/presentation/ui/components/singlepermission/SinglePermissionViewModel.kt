@@ -2,31 +2,40 @@ package ge.luka.melodia.presentation.ui.components.singlepermission
 
 import BaseMviViewmodel
 import android.content.Context
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import ge.luka.melodia.common.utils.FileHelper
+import ge.luka.melodia.data.MediaStoreLoader
 import ge.luka.melodia.domain.repository.MediaStoreRepository
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SinglePermissionViewModel @Inject constructor(
-    private val mediaStoreRepository: MediaStoreRepository
+    private val mediaStoreRepository: MediaStoreRepository,
+    private val mediaStoreLoader: MediaStoreLoader,
 ) : BaseMviViewmodel<PermissionViewState, PermissionAction, PermissionSideEffect>(
-    initialUiState = PermissionViewState()
+    initialUiState = PermissionViewState(scanningState = emptyList(), scanningFinished = false)
 ) {
 
     override fun onAction(uiAction: PermissionAction) {
         when (uiAction) {
-            is PermissionAction.PermissionGranted -> emitSideEffect(PermissionSideEffect.PermissionGranted)
+            is PermissionAction.PermissionGranted -> emitSideEffect(
+                PermissionSideEffect.PermissionGranted(
+                    uiAction.folderUri
+                )
+            )
         }
     }
 
-    suspend fun cacheData() {
-        mediaStoreRepository.cacheAllSongs()
-        mediaStoreRepository.cacheAllAlbums()
-        mediaStoreRepository.cacheAllArtists()
-    }
-
-    fun createMediaDirectory(context: Context) {
-        FileHelper.createAppDirectory(context = context, folderName = "MelodiaMusic")
+    fun startScan(context: Context, folderUri: String?) {
+        viewModelScope.launch {
+            mediaStoreLoader.scanSongsList(context, folderUri).collect { song ->
+                mediaStoreRepository.cacheAllSongs(song)
+                updateUiState { copy(scanningState = scanningState + song) }
+            }
+            mediaStoreRepository.cacheAllAlbums()
+            mediaStoreRepository.cacheAllArtists()
+            updateUiState { copy(scanningFinished = true) }
+        }
     }
 }
