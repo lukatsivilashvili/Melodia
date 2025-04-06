@@ -91,8 +91,8 @@ fun Controls(
         }
 
         WindowType.Medium -> {
-            playButtonSize = 100.dp
-            skipButtonSize = 80.dp
+            playButtonSize = 60.dp
+            skipButtonSize = 50.dp
         }
 
         WindowType.Expanded -> {

@@ -115,11 +115,13 @@ fun AlbumsScreenContent(
         }
     }
 
-    if (viewState.albumsList.isNotEmpty()) {
+    val albumsList = viewState.albumsList
+
+    if (albumsList.isNotEmpty()) {
         LazyVerticalGrid(
             modifier = modifier.fillMaxSize(), columns = GridCells.Fixed(2)
         ) {
-            items(viewState.albumsList, key = { it.albumId ?: 0 }) { albumItem ->
+            items(albumsList, key = { it.albumId ?: 0 }) { albumItem ->
                 GeneralAlbumListItem(albumItem = albumItem, onClick = {
                     viewModel.onAction(
                         AlbumsAction.AlbumItemPressed(

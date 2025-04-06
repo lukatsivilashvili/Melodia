@@ -98,7 +98,7 @@ private fun createPermissionState(
             scope.launch {
                 MediaStoreLoader.setSelectedFolderUri(uri)
                 viewModel.onAction(PermissionAction.PermissionGranted)
-                delay(2500)
+                delay(5000)
                 navHostController.navigate(MelodiaScreen.Library)
                 onUpdateRoute(MelodiaScreen.Library.toString().getScreenFromRoute())
             }

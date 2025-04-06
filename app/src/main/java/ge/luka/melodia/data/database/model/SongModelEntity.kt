@@ -5,8 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "allSongs")
 data class SongModelEntity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    @PrimaryKey(autoGenerate = false)
     val songId: Long? = null,
     val albumId: Long? = null,
     val artistId: Long? = null,

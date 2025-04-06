@@ -2,9 +2,11 @@ package ge.luka.melodia.domain.model
 
 import android.database.Cursor
 import android.net.Uri
+import androidx.compose.runtime.Immutable
 import kotlinx.serialization.Serializable
 
 @Serializable
+@Immutable
 data class AlbumModel(
     override val songId: Long? = null,
     override val albumId: Long? = null,

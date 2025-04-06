@@ -24,7 +24,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ge.luka.melodia.common.utils.WindowType
@@ -77,13 +76,12 @@ private fun NowPlayingContent(
     onNextPressed: () -> Unit,
     onProgressBarDragged: (Float) -> Unit
 ) {
-    val navBarHeight = with(LocalDensity.current) { WindowInsets.systemBars.getBottom(this).toDp() }
     val insets = WindowInsets.systemBars.asPaddingValues()
     val statusBarHeight = insets.calculateTopPadding()
 
     val containerModifier =
         Modifier
-            .padding(bottom = navBarHeight + statusBarHeight)
+            .padding(bottom = statusBarHeight/2)
             .fillMaxSize()
             .background(
                 MaterialTheme.colorScheme.surfaceContainer,
@@ -127,7 +125,7 @@ private fun AlbumArtSection(
         }
 
         WindowType.Medium -> {
-            48.dp
+            80.dp
         }
 
         WindowType.Expanded -> {
@@ -174,7 +172,7 @@ private fun AlbumArtSection(
     }
 }
 
-@Preview
+@Preview(showSystemUi = true)
 @Composable
 fun NowPlayingScreenPreview() {
     MelodiaTheme {

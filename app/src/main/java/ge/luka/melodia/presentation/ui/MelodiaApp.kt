@@ -44,7 +44,7 @@ import ge.luka.melodia.presentation.ui.screens.nowplaying.NowPlaying
 import ge.luka.melodia.presentation.ui.theme.MelodiaThemeWithViewModel
 
 @SuppressLint("RememberReturnType")
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MelodiaApp() {
     val navController = rememberNavController()
