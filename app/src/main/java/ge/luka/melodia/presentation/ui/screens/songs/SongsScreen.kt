@@ -1,23 +1,22 @@
 package ge.luka.melodia.presentation.ui.screens.songs
 
 import android.widget.Toast
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
 import ge.luka.melodia.common.mvi.CollectSideEffects
 import ge.luka.melodia.presentation.ui.components.shared.GeneralMusicListItem
 import ge.luka.melodia.presentation.ui.components.shared.HelperControlButtons
@@ -27,16 +26,7 @@ import ge.luka.melodia.presentation.ui.theme.themecomponents.MelodiaTypography
 @Composable
 fun SongsScreen(
     modifier: Modifier = Modifier,
-    navHostController: NavHostController,
-    onUpdateRoute: (String?) -> Unit
 ) {
-    LaunchedEffect(Unit) {
-        onUpdateRoute.invoke("Songs")
-    }
-
-    BackHandler {
-        navHostController.popBackStack()
-    }
 
     SongsScreenContent(modifier = modifier)
 }
@@ -97,6 +87,7 @@ fun SongsScreenContent(
         LazyColumn(modifier = modifier.fillMaxSize(), state = rememberLazyListState()) {
             item {
                 HelperControlButtons(
+                    modifier = Modifier.padding(top = 8.dp),
                     onPlayClick = { viewModel.onAction(SongsAction.PlayPressed(songsList)) },
                     onShuffleClick = { viewModel.onAction(SongsAction.ShufflePressed(songsList)) }
                 )

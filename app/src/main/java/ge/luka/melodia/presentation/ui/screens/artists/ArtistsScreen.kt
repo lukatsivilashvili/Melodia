@@ -1,6 +1,5 @@
 package ge.luka.melodia.presentation.ui.screens.artists
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,7 +8,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,15 +26,6 @@ fun ArtistsScreen(
     navHostController: NavHostController,
     onUpdateRoute: (String?) -> Unit
 ) {
-
-    LaunchedEffect(Unit) {
-        onUpdateRoute.invoke("Artists")
-    }
-
-    BackHandler {
-        navHostController.popBackStack()
-    }
-
     ArtistsScreenContent(
         modifier = modifier,
         navHostController = navHostController,

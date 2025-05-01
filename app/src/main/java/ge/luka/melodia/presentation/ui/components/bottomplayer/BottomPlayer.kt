@@ -35,7 +35,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import ge.luka.melodia.domain.model.PlayerState
 import ge.luka.melodia.domain.model.SongModel
@@ -50,7 +49,6 @@ import kotlinx.coroutines.isActive
 fun BottomPlayer(
     modifier: Modifier,
     songProgressProvider: () -> Float,
-    statusBarHeight: Dp,
     songModel: SongModel,
     playerState: PlayerState,
     onPlayPausePressed: () -> Unit,
@@ -160,7 +158,6 @@ fun BottomPlayerPreview(modifier: Modifier = Modifier) {
         modifier = Modifier
             .fillMaxWidth(),
         songProgressProvider = { 1f },
-        statusBarHeight = 70.dp,
         songModel = SongModel(),
         playerState = PlayerState.PAUSED,
         onPlayPausePressed = {},

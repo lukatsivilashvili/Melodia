@@ -1,27 +1,34 @@
 package ge.luka.melodia.presentation.ui.screens.library
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import ge.luka.melodia.R
-import ge.luka.melodia.common.mvi.CollectSideEffects
-import ge.luka.melodia.presentation.ui.components.shared.LibraryListItem
-import ge.luka.melodia.presentation.ui.theme.MelodiaTheme
+import ge.luka.melodia.presentation.ui.screens.albums.AlbumsScreen
+import ge.luka.melodia.presentation.ui.screens.artists.ArtistsScreen
+import ge.luka.melodia.presentation.ui.screens.playlists.PlaylistsScreen
+import ge.luka.melodia.presentation.ui.screens.songs.SongsScreen
+import kotlinx.coroutines.launch
 
 @Composable
 fun LibraryScreen(
     modifier: Modifier = Modifier,
-    navHostController: NavHostController?,
-    onUpdateRoute: ((String?) -> Unit)?
+    navHostController: NavHostController,
+    onUpdateRoute: ((String?) -> Unit)
 ) {
     LibraryScreenContent(
         modifier = modifier,
@@ -34,60 +41,68 @@ fun LibraryScreen(
 fun LibraryScreenContent(
     modifier: Modifier,
     viewModel: LibraryScreenVM = hiltViewModel(),
-    navHostController: NavHostController? = null,
-    onUpdateRoute: ((String?) -> Unit)? = null
+    navHostController: NavHostController,
+    onUpdateRoute: ((String?) -> Unit)
 ) {
-    CollectSideEffects(flow = viewModel.sideEffect) { effect ->
-        when (effect) {
-            is LibrarySideEffect.NavigateToAlbums -> navHostController?.navigate(effect.screen)
-            is LibrarySideEffect.NavigateToArtists -> navHostController?.navigate(effect.screen)
-            is LibrarySideEffect.NavigateToLibrary -> navHostController?.navigate(effect.screen)
-            is LibrarySideEffect.NavigateToPlaylists -> navHostController?.navigate(effect.screen)
-            is LibrarySideEffect.NavigateToSongs -> navHostController?.navigate(effect.screen)
+    val tabScreens = listOf(
+        TabScreen("Songs") { SongsScreen() },
+        TabScreen("Albums") {
+            AlbumsScreen(
+                navHostController = navHostController,
+                onUpdateRoute = onUpdateRoute
+            )
+        },
+        TabScreen("Artists") {
+            ArtistsScreen(
+                navHostController = navHostController,
+                onUpdateRoute = onUpdateRoute
+            )
+        },
+        TabScreen("Playlists") {
+            PlaylistsScreen(
+                navHostController = navHostController,
+                onUpdateRoute = onUpdateRoute
+            )
         }
-    }
+    )
+
+    val scope = rememberCoroutineScope()
+    val pagerState = rememberPagerState(pageCount = { tabScreens.size })
+    val selectedTabIndex = remember { derivedStateOf { pagerState.currentPage } }
 
     LaunchedEffect(Unit) {
-        onUpdateRoute?.invoke("Library")
+        onUpdateRoute.invoke("Melodia")
     }
 
-    val navigateToScreen: (String) -> Unit = { screen ->
-        viewModel.onAction(LibraryAction.LibraryItemClicked(libraryItem = screen))
-    }
-
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = 8.dp)
-            .background(MaterialTheme.colorScheme.surface)
-    ) {
-        LibraryListItem(
-            title = "Songs",
-            icon = R.drawable.ic_songs,
-            navigateToScreen = navigateToScreen
-        )
-        LibraryListItem(
-            title = "Albums",
-            icon = R.drawable.ic_albums,
-            navigateToScreen = navigateToScreen
-        )
-        LibraryListItem(
-            title = "Artists",
-            icon = R.drawable.ic_artist,
-            navigateToScreen = navigateToScreen
-        )
-        LibraryListItem(
-            title = "Playlists",
-            icon = R.drawable.ic_playlists,
-            navigateToScreen = navigateToScreen
-        )
-    }
-}
-
-@Preview
-@Composable
-fun LibraryScreenPreview(modifier: Modifier = Modifier) {
-    MelodiaTheme {
-        LibraryScreenContent(modifier = modifier)
+    Column(modifier = modifier.fillMaxSize()) {
+        TabRow(
+            selectedTabIndex = selectedTabIndex.value,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            tabScreens.forEachIndexed { index, screen ->
+                Tab(
+                    selected = selectedTabIndex.value == index,
+                    onClick = {
+                        scope.launch {
+                            pagerState.animateScrollToPage(index)
+                        }
+                    },
+                    text = { Text(text = screen.title) }
+                )
+            }
+        }
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+        ) { index ->
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                tabScreens[index].screen()
+            }
+        }
     }
 }
