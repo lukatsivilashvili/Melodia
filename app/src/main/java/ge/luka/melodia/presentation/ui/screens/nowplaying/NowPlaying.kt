@@ -119,6 +119,12 @@ fun NowPlaying(
             }
         }
 
+        fun collapseBottomPlayer() {
+            coroutineScope.launch {
+                bottomPlayerDragState.animateTo(BarState.COLLAPSED)
+            }
+        }
+
         SideEffect { bottomPlayerDragState.updateAnchors(anchors) }
 
         AnimatedVisibility(
@@ -161,6 +167,7 @@ fun NowPlaying(
                                 )
                             )
                         },
+                        onBackPress = { collapseBottomPlayer() },
                         playerState = viewState.currentPlayBackState,
                         songProgressProvider = viewModel::currentSongProgress,
                         songProgressMillisProvider = viewModel::currentSongProgressMillis

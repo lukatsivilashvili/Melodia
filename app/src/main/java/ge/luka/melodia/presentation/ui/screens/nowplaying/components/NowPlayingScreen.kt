@@ -1,8 +1,8 @@
 package ge.luka.melodia.presentation.ui.screens.nowplaying.components
 
 import android.annotation.SuppressLint
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
@@ -37,8 +37,13 @@ fun NowPlayingScreen(
     onPlayPausePressed: () -> Unit,
     onPreviousPressed: () -> Unit,
     onNextPressed: () -> Unit,
-    onProgressBarDragged: (Float) -> Unit
+    onProgressBarDragged: (Float) -> Unit,
+    onBackPress: () -> Unit
 ) {
+    BackHandler {
+        onBackPress.invoke()
+    }
+
     NowPlayingContent(
         modifier = modifier.fillMaxSize(),
         songModel = songModel,
@@ -67,8 +72,8 @@ private fun NowPlayingContent(
     Box(
         modifier = modifier
             .background(MaterialTheme.colorScheme.surfaceContainer)
+            .fillMaxSize()
     ) {
-        // Blurred background art
         CrossFadingAlbumArt(
             modifier = Modifier
                 .fillMaxSize()
@@ -77,22 +82,29 @@ private fun NowPlayingContent(
             artUri = songModel.artUri.orEmpty(),
             errorPainterType = ErrorPainterType.SOLID_COLOR,
         )
+
         Column(
             modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            AlbumArtSection(songModel = songModel)
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                AlbumArtSection(songModel = songModel)
+            }
             Controls(
-                modifier = Modifier.padding(bottom = 16.dp),
+                modifier = Modifier.padding(bottom = 24.dp),
                 songModel = songModel,
                 playerState = playerState,
+                songProgressProvider = songProgressProvider,
+                songProgressMillisProvider = songProgressMillisProvider,
                 onPlayPausePressed = onPlayPausePressed,
                 onPreviousPressed = onPreviousPressed,
                 onNextPressed = onNextPressed,
-                onProgressBarDragged = onProgressBarDragged,
-                songProgressProvider = songProgressProvider,
-                songProgressMillisProvider = songProgressMillisProvider
+                onProgressBarDragged = onProgressBarDragged
             )
         }
     }
@@ -100,7 +112,7 @@ private fun NowPlayingContent(
 
 @SuppressLint("UnusedCrossfadeTargetStateParameter")
 @Composable
-private fun AlbumArtSection(songModel: SongModel) {
+private fun AlbumArtSection(modifier: Modifier = Modifier, songModel: SongModel) {
     val windowSize = rememberWindowSize()
     val imagePadding = when (windowSize) {
         WindowType.Compact -> 60.dp
@@ -131,7 +143,8 @@ fun NowPlayingScreenPreview() {
             onPlayPausePressed = {},
             onPreviousPressed = {},
             onNextPressed = {},
-            onProgressBarDragged = {}
+            onProgressBarDragged = {},
+            onBackPress = {}
         )
     }
 }

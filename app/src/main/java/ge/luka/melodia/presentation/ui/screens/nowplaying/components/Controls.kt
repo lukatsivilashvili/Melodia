@@ -60,23 +60,32 @@ fun Controls(
     onNextPressed: () -> Unit,
     onProgressBarDragged: (Float) -> Unit
 ) {
+    // Dynamic button sizes
     var playButtonSize by remember { mutableStateOf(0.dp) }
     var skipButtonSize by remember { mutableStateOf(0.dp) }
 
-    var sliderValue by remember(songModel) { mutableFloatStateOf(songProgressProvider()) }
+    // Slider thumb position; re-init when songModel changes
+    var sliderValue by remember(songModel) {
+        mutableFloatStateOf(songProgressProvider())
+    }
     var dragging by remember { mutableStateOf(false) }
 
+    // Up-to-date millis for display
     val currentProgressMillis by rememberUpdatedState(songProgressMillisProvider())
 
-    LaunchedEffect(songProgressProvider, dragging) {
+    // Poll the provider when not dragging, and reset on songModel change
+    LaunchedEffect(songModel, dragging) {
+        // immediately jump to new track's position (usually 0f)
+        sliderValue = songProgressProvider()
         while (true) {
-            if (playerState == PlayerState.PLAYING || !dragging) {
+            if (!dragging) {
                 sliderValue = songProgressProvider()
             }
-            delay(500)
+            delay(100)
         }
     }
 
+    // Size logic based on window
     when (rememberWindowSize()) {
         WindowType.Compact, WindowType.Medium -> {
             playButtonSize = 60.dp
@@ -89,6 +98,7 @@ fun Controls(
     }
 
     Column(modifier.padding(start = 30.dp, end = 30.dp, bottom = 30.dp)) {
+        // Title / artist
         Text(
             text = songModel?.title.orEmpty(),
             color = MaterialTheme.colorScheme.onBackground,
@@ -110,6 +120,7 @@ fun Controls(
         )
         Spacer(Modifier.height(24.dp))
 
+        // Seek bar
         Box(Modifier.fillMaxWidth()) {
             Slider(
                 value = sliderValue,
@@ -125,16 +136,20 @@ fun Controls(
             )
         }
 
+        // Time labels
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             TextButton(
-                onClick = {},
+                onClick = { /* no-op */ },
                 contentPadding = PaddingValues(4.dp),
                 colors = ButtonDefaults.textButtonColors(
                     contentColor = animateColorAsState(
-                        targetValue = if (dragging) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurfaceVariant,
+                        targetValue = if (dragging)
+                            MaterialTheme.colorScheme.onBackground
+                        else
+                            MaterialTheme.colorScheme.onSurfaceVariant,
                         animationSpec = tween(),
                         label = ""
                     ).value
@@ -147,11 +162,14 @@ fun Controls(
             }
 
             TextButton(
-                onClick = {},
+                onClick = { /* no-op */ },
                 contentPadding = PaddingValues(4.dp),
                 colors = ButtonDefaults.textButtonColors(
                     contentColor = animateColorAsState(
-                        targetValue = if (dragging) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurfaceVariant,
+                        targetValue = if (dragging)
+                            MaterialTheme.colorScheme.onBackground
+                        else
+                            MaterialTheme.colorScheme.onSurfaceVariant,
                         animationSpec = tween(),
                         label = ""
                     ).value
@@ -164,8 +182,9 @@ fun Controls(
             }
         }
 
+        // Playback controls
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -196,7 +215,10 @@ fun Controls(
                 )
             ) {
                 Icon(
-                    if (playerState == PlayerState.PLAYING) Icons.Default.Pause else Icons.Default.PlayArrow,
+                    if (playerState == PlayerState.PLAYING)
+                        Icons.Default.Pause
+                    else
+                        Icons.Default.PlayArrow,
                     contentDescription = null,
                     modifier = Modifier.size(32.dp)
                 )
