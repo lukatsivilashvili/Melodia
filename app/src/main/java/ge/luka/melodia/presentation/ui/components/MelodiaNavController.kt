@@ -81,7 +81,7 @@ fun MelodiaNavController(
             )
         }
         composable<MelodiaScreen.Songs> {
-            SongsScreen(navHostController = navController, onUpdateRoute = onUpdateRoute)
+            SongsScreen()
         }
         composable<MelodiaScreen.AlbumSongs> {
             val args = it.toRoute<MelodiaScreen.AlbumSongs>()

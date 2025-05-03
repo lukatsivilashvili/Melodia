@@ -1,7 +1,6 @@
 package ge.luka.melodia.presentation.ui.screens.albums
 
 import android.widget.Toast
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -30,17 +29,11 @@ fun AlbumsScreen(
     modifier: Modifier = Modifier,
     navHostController: NavHostController,
     onUpdateRoute: (String?) -> Unit,
-    artistId: Long?,
-    artistName: String?,
+    artistId: Long? = null,
+    artistName: String? = null,
 ) {
 
-    LaunchedEffect(Unit) {
-        if (artistName != null) onUpdateRoute.invoke(artistName) else onUpdateRoute.invoke("Albums")
-    }
-
-    BackHandler {
-        navHostController.popBackStack()
-    }
+    LaunchedEffect(Unit) { if (artistName != null) onUpdateRoute.invoke(artistName) }
 
     AlbumsScreenContent(
         modifier = modifier,
@@ -94,7 +87,8 @@ fun AlbumsScreenContent(
     }
 
     if (viewState.isDialogVisible && viewState.currentEditingAlbum != null) {
-        MetadataDialog(audioModel = viewState.currentEditingAlbum,
+        MetadataDialog(
+            audioModel = viewState.currentEditingAlbum,
             onDismiss = { viewModel.onAction(AlbumsAction.DialogDismiss) },
             shouldShowAlbumField = false,
             onSave = { id, title, artist, _, artworkUri ->

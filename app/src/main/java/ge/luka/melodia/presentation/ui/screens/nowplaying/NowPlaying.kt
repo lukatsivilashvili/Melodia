@@ -40,7 +40,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ge.luka.melodia.common.utils.Utils
-import ge.luka.melodia.common.utils.Utils.BOTTOM_PLAYER_HEIGHT
 import ge.luka.melodia.domain.model.SongModel
 import ge.luka.melodia.presentation.ui.components.bottomplayer.BarState
 import ge.luka.melodia.presentation.ui.components.bottomplayer.BottomPlayer
@@ -66,7 +65,7 @@ fun NowPlaying(
     val screenHeight = configuration.screenHeightDp.dp
 
     val density = LocalDensity.current
-    val bottomPlayerHeightPx = with(density) { BOTTOM_PLAYER_HEIGHT.toPx() }
+    val bottomPlayerHeightPx = with(density) { Utils.calculateBottomBarHeight().toPx() }
     val expandedOffset = with(density) { screenHeight.toPx() - bottomPlayerHeightPx }
     val screenHeightPx = with(density) { screenHeight.toPx() }
 
@@ -110,13 +109,19 @@ fun NowPlaying(
 
         val offsetBottomPlayer = -(bottomPlayerDragState.offset)
         val alphaBottomPlayer = 1f - offsetBottomPlayer / (screenHeight.value)
-        val alphaNowPlaying = 0f + offsetBottomPlayer / (screenHeight.value * 1.5f)
+        val alphaNowPlaying = 0f + offsetBottomPlayer / (screenHeight.value)
 
         val coroutineScope = rememberCoroutineScope()
 
         fun expandBottomPlayer() {
             coroutineScope.launch {
                 bottomPlayerDragState.animateTo(BarState.EXPANDED)
+            }
+        }
+
+        fun collapseBottomPlayer() {
+            coroutineScope.launch {
+                bottomPlayerDragState.animateTo(BarState.COLLAPSED)
             }
         }
 
@@ -162,6 +167,7 @@ fun NowPlaying(
                                 )
                             )
                         },
+                        onBackPress = { collapseBottomPlayer() },
                         playerState = viewState.currentPlayBackState,
                         songProgressProvider = viewModel::currentSongProgress,
                         songProgressMillisProvider = viewModel::currentSongProgressMillis
@@ -172,7 +178,6 @@ fun NowPlaying(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(Utils.calculateBottomBarHeight())
                         .align(Alignment.BottomCenter)
                         .offset {
                             IntOffset(
@@ -194,7 +199,6 @@ fun NowPlaying(
                                 orientation = Orientation.Vertical
                             ),
                         songProgressProvider = viewModel::currentSongProgress,
-                        statusBarHeight = statusBarHeight,
                         songModel = viewState.currentSong ?: SongModel(),
                         onPlayPausePressed = { viewModel.onAction(NowPlayingAction.PlayPressed) },
                         onNextPressed = { viewModel.onAction(NowPlayingAction.NextSongPressed) },

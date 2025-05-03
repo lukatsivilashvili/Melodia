@@ -60,41 +60,37 @@ fun Controls(
     onNextPressed: () -> Unit,
     onProgressBarDragged: (Float) -> Unit
 ) {
+    // Dynamic button sizes
     var playButtonSize by remember { mutableStateOf(0.dp) }
     var skipButtonSize by remember { mutableStateOf(0.dp) }
 
-    var sliderValue by remember { mutableFloatStateOf(0f) }
+    // Slider thumb position; re-init when songModel changes
+    var sliderValue by remember(songModel) {
+        mutableFloatStateOf(songProgressProvider())
+    }
     var dragging by remember { mutableStateOf(false) }
 
-    // Keep track of the latest progress provider result
-    val currentProgress by rememberUpdatedState(songProgressProvider())
+    // Up-to-date millis for display
     val currentProgressMillis by rememberUpdatedState(songProgressMillisProvider())
 
-    // Add songModel and playerState as keys to restart the effect
-    LaunchedEffect(songModel, playerState) {
+    // Poll the provider when not dragging, and reset on songModel change
+    LaunchedEffect(songModel, dragging) {
+        // immediately jump to new track's position (usually 0f)
+        sliderValue = songProgressProvider()
         while (true) {
-            if (playerState == PlayerState.PLAYING || !dragging) {
-                sliderValue = currentProgress
+            if (!dragging) {
+                sliderValue = songProgressProvider()
             }
-            delay(500) // Update every 500ms
+            delay(100)
         }
     }
 
-    val sliderProgress = if (dragging) sliderValue else currentProgress
-
-    val windowSize = rememberWindowSize()
-
-    when (windowSize.height) {
-        WindowType.Compact -> {
+    // Size logic based on window
+    when (rememberWindowSize()) {
+        WindowType.Compact, WindowType.Medium -> {
             playButtonSize = 60.dp
             skipButtonSize = 50.dp
         }
-
-        WindowType.Medium -> {
-            playButtonSize = 60.dp
-            skipButtonSize = 50.dp
-        }
-
         WindowType.Expanded -> {
             playButtonSize = 100.dp
             skipButtonSize = 80.dp
@@ -102,148 +98,145 @@ fun Controls(
     }
 
     Column(modifier.padding(start = 30.dp, end = 30.dp, bottom = 30.dp)) {
+        // Title / artist
         Text(
-            text = songModel?.title ?: "",
+            text = songModel?.title.orEmpty(),
             color = MaterialTheme.colorScheme.onBackground,
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.fillMaxWidth(),
             overflow = TextOverflow.Ellipsis,
             textAlign = TextAlign.Center,
-            maxLines = 1,
+            maxLines = 1
         )
         Spacer(Modifier.height(12.dp))
         Text(
-            text = songModel?.artist ?: "",
+            text = songModel?.artist.orEmpty(),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.fillMaxWidth(),
             overflow = TextOverflow.Ellipsis,
             textAlign = TextAlign.Center,
-            maxLines = 1,
+            maxLines = 1
         )
         Spacer(Modifier.height(24.dp))
+
+        // Seek bar
         Box(Modifier.fillMaxWidth()) {
             Slider(
-                modifier = Modifier.fillMaxWidth(),
-                value = sliderProgress,
+                value = sliderValue,
                 onValueChange = {
                     sliderValue = it
                     dragging = true
                 },
                 onValueChangeFinished = {
-                    onProgressBarDragged.invoke(sliderValue)
+                    onProgressBarDragged(sliderValue)
                     dragging = false
                 },
+                modifier = Modifier.fillMaxWidth()
             )
         }
+
+        // Time labels
         Row(
             Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             TextButton(
-                onClick = { },
+                onClick = { /* no-op */ },
                 contentPadding = PaddingValues(4.dp),
                 colors = ButtonDefaults.textButtonColors(
                     contentColor = animateColorAsState(
-                        targetValue = if (dragging) {
+                        targetValue = if (dragging)
                             MaterialTheme.colorScheme.onBackground
-                        } else {
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                        },
+                        else
+                            MaterialTheme.colorScheme.onSurfaceVariant,
                         animationSpec = tween(),
-                        label = "",
-                    ).value,
-                ),
+                        label = ""
+                    ).value
+                )
             ) {
                 Text(
                     text = currentProgressMillis.formatDuration(),
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.bodySmall
                 )
             }
 
             TextButton(
-                onClick = { },
+                onClick = { /* no-op */ },
                 contentPadding = PaddingValues(4.dp),
                 colors = ButtonDefaults.textButtonColors(
                     contentColor = animateColorAsState(
-                        targetValue = if (dragging) {
+                        targetValue = if (dragging)
                             MaterialTheme.colorScheme.onBackground
-                        } else {
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                        },
+                        else
+                            MaterialTheme.colorScheme.onSurfaceVariant,
                         animationSpec = tween(),
-                        label = "",
-                    ).value,
-                ),
+                        label = ""
+                    ).value
+                )
             ) {
                 Text(
-                    text = songModel?.duration?.formatDuration() ?: "00:00",
-                    style = MaterialTheme.typography.bodySmall,
+                    text = songModel?.duration?.formatDuration().orEmpty(),
+                    style = MaterialTheme.typography.bodySmall
                 )
             }
         }
+
+        // Playback controls
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             FilledIconButton(
-                onClick = { onPreviousPressed.invoke() },
+                onClick = onPreviousPressed,
                 modifier = Modifier.size(skipButtonSize),
                 colors = IconButtonDefaults.filledIconButtonColors(
                     contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                ),
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                )
             ) {
                 Icon(
                     Icons.Outlined.SkipPrevious,
-                    null,
+                    contentDescription = null,
                     modifier = Modifier.fillMaxSize(0.5f)
                 )
             }
 
-            Spacer(modifier = Modifier.width(24.dp))  // Adds space between buttons
+            Spacer(Modifier.width(24.dp))
 
             FilledIconButton(
-                onClick = { onPlayPausePressed.invoke() },
-                modifier = Modifier
-                    .height(playButtonSize)
-                    .width(playButtonSize),
+                onClick = onPlayPausePressed,
+                modifier = Modifier.size(playButtonSize),
                 shape = CircleShape,
                 colors = IconButtonDefaults.iconButtonColors(
                     contentColor = MaterialTheme.colorScheme.primaryContainer,
-                    containerColor = MaterialTheme.colorScheme.primary,
-                ),
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
             ) {
                 Icon(
-                    if (playerState != PlayerState.PLAYING) {
-                        Icons.Default.PlayArrow
-                    } else {
+                    if (playerState == PlayerState.PLAYING)
                         Icons.Default.Pause
-                    },
-                    null,
-                    modifier = Modifier.size(32.dp),  // Properly sized icon inside the button
+                    else
+                        Icons.Default.PlayArrow,
+                    contentDescription = null,
+                    modifier = Modifier.size(32.dp)
                 )
             }
 
-            Spacer(modifier = Modifier.width(24.dp))  // Adds space between buttons
+            Spacer(Modifier.width(24.dp))
 
             FilledIconButton(
-                onClick = {
-                    onNextPressed.invoke()
-                    if (playerState != PlayerState.PLAYING) {
-                        onPlayPausePressed.invoke()
-                    }
-                },
+                onClick = onNextPressed,
                 modifier = Modifier.size(skipButtonSize),
                 colors = IconButtonDefaults.filledIconButtonColors(
                     contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                ),
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                )
             ) {
                 Icon(
                     Icons.Outlined.SkipNext,
-                    null,
+                    contentDescription = null,
                     modifier = Modifier.fillMaxSize(0.5f)
                 )
             }
