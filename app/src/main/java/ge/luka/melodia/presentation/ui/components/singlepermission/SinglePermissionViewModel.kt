@@ -29,8 +29,9 @@ class SinglePermissionViewModel @Inject constructor(
 
     fun startScan(context: Context, folderUri: String?) {
         viewModelScope.launch {
-            mediaStoreLoader.scanSongsList(context, folderUri).collect { song ->
-                mediaStoreRepository.cacheAllSongs(song)
+            mediaStoreLoader.setSelectedFolderUri(folderUri)
+            mediaStoreLoader.scanSongsList(context).collect { song ->
+                mediaStoreRepository.cacheSong(song)
                 updateUiState { copy(scanningState = scanningState + song) }
             }
             mediaStoreRepository.cacheAllAlbums()

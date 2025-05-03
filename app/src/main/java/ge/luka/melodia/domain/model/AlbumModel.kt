@@ -3,6 +3,7 @@ package ge.luka.melodia.domain.model
 import android.database.Cursor
 import android.net.Uri
 import androidx.compose.runtime.Immutable
+import androidx.core.net.toUri
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -35,7 +36,8 @@ data class AlbumModel(
                 title = cursor.getString(titleColumn),
                 artist = cursor.getString(artistColumn),
                 songCount = cursor.getInt(songCountColumn),
-                artUri = Uri.withAppendedPath(Uri.parse("content://media/external/audio/albumart"),
+                artUri = Uri.withAppendedPath(
+                    "content://media/external/audio/albumart".toUri(),
                     cursor.getLong(albumIdColumn).toString()
                 ).toString(),
                 duration = duration
