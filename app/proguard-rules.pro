@@ -19,3 +19,21 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+# ==== DISABLE ALL OBFUSCATION ====
+# Keep all @Serializable classes and their serializers
+# ===== KOTLIN SERIALIZATION =====
+-keep @kotlinx.serialization.Serializable class ** { *; }
+-keepclassmembers class * implements kotlinx.serialization.Serializable {
+    <methods>;
+}
+
+# Keep Kotlin Serialization runtime
+-keep class kotlinx.serialization.** { *; }
+-keepclassmembers class kotlinx.serialization.** { *; }
+
+# Keep critical annotations/metadata
+-keepattributes *Annotation*, InnerClasses, Signature
+-keepattributes RuntimeVisibleAnnotations, RuntimeVisibleParameterAnnotations
+
+# For debugging (optional)
+-keepattributes SourceFile, LineNumberTable

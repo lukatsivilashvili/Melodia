@@ -70,7 +70,7 @@ fun Controls(
 
     LaunchedEffect(songProgressProvider, dragging) {
         while (true) {
-            if (!dragging) {
+            if (playerState == PlayerState.PLAYING || !dragging) {
                 sliderValue = songProgressProvider()
             }
             delay(500)
