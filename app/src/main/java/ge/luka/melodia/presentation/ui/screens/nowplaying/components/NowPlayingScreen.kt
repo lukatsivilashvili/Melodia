@@ -4,11 +4,13 @@ import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -91,14 +93,22 @@ private fun NowPlayingContent(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Add any new components here above the album art
+            // Example: TopBar(), SearchBar(), etc.
+
+            // Album art section that adapts to remaining space
             Box(
                 modifier = Modifier
-                    .weight(1f)
+                    .weight(1f, fill = false) // Don't fill all space, just take what's needed
                     .fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                AlbumArtSection(songModel = songModel)
+                AlbumArtSection(
+                    modifier = Modifier.fillMaxSize(),
+                    songModel = songModel
+                )
             }
+
             Controls(
                 modifier = Modifier.padding(bottom = 24.dp),
                 songModel = songModel,
@@ -111,6 +121,9 @@ private fun NowPlayingContent(
                 onProgressBarDragged = onProgressBarDragged,
                 palette = palette
             )
+
+            // Add any new components here within Controls section
+            // They will be positioned below the main controls
         }
     }
 }
@@ -125,15 +138,22 @@ private fun AlbumArtSection(modifier: Modifier = Modifier, songModel: SongModel)
         WindowType.Expanded -> 15.dp
     }
 
-    CrossFadingAlbumArt(
-        modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(1f)
-            .padding(imagePadding)
-            .clip(RoundedCornerShape(8.dp)),
-        artUri = songModel.artUri.orEmpty(),
-        errorPainterType = ErrorPainterType.PLACEHOLDER,
-    )
+    // Use BoxWithConstraints to get actual available space
+    BoxWithConstraints(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
+        // Calculate the maximum size based on available width and height
+        val maxSize = minOf(maxWidth, maxHeight) - (imagePadding * 2)
+
+        CrossFadingAlbumArt(
+            modifier = Modifier
+                .size(maxSize)
+                .clip(RoundedCornerShape(8.dp)),
+            artUri = songModel.artUri.orEmpty(),
+            errorPainterType = ErrorPainterType.PLACEHOLDER,
+        )
+    }
 }
 
 @Preview(showSystemUi = true)

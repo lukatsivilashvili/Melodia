@@ -1,5 +1,6 @@
 package ge.luka.melodia.presentation.ui.screens.nowplaying.components
 
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,12 +14,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.DarkMode
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.rounded.Shuffle
 import androidx.compose.material.icons.rounded.SkipNext
 import androidx.compose.material.icons.rounded.SkipPrevious
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -36,6 +40,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ge.luka.melodia.common.extensions.formatDuration
+import ge.luka.melodia.common.extensions.toComposeColor
 import ge.luka.melodia.common.utils.WindowType
 import ge.luka.melodia.common.utils.rememberWindowSize
 import ge.luka.melodia.domain.model.PlayerState
@@ -112,12 +117,15 @@ fun Controls(
             text = songModel?.title.orEmpty(),
             color = MaterialTheme.colorScheme.onBackground,
             style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .basicMarquee(),
             overflow = TextOverflow.Ellipsis,
             textAlign = TextAlign.Center,
             maxLines = 1
         )
         Spacer(Modifier.height(12.dp))
+
         Text(
             text = songModel?.artist.orEmpty(),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -169,6 +177,21 @@ fun Controls(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            IconButton(
+                onClick = {},
+                modifier = Modifier.size(skipButtonSize),
+            ) {
+                Icon(
+                    Icons.Rounded.DarkMode,
+                    tint = MaterialTheme.colorScheme.onBackground,
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(0.6f)
+                )
+            }
+
+            Spacer(Modifier.width(32.dp))
+
+
             FilledIconButton(
                 onClick = onPreviousPressed,
                 modifier = Modifier.size(skipButtonSize),
@@ -228,6 +251,20 @@ fun Controls(
                     Icons.Rounded.SkipNext,
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize(0.5f)
+                )
+            }
+
+            Spacer(Modifier.width(32.dp))
+
+            IconButton(
+                onClick = {},
+                modifier = Modifier.size(skipButtonSize),
+            ) {
+                Icon(
+                    Icons.Rounded.Shuffle,
+                    tint = MaterialTheme.colorScheme.onBackground,
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(0.6f)
                 )
             }
         }
