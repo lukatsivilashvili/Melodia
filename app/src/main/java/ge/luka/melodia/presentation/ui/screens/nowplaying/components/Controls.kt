@@ -1,11 +1,8 @@
 package ge.luka.melodia.presentation.ui.screens.nowplaying.components
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,18 +13,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.outlined.SkipNext
-import androidx.compose.material.icons.outlined.SkipPrevious
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.rounded.Pause
+import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.rounded.SkipNext
+import androidx.compose.material.icons.rounded.SkipPrevious
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -46,6 +40,7 @@ import ge.luka.melodia.common.utils.WindowType
 import ge.luka.melodia.common.utils.rememberWindowSize
 import ge.luka.melodia.domain.model.PlayerState
 import ge.luka.melodia.domain.model.SongModel
+import ge.luka.melodia.presentation.ui.components.shared.MelodiaSlider
 import kotlinx.coroutines.delay
 
 @Composable
@@ -58,24 +53,39 @@ fun Controls(
     onPlayPausePressed: () -> Unit,
     onPreviousPressed: () -> Unit,
     onNextPressed: () -> Unit,
-    onProgressBarDragged: (Float) -> Unit
+    onProgressBarDragged: (Float) -> Unit,
+    palette: Map<String, String>
 ) {
-    // Dynamic button sizes
     var playButtonSize by remember { mutableStateOf(0.dp) }
     var skipButtonSize by remember { mutableStateOf(0.dp) }
 
-    // Slider thumb position; re-init when songModel changes
     var sliderValue by remember(songModel) {
         mutableFloatStateOf(songProgressProvider())
     }
     var dragging by remember { mutableStateOf(false) }
-
-    // Up-to-date millis for display
     val currentProgressMillis by rememberUpdatedState(songProgressMillisProvider())
 
-    // Poll the provider when not dragging, and reset on songModel change
+    var vibrant by remember { mutableStateOf("#000000") }
+    var darkVibrant by remember { mutableStateOf("#000000") }
+    var lightVibrant by remember { mutableStateOf("#000000") }
+    var domainSwatch by remember { mutableStateOf("#000000") }
+    var mutedSwatch by remember { mutableStateOf("#000000") }
+    var lightMutedSwatch by remember { mutableStateOf("#000000") }
+    var darkMutedSwatch by remember { mutableStateOf("#000000") }
+    var onDarkVibrant by remember { mutableStateOf("#ffffff") }
+
+    LaunchedEffect(key1 = palette) {
+        vibrant = palette["vibrant"].toString()
+        darkVibrant = palette["darkVibrant"].toString()
+        lightVibrant = palette["lightVibrant"].toString()
+        domainSwatch = palette["domainSwatch"].toString()
+        mutedSwatch = palette["mutedSwatch"].toString()
+        lightMutedSwatch = palette["lightMuted"].toString()
+        darkMutedSwatch = palette["darkMuted"].toString()
+        onDarkVibrant = palette["onDarkVibrant"].toString()
+    }
+
     LaunchedEffect(songModel, dragging) {
-        // immediately jump to new track's position (usually 0f)
         sliderValue = songProgressProvider()
         while (true) {
             if (!dragging) {
@@ -85,12 +95,12 @@ fun Controls(
         }
     }
 
-    // Size logic based on window
     when (rememberWindowSize()) {
         WindowType.Compact, WindowType.Medium -> {
             playButtonSize = 60.dp
             skipButtonSize = 50.dp
         }
+
         WindowType.Expanded -> {
             playButtonSize = 100.dp
             skipButtonSize = 80.dp
@@ -98,7 +108,6 @@ fun Controls(
     }
 
     Column(modifier.padding(start = 30.dp, end = 30.dp, bottom = 30.dp)) {
-        // Title / artist
         Text(
             text = songModel?.title.orEmpty(),
             color = MaterialTheme.colorScheme.onBackground,
@@ -120,9 +129,8 @@ fun Controls(
         )
         Spacer(Modifier.height(24.dp))
 
-        // Seek bar
         Box(Modifier.fillMaxWidth()) {
-            Slider(
+            MelodiaSlider(
                 value = sliderValue,
                 onValueChange = {
                     sliderValue = it
@@ -132,7 +140,8 @@ fun Controls(
                     onProgressBarDragged(sliderValue)
                     dragging = false
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                thumbColor = mutedSwatch
             )
         }
 
@@ -141,48 +150,20 @@ fun Controls(
             Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            TextButton(
-                onClick = { /* no-op */ },
-                contentPadding = PaddingValues(4.dp),
-                colors = ButtonDefaults.textButtonColors(
-                    contentColor = animateColorAsState(
-                        targetValue = if (dragging)
-                            MaterialTheme.colorScheme.onBackground
-                        else
-                            MaterialTheme.colorScheme.onSurfaceVariant,
-                        animationSpec = tween(),
-                        label = ""
-                    ).value
-                )
-            ) {
-                Text(
-                    text = currentProgressMillis.formatDuration(),
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-
-            TextButton(
-                onClick = { /* no-op */ },
-                contentPadding = PaddingValues(4.dp),
-                colors = ButtonDefaults.textButtonColors(
-                    contentColor = animateColorAsState(
-                        targetValue = if (dragging)
-                            MaterialTheme.colorScheme.onBackground
-                        else
-                            MaterialTheme.colorScheme.onSurfaceVariant,
-                        animationSpec = tween(),
-                        label = ""
-                    ).value
-                )
-            ) {
-                Text(
-                    text = songModel?.duration?.formatDuration().orEmpty(),
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
+            Text(
+                modifier = Modifier.padding(4.dp),
+                text = currentProgressMillis.formatDuration(),
+                color = MaterialTheme.colorScheme.onBackground,
+                style = MaterialTheme.typography.bodySmall
+            )
+            Text(
+                modifier = Modifier.padding(4.dp),
+                text = songModel?.duration?.formatDuration().orEmpty(),
+                color = MaterialTheme.colorScheme.onBackground,
+                style = MaterialTheme.typography.bodySmall
+            )
         }
 
-        // Playback controls
         Row(
             Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
@@ -191,13 +172,16 @@ fun Controls(
             FilledIconButton(
                 onClick = onPreviousPressed,
                 modifier = Modifier.size(skipButtonSize),
-                colors = IconButtonDefaults.filledIconButtonColors(
-                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                    containerColor = MaterialTheme.colorScheme.tertiaryContainer
-                )
+                colors = IconButtonColors(
+                    containerColor = MaterialTheme.colorScheme.onBackground,
+                    contentColor = MaterialTheme.colorScheme.background,
+                    disabledContainerColor = MaterialTheme.colorScheme.onBackground,
+                    disabledContentColor = MaterialTheme.colorScheme.background,
+
+                    )
             ) {
                 Icon(
-                    Icons.Outlined.SkipPrevious,
+                    Icons.Rounded.SkipPrevious,
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize(0.5f)
                 )
@@ -209,16 +193,19 @@ fun Controls(
                 onClick = onPlayPausePressed,
                 modifier = Modifier.size(playButtonSize),
                 shape = CircleShape,
-                colors = IconButtonDefaults.iconButtonColors(
-                    contentColor = MaterialTheme.colorScheme.primaryContainer,
-                    containerColor = MaterialTheme.colorScheme.primary
-                )
+                colors = IconButtonColors(
+                    containerColor = MaterialTheme.colorScheme.onBackground,
+                    contentColor = MaterialTheme.colorScheme.background,
+                    disabledContainerColor = MaterialTheme.colorScheme.onBackground,
+                    disabledContentColor = MaterialTheme.colorScheme.background,
+
+                    )
             ) {
                 Icon(
                     if (playerState == PlayerState.PLAYING)
-                        Icons.Default.Pause
+                        Icons.Rounded.Pause
                     else
-                        Icons.Default.PlayArrow,
+                        Icons.Rounded.PlayArrow,
                     contentDescription = null,
                     modifier = Modifier.size(32.dp)
                 )
@@ -229,13 +216,16 @@ fun Controls(
             FilledIconButton(
                 onClick = onNextPressed,
                 modifier = Modifier.size(skipButtonSize),
-                colors = IconButtonDefaults.filledIconButtonColors(
-                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                    containerColor = MaterialTheme.colorScheme.tertiaryContainer
-                )
+                colors = IconButtonColors(
+                    containerColor = MaterialTheme.colorScheme.onBackground,
+                    contentColor = MaterialTheme.colorScheme.background,
+                    disabledContainerColor = MaterialTheme.colorScheme.onBackground,
+                    disabledContentColor = MaterialTheme.colorScheme.background,
+
+                    )
             ) {
                 Icon(
-                    Icons.Outlined.SkipNext,
+                    Icons.Rounded.SkipNext,
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize(0.5f)
                 )

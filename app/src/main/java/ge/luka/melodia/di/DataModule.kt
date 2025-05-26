@@ -35,5 +35,4 @@ object DataModule {
     @Provides
     @Singleton
     fun provideArtistsDao(database: MelodiaDatabase): ArtistsDao = database.artistsDao
-
 }

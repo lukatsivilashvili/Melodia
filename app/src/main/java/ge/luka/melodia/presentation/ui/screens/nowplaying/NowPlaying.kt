@@ -15,14 +15,11 @@ import androidx.compose.foundation.gestures.anchoredDraggable
 import androidx.compose.foundation.gestures.animateTo
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
@@ -41,8 +38,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ge.luka.melodia.common.utils.Utils
 import ge.luka.melodia.domain.model.SongModel
-import ge.luka.melodia.presentation.ui.components.bottomplayer.BarState
-import ge.luka.melodia.presentation.ui.components.bottomplayer.BottomPlayer
+import ge.luka.melodia.presentation.ui.components.shared.BarState
+import ge.luka.melodia.presentation.ui.components.shared.BottomPlayer
 import ge.luka.melodia.presentation.ui.screens.nowplaying.components.NowPlayingScreen
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -68,9 +65,6 @@ fun NowPlaying(
     val bottomPlayerHeightPx = with(density) { Utils.calculateBottomBarHeight().toPx() }
     val expandedOffset = with(density) { screenHeight.toPx() - bottomPlayerHeightPx }
     val screenHeightPx = with(density) { screenHeight.toPx() }
-
-    val insets = WindowInsets.systemBars.asPaddingValues()
-    val statusBarHeight = insets.calculateTopPadding()
 
     if (viewState.shouldShowBottomPlayer) {
         if (!invoked) {
@@ -170,7 +164,8 @@ fun NowPlaying(
                         onBackPress = { collapseBottomPlayer() },
                         playerState = viewState.currentPlayBackState,
                         songProgressProvider = viewModel::currentSongProgress,
-                        songProgressMillisProvider = viewModel::currentSongProgressMillis
+                        songProgressMillisProvider = viewModel::currentSongProgressMillis,
+                        palette = viewState.currentSong?.palette ?: emptyMap()
                     )
                 }
 

@@ -1,12 +1,10 @@
 package ge.luka.melodia.di
 
-import android.content.Context
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import ge.luka.melodia.data.MediaStoreLoader
 import ge.luka.melodia.data.database.dao.AlbumsDao
 import ge.luka.melodia.data.database.dao.ArtistsDao
 import ge.luka.melodia.data.database.dao.SongsDao
@@ -30,18 +28,14 @@ abstract class RepositoryModule {
         @Provides
         @Singleton
         fun provideMediaStoreRepository(
-            mediaStoreLoader: MediaStoreLoader,
             songsDao: SongsDao,
             albumsDao: AlbumsDao,
             artistsDao: ArtistsDao,
-            context: Context
         ): MediaStoreRepository {
             return MediaStoreRepositoryImpl(
-                mediaStoreLoader = mediaStoreLoader,
-                context = context,
                 songsDao = songsDao,
                 albumsDao = albumsDao,
-                artistsDao = artistsDao
+                artistsDao = artistsDao,
             )
         }
     }

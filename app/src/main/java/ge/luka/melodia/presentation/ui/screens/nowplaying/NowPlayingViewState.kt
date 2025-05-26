@@ -7,5 +7,6 @@ data class NowPlayingViewState(
     val currentSong: SongModel? = null,
     val currentPlayBackState: PlayerState = PlayerState.PAUSED,
     val currentSongProgress: Float = 0.0f,
-    val shouldShowBottomPlayer: Boolean = false
+    val shouldShowBottomPlayer: Boolean = false,
+    val currentPalette: Map<String, String> = emptyMap()
 )

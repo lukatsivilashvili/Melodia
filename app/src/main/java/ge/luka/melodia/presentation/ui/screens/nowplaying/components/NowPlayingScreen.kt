@@ -38,7 +38,8 @@ fun NowPlayingScreen(
     onPreviousPressed: () -> Unit,
     onNextPressed: () -> Unit,
     onProgressBarDragged: (Float) -> Unit,
-    onBackPress: () -> Unit
+    onBackPress: () -> Unit,
+    palette: Map<String, String>
 ) {
     BackHandler {
         onBackPress.invoke()
@@ -53,7 +54,8 @@ fun NowPlayingScreen(
         onPlayPausePressed = onPlayPausePressed,
         onPreviousPressed = onPreviousPressed,
         onNextPressed = onNextPressed,
-        onProgressBarDragged = onProgressBarDragged
+        onProgressBarDragged = onProgressBarDragged,
+        palette = palette
     )
 }
 
@@ -67,8 +69,10 @@ private fun NowPlayingContent(
     onPlayPausePressed: () -> Unit,
     onPreviousPressed: () -> Unit,
     onNextPressed: () -> Unit,
-    onProgressBarDragged: (Float) -> Unit
+    onProgressBarDragged: (Float) -> Unit,
+    palette: Map<String, String>
 ) {
+
     Box(
         modifier = modifier
             .background(MaterialTheme.colorScheme.surfaceContainer)
@@ -77,8 +81,8 @@ private fun NowPlayingContent(
         CrossFadingAlbumArt(
             modifier = Modifier
                 .fillMaxSize()
-                .alpha(0.4f)
-                .blur(radius = 40.dp),
+                .blur(radius = 100.dp)
+                .alpha(0.6f),
             artUri = songModel.artUri.orEmpty(),
             errorPainterType = ErrorPainterType.SOLID_COLOR,
         )
@@ -104,7 +108,8 @@ private fun NowPlayingContent(
                 onPlayPausePressed = onPlayPausePressed,
                 onPreviousPressed = onPreviousPressed,
                 onNextPressed = onNextPressed,
-                onProgressBarDragged = onProgressBarDragged
+                onProgressBarDragged = onProgressBarDragged,
+                palette = palette
             )
         }
     }
@@ -144,7 +149,8 @@ fun NowPlayingScreenPreview() {
             onPreviousPressed = {},
             onNextPressed = {},
             onProgressBarDragged = {},
-            onBackPress = {}
+            onBackPress = {},
+            palette = emptyMap()
         )
     }
 }

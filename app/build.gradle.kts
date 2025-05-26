@@ -140,4 +140,11 @@ dependencies {
     // Media3
     implementation(libs.media3.exoplayer)
     implementation(libs.media3.ui)
+
+    // Palette
+    implementation(libs.androidx.palette)
+
+    // Moshi
+    implementation(libs.moshi)
+    ksp(libs.moshi.codegen)
 }

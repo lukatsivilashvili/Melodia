@@ -16,6 +16,7 @@ data class SongModelEntity(
     val duration: Long? = null,
     val songPath: String? = null,
     val artUri: String? = null,
-    val bitrate: Int? = null
+    val bitrate: Int? = null,
+    val palette: Map<String, String>? = null
 )
 

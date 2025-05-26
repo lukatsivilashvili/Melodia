@@ -14,7 +14,12 @@ class SinglePermissionViewModel @Inject constructor(
     private val mediaStoreRepository: MediaStoreRepository,
     private val mediaStoreLoader: MediaStoreLoader,
 ) : BaseMviViewmodel<PermissionViewState, PermissionAction, PermissionSideEffect>(
-    initialUiState = PermissionViewState(scanningState = emptyList(), scanningFinished = false)
+    initialUiState = PermissionViewState(
+        scanningSongState = emptyList(),
+        scanningAlbumState = emptyList(),
+        scanningArtistState = emptyList(),
+        scanningFinished = false
+    )
 ) {
 
     override fun onAction(uiAction: PermissionAction) {
@@ -30,12 +35,19 @@ class SinglePermissionViewModel @Inject constructor(
     fun startScan(context: Context, folderUri: String?) {
         viewModelScope.launch {
             mediaStoreLoader.setSelectedFolderUri(folderUri)
+
             mediaStoreLoader.scanSongsList(context).collect { song ->
                 mediaStoreRepository.cacheSong(song)
-                updateUiState { copy(scanningState = scanningState + song) }
+                updateUiState { copy(scanningSongState = scanningSongState + song) }
             }
-            mediaStoreRepository.cacheAllAlbums()
-            mediaStoreRepository.cacheAllArtists()
+            mediaStoreLoader.scanAlbumsList(context).collect { album ->
+                mediaStoreRepository.cacheAlbum(album)
+                updateUiState { copy(scanningAlbumState = scanningAlbumState + album) }
+            }
+            mediaStoreLoader.scanArtistsList(context).collect { artist ->
+                mediaStoreRepository.cacheArtist(artist)
+                updateUiState { copy(scanningArtistState = scanningArtistState + artist) }
+            }
             updateUiState { copy(scanningFinished = true) }
         }
     }

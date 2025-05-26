@@ -13,6 +13,9 @@ interface AlbumsDao {
     @Upsert
     suspend fun insertAllAlbums(albums: List<AlbumModelEntity>)
 
+    @Upsert
+    suspend fun insertSingleAlbum(songs: AlbumModelEntity)
+
     @Query("SELECT * FROM allAlbums ORDER BY title ASC")
     fun getAllAlbumsOrderedByTitle(): Flow<List<AlbumModelEntity>>
 

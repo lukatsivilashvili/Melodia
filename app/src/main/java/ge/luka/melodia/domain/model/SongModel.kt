@@ -5,6 +5,7 @@ import android.database.Cursor
 import android.net.Uri
 import android.provider.MediaStore
 import androidx.compose.runtime.Immutable
+import androidx.core.net.toUri
 
 @Immutable
 data class SongModel(
@@ -18,7 +19,8 @@ data class SongModel(
     val trackNumber: Int? = null,
     val duration: Long? = null,
     val songPath: String? = null,
-    val bitrate: Int? = null
+    val bitrate: Int? = null,
+    val palette: Map<String, String>? = null
 ) : BaseModel {
     companion object {
         fun fromCursor(
@@ -31,7 +33,8 @@ data class SongModel(
             artistColumn: Int,
             trackNumberColumn: Int,
             durationColumn: Int,
-            bitrateColumn: Int
+            bitrateColumn: Int,
+            palette: Map<String, String>
         ): SongModel {
             return SongModel(
                 songId = cursor.getLong(songIdColumn),
@@ -46,10 +49,11 @@ data class SongModel(
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     cursor.getLong(songIdColumn)
                 ).toString(),
-                artUri = Uri.withAppendedPath(/* baseUri = */ Uri.parse("content://media/external/audio/albumart"),
+                artUri = Uri.withAppendedPath(/* baseUri = */ "content://media/external/audio/albumart".toUri(),
                     cursor.getLong(albumIdColumn).toString()
                 ).toString(),
-                bitrate = cursor.getInt(bitrateColumn)
+                bitrate = cursor.getInt(bitrateColumn),
+                palette = palette
             )
         }
     }

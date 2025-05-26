@@ -13,8 +13,8 @@ interface MediaStoreRepository {
     suspend fun getAlbumSongs(albumId: Long): Flow<List<SongModel>>
 
     suspend fun cacheSong(songModel: SongModel)
-    suspend fun cacheAllAlbums()
-    suspend fun cacheAllArtists()
+    suspend fun cacheAlbum(albumModel: AlbumModel)
+    suspend fun cacheArtist(artistModel: ArtistModel)
 
     suspend fun updateSongRecord(
         songId: Long,

@@ -15,7 +15,8 @@ fun SongModel.toEntity(): SongModelEntity {
         duration = duration,
         songPath = songPath,
         artUri = artUri,
-        bitrate = bitrate
+        bitrate = bitrate,
+        palette = palette
     )
 }
 
@@ -31,7 +32,8 @@ fun SongModelEntity.toDomain(): SongModel {
         duration = duration,
         songPath = songPath,
         artUri = artUri,
-        bitrate = bitrate
+        bitrate = bitrate,
+        palette = palette
     )
 }
 

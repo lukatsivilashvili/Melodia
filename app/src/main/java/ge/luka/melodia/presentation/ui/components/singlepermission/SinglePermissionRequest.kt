@@ -42,6 +42,8 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import ge.luka.melodia.common.extensions.getScreenFromRoute
 import ge.luka.melodia.common.mvi.CollectSideEffects
+import ge.luka.melodia.domain.model.AlbumModel
+import ge.luka.melodia.domain.model.ArtistModel
 import ge.luka.melodia.domain.model.SongModel
 import ge.luka.melodia.presentation.ui.screens.MelodiaScreen
 import kotlinx.coroutines.launch
@@ -71,16 +73,17 @@ fun SinglePermissionRequest(
     }
 
     val permission =
-        rememberPermissionState(permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.READ_MEDIA_AUDIO
-        else Manifest.permission.READ_EXTERNAL_STORAGE, onPermissionResult = { granted ->
-            if (granted) {
-                try {
-                    folderPickerLauncher.launch(null)
-                } catch (e: Exception) {
-                    Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+        rememberPermissionState(
+            permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.READ_MEDIA_AUDIO
+            else Manifest.permission.READ_EXTERNAL_STORAGE, onPermissionResult = { granted ->
+                if (granted) {
+                    try {
+                        folderPickerLauncher.launch(null)
+                    } catch (e: Exception) {
+                        Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
                 }
-            }
-        })
+            })
 
     CollectSideEffects(flow = viewModel.sideEffect) { effect ->
         if (effect is PermissionSideEffect.PermissionGranted) {
@@ -90,7 +93,9 @@ fun SinglePermissionRequest(
 
     if (showSongScanDialog.value) {
         ScanProgressDialog(
-            scannedSongs = uiState.scanningState,
+            scannedSongs = uiState.scanningSongState,
+            scannedAlbums = uiState.scanningAlbumState,
+            scannedArtists = uiState.scanningArtistState,
             onDismiss = {
                 onUpdateRoute(MelodiaScreen.Library.toString().getScreenFromRoute())
                 navHostController.navigate(MelodiaScreen.Library)
@@ -134,6 +139,8 @@ fun SinglePermissionRequest(
 fun ScanProgressDialog(
     modifier: Modifier = Modifier,
     scannedSongs: List<SongModel>,
+    scannedAlbums: List<AlbumModel>,
+    scannedArtists: List<ArtistModel>,
     onDismiss: () -> Unit,
     isButtonEnabled: Boolean
 ) {
@@ -142,23 +149,36 @@ fun ScanProgressDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(onClick = onDismiss, enabled = isButtonEnabled) {
-                Text("Dismiss")
+                if (isButtonEnabled) Text("Finish") else Text("Dismiss")
             }
         },
-        title = { Text("Scanning for Songs") },
+        title = {
+            when {
+                scannedSongs.isNotEmpty() -> Text("Scanning for Songs")
+                scannedAlbums.isNotEmpty() -> Text("Scanning for Albums")
+                scannedArtists.isNotEmpty() -> Text("Scanning for Artists")
+                else -> Text("Finished scanning!")
+            }
+        },
         text = {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 24.dp)
             ) {
-                CircularProgressIndicator(modifier = modifier.align(Alignment.CenterHorizontally))
+                if (isButtonEnabled.not()) CircularProgressIndicator(
+                    modifier = modifier.align(
+                        Alignment.CenterHorizontally
+                    )
+                )
                 Text(
                     modifier = Modifier.padding(top = 16.dp),
                     text = "Last found: ${scannedSongs.lastOrNull()?.title ?: "No songs found"}",
                     maxLines = 1
                 )
-                Text(text = "Total found: ${scannedSongs.size}")
+                Text(text = "Songs found: ${scannedSongs.size}")
+                Text(text = "Albums found: ${scannedAlbums.size}")
+                Text(text = "Artists found: ${scannedArtists.size}")
             }
         }
     )
@@ -166,7 +186,8 @@ fun ScanProgressDialog(
 
 @Composable
 private fun RationaleDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
-    AlertDialog(onDismissRequest = onDismiss,
+    AlertDialog(
+        onDismissRequest = onDismiss,
         title = { Text("Permission Required", fontWeight = FontWeight.Bold, fontSize = 16.sp) },
         text = { Text("To access your media files, please grant storage permission.") },
         confirmButton = {

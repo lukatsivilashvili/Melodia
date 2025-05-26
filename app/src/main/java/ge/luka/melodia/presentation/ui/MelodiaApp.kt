@@ -36,7 +36,7 @@ import ge.luka.melodia.R
 import ge.luka.melodia.common.extensions.copy
 import ge.luka.melodia.common.extensions.getScreenFromRoute
 import ge.luka.melodia.common.utils.Utils
-import ge.luka.melodia.presentation.ui.components.bottomplayer.BarState
+import ge.luka.melodia.presentation.ui.components.shared.BarState
 import ge.luka.melodia.presentation.ui.screens.MelodiaScreen
 import ge.luka.melodia.presentation.ui.screens.nowplaying.NowPlaying
 import ge.luka.melodia.presentation.ui.theme.MelodiaThemeWithViewModel
