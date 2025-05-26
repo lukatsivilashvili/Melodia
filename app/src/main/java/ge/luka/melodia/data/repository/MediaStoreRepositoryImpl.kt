@@ -1,9 +1,7 @@
 package ge.luka.melodia.data.repository
 
-import android.content.Context
 import ge.luka.melodia.common.transformers.toDomain
 import ge.luka.melodia.common.transformers.toEntity
-import ge.luka.melodia.data.MediaStoreLoader
 import ge.luka.melodia.data.database.dao.AlbumsDao
 import ge.luka.melodia.data.database.dao.ArtistsDao
 import ge.luka.melodia.data.database.dao.SongsDao
@@ -15,14 +13,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class MediaStoreRepositoryImpl @Inject constructor(
-    private val mediaStoreLoader: MediaStoreLoader,
     private val songsDao: SongsDao,
     private val albumsDao: AlbumsDao,
     private val artistsDao: ArtistsDao,
-    private val context: Context
 ) : MediaStoreRepository {
 
     override suspend fun getAllSongs(): Flow<List<SongModel>> {
@@ -55,19 +52,19 @@ class MediaStoreRepositoryImpl @Inject constructor(
             .flowOn(Dispatchers.IO)
     }
 
-    override suspend fun cacheSong(songModel: SongModel) {
+    override suspend fun cacheSong(songModel: SongModel) = withContext(Dispatchers.IO) {
         val song = songModel.toEntity()
         songsDao.insertSingleSong(song)
     }
 
-    override suspend fun cacheAllAlbums() {
-        val albums = mediaStoreLoader.getAlbumList(context).map { it.toEntity() }
-        albumsDao.insertAllAlbums(albums)
+    override suspend fun cacheAlbum(albumModel: AlbumModel) = withContext(Dispatchers.IO) {
+        val album = albumModel.toEntity()
+        albumsDao.insertSingleAlbum(album)
     }
 
-    override suspend fun cacheAllArtists() {
-        val artists = mediaStoreLoader.getArtistsList(context).map { it.toEntity() }
-        artistsDao.insertAllArtists(artists)
+    override suspend fun cacheArtist(artistModel: ArtistModel) = withContext(Dispatchers.IO) {
+        val artist = artistModel.toEntity()
+        artistsDao.insertSingleArtist(artist)
     }
 
     override suspend fun updateSongRecord(
@@ -76,11 +73,10 @@ class MediaStoreRepositoryImpl @Inject constructor(
         artist: String?,
         album: String?,
         artUri: String?,
-    ): Boolean {
+    ): Boolean = withContext(Dispatchers.IO) {
         if (album != null && !albumsDao.doesAlbumExist(album)) {
-            return false // Abort the update since the album doesn't exist
+            return@withContext false
         }
-
         val albumId = album?.let { albumsDao.getAlbumIdByName(it) }
         val artistId = artist?.let { artistsDao.getArtistIdByName(it) }
 
@@ -91,10 +87,9 @@ class MediaStoreRepositoryImpl @Inject constructor(
             album = album,
             artUri = artUri
         )
-
         songsDao.updateSongIdsById(songId = songId, albumId = albumId, artistId = artistId)
 
-        return true
+        return@withContext true
     }
 
     override suspend fun updateAlbumRecord(
@@ -103,7 +98,7 @@ class MediaStoreRepositoryImpl @Inject constructor(
         title: String,
         artist: String?,
         artUri: String?
-    ): Boolean {
+    ): Boolean = withContext(Dispatchers.IO) {
         albumsDao.updateAlbumById(
             albumId = albumId,
             title = title,
@@ -112,6 +107,6 @@ class MediaStoreRepositoryImpl @Inject constructor(
         )
         artistsDao.updateArtistArt(artistId, artUri)
         songsDao.updateSongArtByAlbumId(albumId, artUri)
-        return true
+        return@withContext true
     }
 }

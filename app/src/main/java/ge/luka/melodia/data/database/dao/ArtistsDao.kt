@@ -12,6 +12,9 @@ interface ArtistsDao {
     @Upsert
     suspend fun insertAllArtists(artists: List<ArtistModelEntity>)
 
+    @Upsert
+    suspend fun insertSingleArtist(artist: ArtistModelEntity)
+
     @Query("SELECT * FROM allArtists ORDER BY title ASC")
     fun getAllArtistsOrderedByTitle(): Flow<List<ArtistModelEntity>>
 

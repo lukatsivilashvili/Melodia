@@ -1,4 +1,4 @@
-package ge.luka.melodia.presentation.ui.components.bottomplayer
+package ge.luka.melodia.presentation.ui.components.shared
 
 
 import androidx.compose.animation.core.Animatable
@@ -38,9 +38,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ge.luka.melodia.domain.model.PlayerState
 import ge.luka.melodia.domain.model.SongModel
-import ge.luka.melodia.presentation.ui.components.shared.CrossFadingAlbumArt
-import ge.luka.melodia.presentation.ui.components.shared.ErrorPainterType
-import ge.luka.melodia.presentation.ui.components.shared.TransparentSurface
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 
